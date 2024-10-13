@@ -92,6 +92,9 @@ fun LoginScreen(navController: NavController) {
                         fontSize = 20.sp
                     ))
                 }
+//                Image(
+//                    painter = painterResource(R.drawable.loginimage2),
+//                    contentDescription = null)
             }
 
         }

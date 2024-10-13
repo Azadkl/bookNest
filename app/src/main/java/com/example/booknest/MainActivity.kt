@@ -39,7 +39,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            BookNestTheme {
+            BookNestTheme(darkTheme = false) {
 
                 Scaffold(modifier = Modifier.fillMaxSize()
                 ) {contentPadding->
@@ -58,7 +58,8 @@ fun NavigationExample(){
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = "home") {
         composable("home"){ LoginScreen(navController) }
-        composable("SignIn"){ SignInScreen() }
+        composable("SignIn"){ SignInScreen(navController) }
         composable("SignUp"){ SignUpScreen(navController) }
+        composable("HomePage"){ HomePageScreen() }
     }
 }

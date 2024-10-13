@@ -41,6 +41,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextStyle
@@ -76,6 +78,9 @@ fun SignUpScreen(navController: NavController) {
 
         }
         val focusManager = LocalFocusManager.current
+        val usernameFocusRequester = remember { FocusRequester() }
+        val emailFocusRequester = remember { FocusRequester() }
+        val passwordFocusRequester = remember { FocusRequester() }
         var username by remember { mutableStateOf("") }
         var email by remember { mutableStateOf("") }
         var password by remember { mutableStateOf("") }
@@ -97,7 +102,7 @@ fun SignUpScreen(navController: NavController) {
                     .padding(top = 50.dp)
                     .size(width = 355.dp,height=55.dp)
                     .border(width =0.dp, color = Color.Transparent )
-                    .focusable(),
+                    .focusRequester(usernameFocusRequester),
                 shape= RoundedCornerShape(15.dp),
                 colors = TextFieldDefaults.colors(
                     focusedIndicatorColor = Color.Transparent,
@@ -109,7 +114,7 @@ fun SignUpScreen(navController: NavController) {
                 ),
                 keyboardActions = KeyboardActions(
                     onNext = {
-                        focusManager.moveFocus(FocusDirection.Next)
+                        emailFocusRequester.requestFocus()
                     }
                 )
             )
@@ -121,7 +126,7 @@ fun SignUpScreen(navController: NavController) {
                     .padding(top = 30.dp)
                     .size(width = 355.dp,height=55.dp)
                     .border(width =0.dp, color = Color.Transparent )
-                    .focusable(),
+                    .focusRequester(emailFocusRequester),
                 shape= RoundedCornerShape(15.dp),
                 colors = TextFieldDefaults.colors(
                     focusedIndicatorColor = Color.Transparent,
@@ -133,7 +138,7 @@ fun SignUpScreen(navController: NavController) {
                 ),
                 keyboardActions = KeyboardActions(
                     onNext = {
-                        focusManager.moveFocus(FocusDirection.Down)
+                        passwordFocusRequester.requestFocus()
                     }
                 )
             )
@@ -145,6 +150,7 @@ fun SignUpScreen(navController: NavController) {
                     .padding(top = 30.dp)
                     .size(width = 355.dp,height=55.dp)
                     .border(width =0.dp, color = Color.Transparent )
+                    .focusRequester(passwordFocusRequester)
                 ,
                 shape= RoundedCornerShape(15.dp),
                 colors = TextFieldDefaults.colors(
@@ -162,6 +168,11 @@ fun SignUpScreen(navController: NavController) {
                 keyboardOptions = KeyboardOptions(
                     imeAction = ImeAction.Done
                 ),
+                keyboardActions = KeyboardActions(
+                    onDone = {
+                        focusManager.clearFocus()
+                    }
+                )
             )
             Row(
                 verticalAlignment = Alignment.CenterVertically,

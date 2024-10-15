@@ -60,8 +60,13 @@ import com.example.booknest.ui.theme.ButtonColor2
 
 @Composable
 fun SignInScreen(navController: NavController) {
+    val image: Painter = painterResource(id = R.drawable.loginimage)
+    val focusManager = LocalFocusManager.current
+    var errorMessage by remember { mutableStateOf("") }
+    var username by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var passwordVisible by remember { mutableStateOf(false) }
     Box (modifier = Modifier.fillMaxSize()){
-        val image: Painter = painterResource(id = R.drawable.loginimage)
         Image(
             painter = image,
             contentDescription = "My Image",
@@ -72,6 +77,8 @@ fun SignInScreen(navController: NavController) {
             modifier = Modifier.fillMaxHeight(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+
+
             Row(
                 modifier = Modifier.fillMaxWidth().padding(top = 100.dp, bottom = 150.dp),
                 horizontalArrangement = Arrangement.Center,
@@ -89,10 +96,6 @@ fun SignInScreen(navController: NavController) {
                 )
 
             }
-            val focusManager = LocalFocusManager.current
-            var username by remember { mutableStateOf("") }
-            var password by remember { mutableStateOf("") }
-            var passwordVisible by remember { mutableStateOf(false) }
             Column(
                 modifier = Modifier.fillMaxSize()
                     .clip(RoundedCornerShape(topStart = 80.dp, topEnd = 80.dp))
@@ -106,6 +109,7 @@ fun SignInScreen(navController: NavController) {
                     ),
                     modifier = Modifier.padding(top = 30.dp)
                 )
+
                 OutlinedTextField(
                     value = username,
                     placeholder = { Text("E-mail") },
@@ -166,8 +170,12 @@ fun SignInScreen(navController: NavController) {
                         imeAction = ImeAction.Done
                     ),
                 )
+                ErrorMessage(errorMessage)
                 Button(
                     onClick = {
+                        /*if (username.isEmpty()||password.isEmpty()){
+                            errorMessage = "Please enter e-mail and password.}"*/
+
                         navController.navigate("HomePage")
                     },
                     modifier = Modifier.padding(top = 40.dp).size(width = 280.dp, height = 40.dp),
@@ -192,5 +200,15 @@ fun SignInScreen(navController: NavController) {
 
 
         }
+    }
+
+}
+@Composable
+fun ErrorMessage(errorMessage: String){
+    if (errorMessage.isNotEmpty()){
+        Text(
+            text= errorMessage,
+            color = Color.Red,
+        )
     }
 }

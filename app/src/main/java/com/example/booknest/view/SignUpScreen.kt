@@ -1,31 +1,32 @@
-package com.example.booknest
+package com.example.booknest.view
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material.icons.outlined.Lock
+import androidx.compose.material.icons.outlined.Mail
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
@@ -39,7 +40,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
@@ -51,22 +53,16 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.max
-import androidx.compose.ui.unit.min
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.booknest.R
 import com.example.booknest.ui.theme.ButtonColor1
 import com.example.booknest.ui.theme.ButtonColor2
 
 @Composable
-fun SignInScreen(navController: NavController) {
-    val image: Painter = painterResource(id = R.drawable.loginimage)
-    val focusManager = LocalFocusManager.current
-    var errorMessage by remember { mutableStateOf("") }
-    var username by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var passwordVisible by remember { mutableStateOf(false) }
-    Box (modifier = Modifier.fillMaxSize()){
+fun SignUpScreen(navController: NavController) {
+    Box (modifier = Modifier.fillMaxSize()) {
+        val image: Painter = painterResource(id = R.drawable.loginimage)
         Image(
             painter = image,
             contentDescription = "My Image",
@@ -75,12 +71,11 @@ fun SignInScreen(navController: NavController) {
         )
         Column(
             modifier = Modifier.fillMaxHeight(),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
-
-
             Row(
-                modifier = Modifier.fillMaxWidth().padding(top = 100.dp, bottom = 150.dp),
+                modifier = Modifier.fillMaxWidth().padding(top = 50.dp),
                 horizontalArrangement = Arrangement.Center,
             ) {
                 Text(
@@ -96,29 +91,36 @@ fun SignInScreen(navController: NavController) {
                 )
 
             }
+            val focusManager = LocalFocusManager.current
+            val usernameFocusRequester = remember { FocusRequester() }
+            val emailFocusRequester = remember { FocusRequester() }
+            val passwordFocusRequester = remember { FocusRequester() }
+            var username by remember { mutableStateOf("") }
+            var email by remember { mutableStateOf("") }
+            var password by remember { mutableStateOf("") }
+            var passwordVisible by remember { mutableStateOf(false) }
             Column(
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = 25.dp)
                     .clip(RoundedCornerShape(topStart = 80.dp, topEnd = 80.dp))
-                    .background(ButtonColor2),
+                    .background(ButtonColor1),
                 horizontalAlignment = Alignment.CenterHorizontally
-            )
-            {
+            ) {
                 Text(
-                    "Sign in", style = TextStyle(
-                        fontSize = 40.sp
-                    ),
-                    modifier = Modifier.padding(top = 30.dp)
+                    "Create Account", style = TextStyle(
+                        fontSize = 25.sp
+                    ), modifier = Modifier.padding(top = 30.dp)
                 )
-
                 OutlinedTextField(
                     value = username,
-                    placeholder = { Text("E-mail") },
+                    placeholder = { Text("First and last name") },
                     onValueChange = { username = it },
                     modifier = Modifier
                         .padding(top = 50.dp)
                         .size(width = 355.dp, height = 55.dp)
                         .border(width = 0.dp, color = Color.Transparent)
-                        .focusable(),
+                        .focusRequester(usernameFocusRequester),
                     shape = RoundedCornerShape(15.dp),
                     colors = TextFieldDefaults.colors(
                         focusedIndicatorColor = Color.Transparent,
@@ -135,7 +137,36 @@ fun SignInScreen(navController: NavController) {
                     ),
                     keyboardActions = KeyboardActions(
                         onNext = {
-                            focusManager.moveFocus(FocusDirection.Down)
+                            emailFocusRequester.requestFocus()
+                        }
+                    )
+                )
+                OutlinedTextField(
+                    value = email,
+                    placeholder = { Text("Your email addres") },
+                    onValueChange = { email = it },
+                    modifier = Modifier
+                        .padding(top = 30.dp)
+                        .size(width = 355.dp, height = 55.dp)
+                        .border(width = 0.dp, color = Color.Transparent)
+                        .focusRequester(emailFocusRequester),
+                    shape = RoundedCornerShape(15.dp),
+                    colors = TextFieldDefaults.colors(
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent,
+                    ),
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Outlined.Mail,
+                            contentDescription = null
+                        )
+                    },
+                    keyboardOptions = KeyboardOptions(
+                        imeAction = ImeAction.Next
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onNext = {
+                            passwordFocusRequester.requestFocus()
                         }
                     )
                 )
@@ -144,9 +175,10 @@ fun SignInScreen(navController: NavController) {
                     placeholder = { Text("Booknest password") },
                     onValueChange = { password = it },
                     modifier = Modifier
-                        .padding(top = 25.dp)
+                        .padding(top = 30.dp)
                         .size(width = 355.dp, height = 55.dp)
-                        .border(width = 0.dp, color = Color.Transparent),
+                        .border(width = 0.dp, color = Color.Transparent)
+                        .focusRequester(passwordFocusRequester),
                     shape = RoundedCornerShape(15.dp),
                     colors = TextFieldDefaults.colors(
                         focusedIndicatorColor = Color.Transparent,
@@ -169,43 +201,74 @@ fun SignInScreen(navController: NavController) {
                     keyboardOptions = KeyboardOptions(
                         imeAction = ImeAction.Done
                     ),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            focusManager.clearFocus()
+                        }
+                    )
                 )
-                ErrorMessage(errorMessage)
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.ErrorOutline,
+                        contentDescription = "Error",
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = "Passwords must be at least 6 characters.",
+
+                        )
+
+                }
                 Button(
-                    onClick = {
-                        navController.navigate("login")
-                    },
+                    onClick = {},
                     modifier = Modifier.padding(top = 40.dp).size(width = 280.dp, height = 40.dp),
                     shape = RoundedCornerShape(5.dp),
-                    colors = ButtonDefaults.buttonColors(ButtonColor1)
+                    colors = ButtonDefaults.buttonColors(ButtonColor2)
 
                 ) {
                     Text(
-                        "Sign in", style = TextStyle(
+                        "Create account", style = TextStyle(
                             fontSize = 20.sp
                         )
                     )
                 }
-                Text("Forgot your password?", style = TextStyle(
-                    fontSize = 20.sp
-                ),
-                    modifier = Modifier
-                        .padding(top = 20.dp)
-                        .clickable { })
+                Spacer(modifier = Modifier.padding(20.dp))
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
 
+                    ) {
+                    Divider(
+                        color = Color.Black,
+                        modifier = Modifier.weight(1f)
+                    )
+                    Text(
+                        text = "Already have an account?",
+                        modifier = Modifier.padding(horizontal = 16.dp)
+                    )
+                    Divider(
+                        color = Color.Black,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+                Button(
+                    onClick = {
+                        navController.navigate("SignIn")
+                    },
+                    modifier = Modifier.padding(top = 10.dp).size(width = 280.dp, height = 40.dp),
+                    shape = RoundedCornerShape(5.dp),
+                    colors = ButtonDefaults.buttonColors(ButtonColor2)
+
+                ) {
+                    Text(
+                        "Sign-In now", style = TextStyle(
+                            fontSize = 20.sp
+                        )
+                    )
+                }
             }
-
-
         }
-    }
-
-}
-@Composable
-fun ErrorMessage(errorMessage: String){
-    if (errorMessage.isNotEmpty()){
-        Text(
-            text= errorMessage,
-            color = Color.Red,
-        )
     }
 }

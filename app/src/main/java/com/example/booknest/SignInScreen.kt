@@ -173,10 +173,7 @@ fun SignInScreen(navController: NavController) {
                 ErrorMessage(errorMessage)
                 Button(
                     onClick = {
-                        /*if (username.isEmpty()||password.isEmpty()){
-                            errorMessage = "Please enter e-mail and password.}"*/
-
-                        navController.navigate("HomePage")
+                        navController.navigate("login")
                     },
                     modifier = Modifier.padding(top = 40.dp).size(width = 280.dp, height = 40.dp),
                     shape = RoundedCornerShape(5.dp),
@@ -189,7 +186,7 @@ fun SignInScreen(navController: NavController) {
                         )
                     )
                 }
-                Text("Forgot your password ?", style = TextStyle(
+                Text("Forgot your password?", style = TextStyle(
                     fontSize = 20.sp
                 ),
                     modifier = Modifier

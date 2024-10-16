@@ -25,6 +25,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.internal.composableLambda
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -64,12 +65,10 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun NavigationExample(){
     val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = "home") {
-        composable("home"){ LoginScreen(navController) }
+    NavHost(navController = navController, startDestination = "login") {
+        composable("login"){ LoginScreen(navController) }
         composable("SignIn"){ SignInScreen(navController) }
         composable("SignUp"){ SignUpScreen(navController) }
-        composable("HomePage"){ HomePageScreen(navController) }
-        composable("Profile"){ ProfileScreen(navController) }
 
     }
 }

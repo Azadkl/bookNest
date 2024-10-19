@@ -103,7 +103,7 @@ fun SignUpScreen(navController: NavController) {
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(top = 25.dp)
-                    .clip(RoundedCornerShape(topStart = 80.dp, topEnd = 80.dp))
+                    .clip(RoundedCornerShape(topStart = 60.dp, topEnd = 60.dp))
                     .background(ButtonColor1),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {

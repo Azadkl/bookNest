@@ -25,7 +25,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            BookNestTheme(darkTheme = false) {
+            BookNestTheme() {
 
                 Scaffold(modifier = Modifier.fillMaxSize()
                 ) {contentPadding->

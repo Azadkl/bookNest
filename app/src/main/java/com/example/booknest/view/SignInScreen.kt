@@ -95,7 +95,7 @@ fun SignInScreen(navController: NavController) {
             }
             Column(
                 modifier = Modifier.fillMaxSize()
-                    .clip(RoundedCornerShape(topStart = 80.dp, topEnd = 80.dp))
+                    .clip(RoundedCornerShape(topStart = 60.dp, topEnd = 60.dp))
                     .background(ButtonColor2),
                 horizontalAlignment = Alignment.CenterHorizontally
             )

@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
@@ -42,8 +43,10 @@ fun BottomBarScreen(navController: NavController,modifier: Modifier=Modifier) {
     val navItemList = listOf(
         NavItem("Home", Icons.Default.Home),
         NavItem("Profile", Icons.Default.Person),
-        NavItem("Notifications", Icons.Default.Notifications),
-        NavItem("Settings", Icons.Default.Settings)
+        NavItem("Notificatio", Icons.Default.Notifications),
+        NavItem("MyBooks", Icons.Default.Book),
+        NavItem("Settings", Icons.Default.Settings),
+
     )
     val contentPadding = PaddingValues(0.dp)
     var selectedIndex by remember { mutableIntStateOf(0) }
@@ -57,7 +60,7 @@ fun BottomBarScreen(navController: NavController,modifier: Modifier=Modifier) {
             ){
             NavigationBar(
                 modifier=Modifier.fillMaxWidth().height(90.dp),
-                containerColor = ButtonColor1,) {
+                containerColor = Color.White,) {
                 navItemList.forEachIndexed { index, navItem ->
                     NavigationBarItem(
                         modifier = Modifier.padding(top = 30.dp),
@@ -103,8 +106,9 @@ fun BottomBarScreen(navController: NavController,modifier: Modifier=Modifier) {
 fun ContentScreen(modifier: Modifier=Modifier,selectedIndex : Int) {
     when (selectedIndex) {
         0-> HomePageScreen()
-        1 -> ProfileScreen() // Profile Screen
-        2 -> NotificationsScreen() // Notifications Screen
-        3 -> SettingsScreen() // Settings Screen
+        1 -> ProfileScreen()
+        2 -> NotificationsScreen()
+        3 -> MyBooksPage()
+        4 -> SettingsScreen()
     }
 }

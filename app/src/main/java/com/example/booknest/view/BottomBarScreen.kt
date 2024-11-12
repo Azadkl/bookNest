@@ -34,6 +34,9 @@ import androidx.compose.ui.graphics.DefaultShadowColor
 import androidx.compose.ui.graphics.vector.DefaultTintColor
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.example.booknest.NavItem
 import com.example.booknest.ui.theme.ButtonColor1
 import com.example.booknest.ui.theme.PrimaryColor
@@ -49,6 +52,7 @@ fun BottomBarScreen(navController: NavController,modifier: Modifier=Modifier) {
 
     )
     val contentPadding = PaddingValues(0.dp)
+    var navController = rememberNavController()
     var selectedIndex by remember { mutableIntStateOf(0) }
     Scaffold (
         bottomBar = {
@@ -67,6 +71,13 @@ fun BottomBarScreen(navController: NavController,modifier: Modifier=Modifier) {
                         selected = selectedIndex == index,
                         onClick = {
                             selectedIndex = index
+                            when (index) {
+                                0 -> navController.navigate("Home") // Home sayfasına yönlendir
+                                1 -> navController.navigate("profile") // Profile sayfasına yönlendir
+                                2 -> navController.navigate("notifications") // Notifications sayfasına yönlendir
+                                3 -> navController.navigate("myBooks") // MyBooks sayfasına yönlendir
+                                4 -> navController.navigate("settings") // Settings sayfasına yönlendir
+                            }
                         },
                         icon = {
                             Icon(imageVector = navItem.icon, contentDescription = "home")
@@ -96,7 +107,13 @@ fun BottomBarScreen(navController: NavController,modifier: Modifier=Modifier) {
                 .padding(contentPadding),
             color = PrimaryColor
         ) {
-            ContentScreen(modifier= Modifier.padding(contentPadding),selectedIndex)
+            NavHost(navController = navController, startDestination = "Home") {
+                composable("Home") { HomePageScreen() }
+                composable("profile") { ProfileScreen() }
+                composable("notifications") { NotificationsScreen() }
+                composable("myBooks") { MyBooksPage() }
+                composable("settings") { SettingsScreen() }
+            }
 
         }
     }

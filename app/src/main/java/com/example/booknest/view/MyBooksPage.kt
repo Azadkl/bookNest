@@ -2,6 +2,7 @@ package com.example.booknest.view
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -30,6 +31,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Divider
+import androidx.compose.material3.DividerDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -46,10 +49,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ModifierInfo
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.booknest.Book
@@ -58,49 +63,8 @@ import com.example.booknest.ui.theme.ButtonColor1
 
 @Composable
 fun MyBooksPage(modifier: Modifier=Modifier) {
+
     var search by remember { mutableStateOf("") }
-    val focusManager = LocalFocusManager.current
-    val books = listOf(
-        Book(
-            title = "Deneme",
-            author = "Deneme",
-            image = ""
-        ),
-        Book(
-            title = "Deneme",
-            author = "Deneme Deneme",
-            image = ""
-        ),
-        Book(
-            title = "Deneme",
-            author = "Deneme",
-            image = ""
-        )
-    )
-    val wantToReadBooks = listOf(
-        Book(
-            title = "Deneme",
-            author = "Deneme",
-            image = ""
-        ),
-        Book(
-            title = "Deneme",
-            author = "Deneme",
-            image = ""
-        ),
-        Book(
-            title = "Deneme",
-            author = "Deneme",
-            image = ""
-        ),
-    )
-
-    val currentlyReadingBook = Book(
-        title = "Deneme",
-        author = "Deneme",
-        image = ""
-    )
-
 
 
     Column (modifier= Modifier.fillMaxHeight(),
@@ -108,18 +72,18 @@ fun MyBooksPage(modifier: Modifier=Modifier) {
         ){
         OutlinedTextField(
             value = search,
-            placeholder = { Text("Search my books") },
+            placeholder = { Text("Search my books",modifier=Modifier.align(Alignment.CenterHorizontally)) },
             onValueChange = { search = it },
             modifier = Modifier
-                .padding(top = 10.dp, bottom = 25.dp)
-                .size(width = 355.dp, height = 55.dp)
+                .padding(top = 20.dp, bottom = 20.dp)
+                .size(width = 320.dp, height = 56.dp)
                 .border(width = 0.dp, color = Color.Transparent)
                 .focusable(),
-            shape = RoundedCornerShape(15.dp),
+            shape = RoundedCornerShape(20.dp),
 
             colors = TextFieldDefaults.colors(
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent,
+                focusedIndicatorColor = Color.DarkGray,
+                unfocusedIndicatorColor = Color.DarkGray,
             ),
             leadingIcon = {
                 Icon(
@@ -132,94 +96,72 @@ fun MyBooksPage(modifier: Modifier=Modifier) {
             ),
 
         )
-        Row (modifier=Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceAround,
-            verticalAlignment = Alignment.CenterVertically){
-            Text(text = "Books I've Read",style = MaterialTheme.typography.headlineSmall)
-            IconButton(onClick = {},
-                modifier=Modifier.size(35.dp)) {
-                Icon(
-                    imageVector = Icons.Outlined.Edit,
-                    contentDescription = "Edit Icon",
-                    modifier = Modifier.size(25.dp),
-                    tint = Color.Black
-                )
+
+
+
+        Column (modifier=Modifier.fillMaxHeight().fillMaxWidth().padding(start = 15.dp),
+            horizontalAlignment = Alignment.Start){
+            Row (modifier=Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween){
+                BookCard(onClick = {})
+                Text(text="Books I've Read",modifier=Modifier.padding(end = 50.dp), style = TextStyle(fontSize = 25.sp))
+            }
+
+            Spacer(modifier = Modifier.padding(8.dp))
+            Divider(
+                color = Color.Black,
+                modifier = Modifier.fillMaxWidth().padding(end = 30.dp),
+                thickness = 1.dp
+            )
+            Spacer(modifier = Modifier.padding(8.dp))
+            Row (modifier=Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween){
+                BookCard(onClick = {})
+                Text(text="Books I Want to Read", modifier = Modifier.padding(end = 20.dp),style = TextStyle(fontSize = 25.sp))
+            }
+            Spacer(modifier = Modifier.padding(8.dp))
+            Divider(
+                color = Color.Black,
+                modifier = Modifier.fillMaxWidth().padding(end = 30.dp),
+                thickness = 1.dp
+            )
+            Spacer(modifier = Modifier.padding(8.dp))
+            Row (modifier=Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween){
+                BookCard(onClick = {})
+                Text(text="Currently Reading", modifier=Modifier.padding(end = 30.dp),style = TextStyle(fontSize = 25.sp))
             }
         }
 
-        BookList(books = books, modifier = Modifier.size(255.dp, 155.dp))
 
-        Spacer(modifier = Modifier.height(16.dp))
-        Row(modifier=Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceAround,
-            verticalAlignment = Alignment.CenterVertically) {
-            Text(text = "Books I Want to Read", style = MaterialTheme.typography.headlineSmall)
-            IconButton(onClick = {},
-                modifier=Modifier.size(35.dp)) {
-                Icon(
-                    imageVector = Icons.Outlined.Edit,
-                    contentDescription = "Edit Icon",
-                    modifier = Modifier.size(25.dp),
-                    tint = Color.Black
-                )
-            }
-        }
-        BookList(books = wantToReadBooks, modifier = Modifier.size(255.dp, 155.dp))
 
-        Spacer(modifier = Modifier.height(16.dp))
-        Row (modifier=Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceAround,
-            verticalAlignment = Alignment.CenterVertically){
-            Text(text = "Currently Reading", style = MaterialTheme.typography.headlineSmall)
-            IconButton(onClick = {},
-                modifier=Modifier.size(35.dp)) {
-                Icon(
-                    imageVector = Icons.Outlined.Edit,
-                    contentDescription = "Edit Icon",
-                    modifier = Modifier.size(25.dp),
-                    tint = Color.Black
-                )
-            }
-        }
-        BookCard(book = currentlyReadingBook, modifier = Modifier.size(415.dp, 205.dp))
-    }
-}
+
+
+}}
 
 @Composable
-fun BookCard(modifier: Modifier=Modifier,book: Book){
+fun BookCard(onClick:()-> Unit){
         Card(
-            modifier = modifier
-                .padding(8.dp),
-            elevation = CardDefaults.cardElevation(4.dp)
+            modifier = Modifier
+                .width(130.dp)
+                .height(190.dp)
+                .clickable { onClick() },
+            elevation = CardDefaults.cardElevation(30.dp),
         ) {
-            Row(modifier = Modifier.fillMaxWidth().padding(8.dp),
+            Row(modifier = Modifier.fillMaxWidth()
+                .fillMaxHeight(),
                 verticalAlignment = Alignment.CenterVertically,) {
                 Image(
                     painter = painterResource(R.drawable.loginimage),
                     contentDescription = "Book Cover Image",
 
                 )
-                Spacer(modifier = Modifier.width(16.dp))
-                Column {
-                    Text(
-                        text = book.title,
-                        style = MaterialTheme.typography.headlineSmall
-                    )
-                    Text(
-                        text = "${book.author}",
-                        style = MaterialTheme.typography.bodyMedium
-                    )
 
-                }
             }
         }
 }
-@Composable
-fun BookList(modifier: Modifier=Modifier,books: List<Book>){
-    LazyRow (modifier = Modifier){
-        items(books){
-            book-> BookCard(book = book,modifier = Modifier.size(255.dp, 155.dp))
-        }
-    }
-}
+
 

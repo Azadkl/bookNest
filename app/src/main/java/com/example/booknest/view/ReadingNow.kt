@@ -12,11 +12,11 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 
 @Composable
-fun ReadingNow(navController: NavController) {
+fun ReadingNow() {
     Column (modifier= Modifier.fillMaxHeight(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center){
-        Text("Home Page", style = TextStyle(
+        Text("Reading Page", style = TextStyle(
             fontSize = 70.sp
         )
         )

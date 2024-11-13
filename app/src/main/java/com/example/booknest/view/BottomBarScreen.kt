@@ -113,19 +113,13 @@ fun BottomBarScreen(navController: NavController,modifier: Modifier=Modifier) {
                 composable("notifications") { NotificationsScreen() }
                 composable("myBooks") { MyBooksPage(navController) }
                 composable("settings") { SettingsScreen() }
+                composable("booksIveRead") { BooksIveRead() }
+                composable("booksIWantToRead") { ToRead() }
+                composable("currentlyReading") { ReadingNow() }
             }
 
         }
     }
     )
 }
-//@Composable
-//fun ContentScreen(modifier: Modifier=Modifier,selectedIndex : Int) {
-//    when (selectedIndex) {
-//        0-> HomePageScreen()
-//        1 -> ProfileScreen()
-//        2 -> NotificationsScreen()
-//        3 -> MyBooksPage()
-//        4 -> SettingsScreen()
-//    }
-//}
+

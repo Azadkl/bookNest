@@ -6,9 +6,11 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -37,6 +39,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
@@ -65,35 +69,32 @@ import androidx.navigation.compose.rememberNavController
 import com.example.booknest.Book
 import com.example.booknest.R
 import com.example.booknest.ui.theme.ButtonColor1
+import com.example.booknest.ui.theme.PrimaryColor
 
 @Composable
 fun MyBooksPage(navController: NavController, modifier: Modifier = Modifier) {
-
     var search by remember { mutableStateOf("") }
 
     Column(
-        modifier = Modifier.fillMaxHeight(),
+        modifier = Modifier
+            .fillMaxHeight()
+            .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         OutlinedTextField(
             value = search,
-            placeholder = { Text("Search my books", modifier = Modifier.align(Alignment.CenterHorizontally)) },
+            placeholder = { Text("Search my books") },
             onValueChange = { search = it },
             modifier = Modifier
-                .padding(top = 20.dp, bottom = 20.dp)
-                .size(width = 320.dp, height = 56.dp)
-                .border(width = 0.dp, color = Color.Transparent)
-                .focusable(),
+                .padding(vertical = 20.dp)
+                .size(width = 320.dp, height = 56.dp),
             shape = RoundedCornerShape(20.dp),
             colors = TextFieldDefaults.colors(
                 focusedIndicatorColor = Color.DarkGray,
                 unfocusedIndicatorColor = Color.DarkGray,
             ),
             leadingIcon = {
-                Icon(
-                    imageVector = Icons.Outlined.Search,
-                    contentDescription = null
-                )
+                Icon(imageVector = Icons.Outlined.Search, contentDescription = null)
             },
             keyboardOptions = KeyboardOptions(
                 imeAction = ImeAction.Search
@@ -102,7 +103,6 @@ fun MyBooksPage(navController: NavController, modifier: Modifier = Modifier) {
 
         Column(
             modifier = Modifier
-                .fillMaxHeight()
                 .fillMaxWidth()
                 .padding(start = 15.dp),
             horizontalAlignment = Alignment.Start
@@ -119,7 +119,6 @@ fun MyBooksPage(navController: NavController, modifier: Modifier = Modifier) {
                     style = TextStyle(fontSize = 25.sp)
                 )
             }
-
             Spacer(modifier = Modifier.padding(8.dp))
             Divider(
                 color = Color.Black,
@@ -136,11 +135,12 @@ fun MyBooksPage(navController: NavController, modifier: Modifier = Modifier) {
             ) {
                 BookCard(onClick = { navController.navigate("booksIWantToRead") })
                 Text(
-                    text = "Books I Want to Read",
+                    text = "Books I Want To Read",
                     modifier = Modifier.padding(end = 20.dp),
                     style = TextStyle(fontSize = 25.sp)
                 )
             }
+
             Spacer(modifier = Modifier.padding(8.dp))
             Divider(
                 color = Color.Black,
@@ -158,13 +158,15 @@ fun MyBooksPage(navController: NavController, modifier: Modifier = Modifier) {
                 BookCard(onClick = { navController.navigate("currentlyReading") })
                 Text(
                     text = "Currently Reading",
-                    modifier = Modifier.padding(end = 30.dp),
+                    modifier = Modifier.padding(end = 20.dp),
                     style = TextStyle(fontSize = 25.sp)
                 )
             }
+
         }
     }
 }
+
 
 @Composable
 fun BookCard(onClick: () -> Unit) {
@@ -189,15 +191,6 @@ fun BookCard(onClick: () -> Unit) {
     }
 }
 
-@Composable
-fun NavHostScreen(navController: NavHostController = rememberNavController()) {
-    NavHost(navController = navController, startDestination = "myBooksPage") {
-        composable("myBooksPage") { MyBooksPage(navController) }
-        composable("booksIveRead") { BooksIveRead(navController) }
-        composable("booksIWantToRead") { ToRead(navController) }
-        composable("currentlyReading") { ReadingNow(navController) }
-    }
-}
 
 
 

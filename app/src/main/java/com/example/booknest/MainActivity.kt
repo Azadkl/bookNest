@@ -10,15 +10,20 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.booknest.ui.theme.BookNestTheme
 import com.example.booknest.ui.theme.PrimaryColor
+import com.example.booknest.view.BooksIveRead
 import com.example.booknest.view.BottomBarScreen
 import com.example.booknest.view.LoginScreen
+import com.example.booknest.view.MyBooksPage
+import com.example.booknest.view.ReadingNow
 import com.example.booknest.view.SignInScreen
 import com.example.booknest.view.SignUpScreen
+import com.example.booknest.view.ToRead
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,13 +37,28 @@ class MainActivity : ComponentActivity() {
                     Surface(modifier = Modifier.fillMaxSize().padding(contentPadding),
                         color = PrimaryColor,
                     ) {
-                        NavigationExample()
+                            NavigationExample()
                     }
                 }
             }
         }
     }
 }
+
+//@Composable
+//fun NavHostScreen(navController: NavHostController = rememberNavController()) {
+//    NavHost(navController = navController, startDestination = "login") {
+//        composable("login") { LoginScreen(navController) }
+//        composable("SignIn") { SignInScreen(navController) }
+//        composable("SignUp") { SignUpScreen(navController) }
+//        composable("home") { BottomBarScreen(navController) }
+//        composable("myBooksPage") { MyBooksPage(navController) }
+//        composable("read") { BooksIveRead() }
+//        composable("want") { ToRead() }
+//        composable("reading") { ReadingNow() }
+//    }
+//}
+
 @Composable
 fun NavigationExample(){
     val navController = rememberNavController()

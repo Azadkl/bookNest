@@ -57,22 +57,27 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.example.booknest.Book
 import com.example.booknest.R
 import com.example.booknest.ui.theme.ButtonColor1
 
 @Composable
-fun MyBooksPage(modifier: Modifier=Modifier) {
+fun MyBooksPage(navController: NavController, modifier: Modifier = Modifier) {
 
     var search by remember { mutableStateOf("") }
 
-
-    Column (modifier= Modifier.fillMaxHeight(),
+    Column(
+        modifier = Modifier.fillMaxHeight(),
         horizontalAlignment = Alignment.CenterHorizontally,
-        ){
+    ) {
         OutlinedTextField(
             value = search,
-            placeholder = { Text("Search my books",modifier=Modifier.align(Alignment.CenterHorizontally)) },
+            placeholder = { Text("Search my books", modifier = Modifier.align(Alignment.CenterHorizontally)) },
             onValueChange = { search = it },
             modifier = Modifier
                 .padding(top = 20.dp, bottom = 20.dp)
@@ -80,7 +85,6 @@ fun MyBooksPage(modifier: Modifier=Modifier) {
                 .border(width = 0.dp, color = Color.Transparent)
                 .focusable(),
             shape = RoundedCornerShape(20.dp),
-
             colors = TextFieldDefaults.colors(
                 focusedIndicatorColor = Color.DarkGray,
                 unfocusedIndicatorColor = Color.DarkGray,
@@ -94,74 +98,108 @@ fun MyBooksPage(modifier: Modifier=Modifier) {
             keyboardOptions = KeyboardOptions(
                 imeAction = ImeAction.Search
             ),
-
         )
 
-
-
-        Column (modifier=Modifier.fillMaxHeight().fillMaxWidth().padding(start = 15.dp),
-            horizontalAlignment = Alignment.Start){
-            Row (modifier=Modifier.fillMaxWidth(),
+        Column(
+            modifier = Modifier
+                .fillMaxHeight()
+                .fillMaxWidth()
+                .padding(start = 15.dp),
+            horizontalAlignment = Alignment.Start
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween){
-                BookCard(onClick = {})
-                Text(text="Books I've Read",modifier=Modifier.padding(end = 50.dp), style = TextStyle(fontSize = 25.sp))
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                BookCard(onClick = { navController.navigate("booksIveRead") })
+                Text(
+                    text = "Books I've Read",
+                    modifier = Modifier.padding(end = 50.dp),
+                    style = TextStyle(fontSize = 25.sp)
+                )
             }
 
             Spacer(modifier = Modifier.padding(8.dp))
             Divider(
                 color = Color.Black,
-                modifier = Modifier.fillMaxWidth().padding(end = 30.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(end = 30.dp),
                 thickness = 1.dp
             )
             Spacer(modifier = Modifier.padding(8.dp))
-            Row (modifier=Modifier.fillMaxWidth(),
+            Row(
+                modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween){
-                BookCard(onClick = {})
-                Text(text="Books I Want to Read", modifier = Modifier.padding(end = 20.dp),style = TextStyle(fontSize = 25.sp))
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                BookCard(onClick = { navController.navigate("booksIWantToRead") })
+                Text(
+                    text = "Books I Want to Read",
+                    modifier = Modifier.padding(end = 20.dp),
+                    style = TextStyle(fontSize = 25.sp)
+                )
             }
             Spacer(modifier = Modifier.padding(8.dp))
             Divider(
                 color = Color.Black,
-                modifier = Modifier.fillMaxWidth().padding(end = 30.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(end = 30.dp),
                 thickness = 1.dp
             )
             Spacer(modifier = Modifier.padding(8.dp))
-            Row (modifier=Modifier.fillMaxWidth(),
+            Row(
+                modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween){
-                BookCard(onClick = {})
-                Text(text="Currently Reading", modifier=Modifier.padding(end = 30.dp),style = TextStyle(fontSize = 25.sp))
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                BookCard(onClick = { navController.navigate("currentlyReading") })
+                Text(
+                    text = "Currently Reading",
+                    modifier = Modifier.padding(end = 30.dp),
+                    style = TextStyle(fontSize = 25.sp)
+                )
             }
         }
-
-
-
-
-
-}}
+    }
+}
 
 @Composable
-fun BookCard(onClick:()-> Unit){
-        Card(
+fun BookCard(onClick: () -> Unit) {
+    Card(
+        modifier = Modifier
+            .width(130.dp)
+            .height(190.dp)
+            .clickable { onClick() },
+        elevation = CardDefaults.cardElevation(30.dp),
+    ) {
+        Row(
             modifier = Modifier
-                .width(130.dp)
-                .height(190.dp)
-                .clickable { onClick() },
-            elevation = CardDefaults.cardElevation(30.dp),
-        ) {
-            Row(modifier = Modifier.fillMaxWidth()
+                .fillMaxWidth()
                 .fillMaxHeight(),
-                verticalAlignment = Alignment.CenterVertically,) {
-                Image(
-                    painter = painterResource(R.drawable.loginimage),
-                    contentDescription = "Book Cover Image",
-
-                )
-
-            }
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Image(
+                painter = painterResource(R.drawable.loginimage),
+                contentDescription = "Book Cover Image",
+            )
         }
+    }
 }
+
+@Composable
+fun NavHostScreen(navController: NavHostController = rememberNavController()) {
+    NavHost(navController = navController, startDestination = "myBooksPage") {
+        composable("myBooksPage") { MyBooksPage(navController) }
+        composable("booksIveRead") { BooksIveRead(navController) }
+        composable("booksIWantToRead") { ToRead(navController) }
+        composable("currentlyReading") { ReadingNow(navController) }
+    }
+}
+
+
+
 
 

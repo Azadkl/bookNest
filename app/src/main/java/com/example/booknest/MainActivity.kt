@@ -45,19 +45,6 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-//@Composable
-//fun NavHostScreen(navController: NavHostController = rememberNavController()) {
-//    NavHost(navController = navController, startDestination = "login") {
-//        composable("login") { LoginScreen(navController) }
-//        composable("SignIn") { SignInScreen(navController) }
-//        composable("SignUp") { SignUpScreen(navController) }
-//        composable("home") { BottomBarScreen(navController) }
-//        composable("myBooksPage") { MyBooksPage(navController) }
-//        composable("read") { BooksIveRead() }
-//        composable("want") { ToRead() }
-//        composable("reading") { ReadingNow() }
-//    }
-//}
 
 @Composable
 fun NavigationExample(){

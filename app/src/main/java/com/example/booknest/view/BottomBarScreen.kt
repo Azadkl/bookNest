@@ -13,6 +13,7 @@ import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -37,6 +38,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.booknest.Model.SearchResult
 import com.example.booknest.NavItem
 import com.example.booknest.ui.theme.ButtonColor1
 import com.example.booknest.ui.theme.PrimaryColor
@@ -46,7 +48,7 @@ fun BottomBarScreen(navController: NavController,modifier: Modifier=Modifier) {
     val navItemList = listOf(
         NavItem("Home", Icons.Default.Home),
         NavItem("Profile", Icons.Default.Person),
-        NavItem("Notificatio", Icons.Default.Notifications),
+        NavItem("Search", Icons.Default.Search),
         NavItem("MyBooks", Icons.Default.Book),
         NavItem("Settings", Icons.Default.Settings),
 
@@ -74,7 +76,7 @@ fun BottomBarScreen(navController: NavController,modifier: Modifier=Modifier) {
                             when (index) {
                                 0 -> navController.navigate("Home") // Home sayfasına yönlendir
                                 1 -> navController.navigate("profile") // Profile sayfasına yönlendir
-                                2 -> navController.navigate("notifications") // Notifications sayfasına yönlendir
+                                2 -> navController.navigate("search") // Notifications sayfasına yönlendir
                                 3 -> navController.navigate("myBooks") // MyBooks sayfasına yönlendir
                                 4 -> navController.navigate("settings") // Settings sayfasına yönlendir
                             }
@@ -110,7 +112,7 @@ fun BottomBarScreen(navController: NavController,modifier: Modifier=Modifier) {
             NavHost(navController = navController, startDestination = "Home") {
                 composable("Home") { HomePageScreen() }
                 composable("profile") { ProfileScreen() }
-                composable("notifications") { NotificationsScreen() }
+                composable("search") { SearchScreen(navController) }
                 composable("myBooks") { MyBooksPage(navController) }
                 composable("settings") { SettingsScreen() }
                 composable("booksIveRead") { BooksIveRead() }

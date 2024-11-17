@@ -39,6 +39,7 @@ fun BooksIveRead(viewModel: BooksViewModel) {
 
         // LazyColumn to display books
         LazyColumn(
+            contentPadding = PaddingValues(bottom = 90.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp) // Space between items
         ) {
             items(books) { book ->

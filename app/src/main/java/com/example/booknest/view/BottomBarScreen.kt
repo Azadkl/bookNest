@@ -115,9 +115,9 @@ fun BottomBarScreen(navController: NavController,modifier: Modifier=Modifier) {
                 composable("search") { SearchScreen(navController) }
                 composable("myBooks") { MyBooksPage(navController) }
                 composable("settings") { SettingsScreen() }
-                composable("booksIveRead") { BooksIveRead() }
-                composable("booksIWantToRead") { ToRead() }
-                composable("currentlyReading") { ReadingNow() }
+                composable("booksIveRead") { BooksIveRead(viewModel = BooksViewModel()) }
+                composable("booksIWantToRead") { ToRead(viewModel = BooksViewModel()) }
+                composable("currentlyReading") { ReadingNow(viewModel = BooksViewModel()) }
             }
 
         }

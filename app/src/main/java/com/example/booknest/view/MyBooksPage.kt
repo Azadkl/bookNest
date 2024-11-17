@@ -101,69 +101,69 @@ fun MyBooksPage(navController: NavController, modifier: Modifier = Modifier) {
             ),
         )
 
-        Column(
+        LazyColumn(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 15.dp),
-            horizontalAlignment = Alignment.Start
+                .fillMaxHeight()
+                .padding(horizontal = 20.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            contentPadding = PaddingValues(bottom = 90.dp)
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                BookCard(onClick = { navController.navigate("booksIveRead") })
-                Text(
-                    text = "Books I've Read",
-                    modifier = Modifier.padding(end = 50.dp),
-                    style = TextStyle(fontSize = 25.sp)
-                )
-            }
-            Spacer(modifier = Modifier.padding(8.dp))
-            Divider(
-                color = Color.Black,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(end = 30.dp),
-                thickness = 1.dp
-            )
-            Spacer(modifier = Modifier.padding(8.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                BookCard(onClick = { navController.navigate("booksIWantToRead") })
-                Text(
-                    text = "Books I Want To Read",
-                    modifier = Modifier.padding(end = 20.dp),
-                    style = TextStyle(fontSize = 25.sp)
-                )
+            item {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = "Books I've Read",
+                        modifier = Modifier.padding(bottom = 10.dp),
+                        style = TextStyle(fontSize = 25.sp)
+                    )
+                    BookCard(onClick = { navController.navigate("booksIveRead") })
+
+                }
+                Spacer(modifier = Modifier.padding(8.dp))
+
+                Spacer(modifier = Modifier.padding(8.dp))
             }
 
-            Spacer(modifier = Modifier.padding(8.dp))
-            Divider(
-                color = Color.Black,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(end = 30.dp),
-                thickness = 1.dp
-            )
-            Spacer(modifier = Modifier.padding(8.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                BookCard(onClick = { navController.navigate("currentlyReading") })
-                Text(
-                    text = "Currently Reading",
-                    modifier = Modifier.padding(end = 20.dp),
-                    style = TextStyle(fontSize = 25.sp)
-                )
+            item {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = "Books I Want To Read",
+                        modifier = Modifier.padding(bottom = 10.dp),
+                        style = TextStyle(fontSize = 25.sp)
+                    )
+                    BookCard(onClick = { navController.navigate("booksIWantToRead") })
+
+                }
+                Spacer(modifier = Modifier.padding(8.dp))
+
+                Spacer(modifier = Modifier.padding(8.dp))
             }
 
+            item {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = "Currently Reading",
+                        modifier = Modifier.padding(bottom = 10.dp),
+                        style = TextStyle(fontSize = 25.sp)
+                    )
+                    BookCard(onClick = { navController.navigate("currentlyReading") })
+
+                }
+                Spacer(modifier = Modifier.padding(8.dp))
+            }
         }
+
     }
 }
 
@@ -172,10 +172,10 @@ fun MyBooksPage(navController: NavController, modifier: Modifier = Modifier) {
 fun BookCard(onClick: () -> Unit) {
     Card(
         modifier = Modifier
-            .width(130.dp)
+            .fillMaxWidth()
             .height(190.dp)
             .clickable { onClick() },
-        elevation = CardDefaults.cardElevation(30.dp),
+        elevation = CardDefaults.cardElevation(5.dp),
     ) {
         Row(
             modifier = Modifier

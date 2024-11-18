@@ -71,7 +71,7 @@ import com.example.booknest.Book
 import com.example.booknest.R
 import com.example.booknest.ui.theme.ButtonColor1
 import com.example.booknest.ui.theme.PrimaryColor
-import com.google.android.mediahome.books.BookItem
+
 
 @Composable
 fun HomePageScreen(modifier: Modifier = Modifier) {

@@ -33,12 +33,17 @@ fun ToRead(viewModel: BooksViewModel) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top
     ) {
+
         // Header text
-        Text(
-            text = "Books I Want To Read",
-            style = TextStyle(fontSize = 30.sp),
-            modifier = Modifier.padding(bottom = 16.dp)
-        )
+        Column(modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(
+                text = "Books I Want To Read",
+                style = TextStyle(fontSize = 30.sp),
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
+        }
+
 
         // LazyColumn to display books
         LazyColumn(

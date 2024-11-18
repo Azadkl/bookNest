@@ -31,11 +31,15 @@ fun BooksIveRead(viewModel: BooksViewModel) {
         verticalArrangement = Arrangement.Top
     ) {
         // Header text
-        Text(
-            text = "Books I've Read",
-            style = TextStyle(fontSize = 40.sp),
-            modifier = Modifier.padding(bottom = 16.dp)
-        )
+
+        Column(modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(
+                text = "Books I've Read",
+                style = TextStyle(fontSize = 40.sp),
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
+        }
 
         // LazyColumn to display books
         LazyColumn(

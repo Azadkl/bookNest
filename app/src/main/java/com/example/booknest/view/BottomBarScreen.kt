@@ -35,11 +35,14 @@ import androidx.compose.ui.graphics.DefaultShadowColor
 import androidx.compose.ui.graphics.vector.DefaultTintColor
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.booknest.Model.SearchResult
 import com.example.booknest.NavItem
+import com.example.booknest.R
 import com.example.booknest.ui.theme.ButtonColor1
 import com.example.booknest.ui.theme.PrimaryColor
 
@@ -118,10 +121,23 @@ fun BottomBarScreen(navController: NavController,modifier: Modifier=Modifier) {
                 composable("booksIveRead") { BooksIveRead(viewModel = BooksViewModel()) }
                 composable("booksIWantToRead") { ToRead(viewModel = BooksViewModel()) }
                 composable("currentlyReading") { ReadingNow(viewModel = BooksViewModel()) }
+                composable("search_screen") { SearchScreen(navController = navController) }
+                composable(
+                    "otherProfile/{userName}/{userImageResId}",
+                    arguments = listOf(
+                        navArgument("userName") { type = NavType.StringType },
+                        navArgument("userImageResId") { type = NavType.IntType }
+                    )
+                ) { backStackEntry ->
+                    val userName = backStackEntry.arguments?.getString("userName") ?: ""
+                    val userImageResId = backStackEntry.arguments?.getInt("userImageResId") ?: R.drawable.loginimage
+                    OtherProfilePage(userName = userName, userImageResId = userImageResId)
+                }
+            }
             }
 
-        }
+        })
     }
-    )
-}
+
+
 

@@ -129,7 +129,9 @@ fun SearchScreen (navController: NavController,modifier: Modifier=Modifier){
                                     containerColor = PrimaryColor,
                                     headlineColor = Color.Black,
                                 ),
-                                modifier=Modifier.padding(top = 10.dp, start = 10.dp, end = 10.dp).height(70.dp).clip(shape = RoundedCornerShape(55.dp)).clickable {  }
+                                modifier=Modifier.padding(top = 10.dp, start = 10.dp, end = 10.dp).height(70.dp).clip(shape = RoundedCornerShape(15.dp)).clickable {
+                                    navController.navigate("otherProfile/${result.name}/${result.imageResId}")
+                                }
                             )
                         }
                         is SearchResult.Book->{
@@ -159,7 +161,7 @@ fun SearchScreen (navController: NavController,modifier: Modifier=Modifier){
 
                                 ,
 
-                                modifier=Modifier.padding(top = 10.dp, start = 10.dp, end = 10.dp).height(70.dp).clip(shape = RoundedCornerShape(55.dp)).clickable {  }
+                                modifier=Modifier.padding(top = 10.dp, start = 10.dp, end = 10.dp).height(70.dp).clip(shape = RoundedCornerShape(15.dp)).clickable {  }
                             )
                         }
                     }

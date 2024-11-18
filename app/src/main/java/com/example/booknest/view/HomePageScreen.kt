@@ -80,14 +80,15 @@ fun HomePageScreen(modifier: Modifier = Modifier) {
     Column(
         modifier = Modifier
             .fillMaxHeight()
+            .fillMaxWidth() 
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         LazyColumn(
             modifier = Modifier
                 .fillMaxHeight()
-                .padding(horizontal = 20.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
+                .fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(8.dp), 
             contentPadding = PaddingValues(bottom = 90.dp)
         ) {
             item {
@@ -100,43 +101,39 @@ fun HomePageScreen(modifier: Modifier = Modifier) {
                         text = "what's happening around?",
                         modifier = Modifier.padding(bottom = 10.dp),
                         style = TextStyle(fontSize = 25.sp)
-
                     )
                     Divider(
                         color = Color.Black,
                         thickness = 1.dp,
                         modifier = Modifier.fillMaxWidth()
                     )
-                    StatusCard()
-                    StatusCard()
-                    StatusCard()
                 }
-
             }
-
-
+            items(3) { 
+                StatusCard()
+            }
         }
     }
 }
+
 @Composable
 fun StatusCard() {
-
     Card(
         modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-            .border(1.dp, Color.Gray),
-        elevation = CardDefaults.cardElevation(4.dp),
-        shape = RoundedCornerShape(8.dp),  // Slightly rounded corners
+            .fillMaxWidth() 
+            .padding(horizontal = 0.dp) 
+            .padding(vertical = 8.dp) 
+            .border(1.dp, Color.Gray), 
+        elevation = CardDefaults.cardElevation(4.dp), 
+        shape = RoundedCornerShape(8.dp), 
         colors = CardDefaults.cardColors(
-            containerColor = Color.White  // Set the card's background color to white
+            containerColor = Color.White 
         )
     ) {
         Column(
             modifier = Modifier
                 .padding(16.dp)
         ) {
-            // Status Text
             Text(
                 text = "Emir gave 5 stars to Crime and Punishment by Fyodor Dostoyevsky",
                 modifier = Modifier.padding(bottom = 8.dp)
@@ -146,14 +143,12 @@ fun StatusCard() {
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-
                 Image(
-                    painter = painterResource(R.drawable.farelerveinsanlar),  // Replace with your image resource
+                    painter = painterResource(R.drawable.farelerveinsanlar), 
                     contentDescription = "Book Cover Image",
                     modifier = Modifier
                         .size(80.dp)
                 )
-
 
                 Column(
                     verticalArrangement = Arrangement.spacedBy(4.dp)
@@ -170,13 +165,14 @@ fun StatusCard() {
                         onClick = {},
                         modifier = Modifier
                             .padding(top = 8.dp)
-                            .size(width = 150.dp, height = 48.dp),
+                            .size(width = 120.dp, height = 32.dp),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Color(0xFF2E8B57)
                         ),
-                        shape = RoundedCornerShape(8.dp)
+                        shape = RoundedCornerShape(12.dp)
                     ) {
                         Text(
+                            fontSize = 13.sp,
                             text = "Want to Read",
                             color = Color.White
                         )
@@ -186,4 +182,3 @@ fun StatusCard() {
         }
     }
 }
-

@@ -160,38 +160,50 @@ fun BottomBarScreen(navController: NavController,modifier: Modifier=Modifier) {
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceEvenly
                         ) {
-                            CustomBox(
-                                modifier = Modifier.clickable {
-
-                                },
-                                title = "My Profile",
-                                imageResId = R.drawable.outline_person_24
-                            )
-                            CustomBox(modifier, "Top picks", imageResId = R.drawable.outline_person_24)
-                            CustomBox(modifier, "Challenge", imageResId = R.drawable.outline_person_24)
+                            CustomBox(modifier, title = "My Profile", imageResId = R.drawable.outline_person_24,navController = navController,"profile",onNavigate = { route ->
+                                showBottomSheet = false
+                                navController.navigate(route)
+                            })
+                            CustomBox(modifier, "Top picks", imageResId = R.drawable.outline_person_24,navController = navController,"",onNavigate = { route ->
+                                showBottomSheet = false
+                                navController.navigate(route)
+                            })
+                            CustomBox(modifier, "Challenge", imageResId = R.drawable.outline_person_24,navController = navController,"",onNavigate = { route ->
+                                showBottomSheet = false
+                                navController.navigate(route)
+                            })
                         }
                         Spacer(modifier = Modifier.height(20.dp))
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceEvenly
                         ) {
-                            CustomBox(modifier, "Friends", imageResId = R.drawable.outline_group_24)
-                            CustomBox(
-                                modifier = Modifier.clickable {
-                                    navController.navigate("groups")
-                                },
-                                title = "Groups",
-                                imageResId = R.drawable.sharp_groups_24
-                            )
-                            CustomBox(modifier, "Giveaways", imageResId = R.drawable.outline_person_24)
+                            CustomBox(modifier, "Friends", imageResId = R.drawable.outline_group_24,navController = navController,"",onNavigate = { route ->
+                                showBottomSheet = false
+                                navController.navigate(route)
+                            })
+                            CustomBox(modifier, title = "Groups", imageResId = R.drawable.sharp_groups_24, navController = navController,"groups",onNavigate = { route ->
+                                showBottomSheet = false
+                                navController.navigate(route)
+                            })
+                            CustomBox(modifier, "Giveaways", imageResId = R.drawable.outline_person_24,navController = navController,"",onNavigate = { route ->
+                                showBottomSheet = false
+                                navController.navigate(route)
+                            })
                         }
                         Spacer(modifier = Modifier.height(20.dp))
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceEvenly
                         ) {
-                            CustomBox(modifier, "Awards", imageResId = R.drawable.awards)
-                            CustomBox(modifier, "Settings", imageResId = R.drawable.settings)
+                            CustomBox(modifier, "Awards", imageResId = R.drawable.awards,navController = navController,"",onNavigate = { route ->
+                                showBottomSheet = false
+                                navController.navigate(route)
+                            })
+                            CustomBox(modifier, "Settings", imageResId = R.drawable.settings,navController = navController,"",onNavigate = { route ->
+                                showBottomSheet = false
+                                navController.navigate(route)
+                            })
                         }
                     }
                 }
@@ -237,7 +249,7 @@ fun BottomBarScreen(navController: NavController,modifier: Modifier=Modifier) {
 
 
 @Composable
-fun CustomBox(modifier: Modifier = Modifier, title: String, imageResId: Int) {
+fun CustomBox(modifier: Modifier = Modifier, title: String, imageResId: Int,navController: NavController,route:String,onNavigate: (String) -> Unit) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -247,7 +259,7 @@ fun CustomBox(modifier: Modifier = Modifier, title: String, imageResId: Int) {
                 .border(1.dp, Color.Gray, RoundedCornerShape(95.dp))
                 .clip(RoundedCornerShape(95.dp))
                 .size(80.dp)
-                .clickable { }
+                .clickable { onNavigate(route) }
         ) {
             Image(
                 painter = painterResource(id = imageResId),

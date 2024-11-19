@@ -76,6 +76,8 @@ import com.example.booknest.R
 import com.example.booknest.ui.theme.ButtonColor1
 import com.example.booknest.ui.theme.PrimaryColor
 
+
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BottomBarScreen(navController: NavController,modifier: Modifier=Modifier) {
@@ -149,33 +151,52 @@ fun BottomBarScreen(navController: NavController,modifier: Modifier=Modifier) {
                     onDismissRequest = { showBottomSheet = false },
                     shape = RoundedCornerShape(0.dp)
                 ) {
-                    Column(modifier=Modifier.fillMaxHeight(),
+                    Column(
+                        modifier = Modifier.fillMaxHeight(),
                         verticalArrangement = Arrangement.Top,
-                        horizontalAlignment = Alignment.CenterHorizontally) {
-                        Row(modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceEvenly) {
-                            CustomBox(modifier,"My Profile", imageResId = R.drawable.outline_person_24)
-                            CustomBox(modifier,"Top picks",imageResId = R.drawable.outline_person_24)
-                            CustomBox(modifier,"Challenge",imageResId = R.drawable.outline_person_24)
-                        }
-                        Spacer(modifier = Modifier.height(20.dp))
-                        Row(modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceEvenly) {
-                            CustomBox(modifier,"Friends",imageResId = R.drawable.outline_group_24)
-                            CustomBox(modifier,"Groups",imageResId = R.drawable.sharp_groups_24)
-                            CustomBox(modifier,"Giveaways",imageResId = R.drawable.outline_person_24)
-                        }
-                        Spacer(modifier = Modifier.height(20.dp))
-                        Row(modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceEvenly) {
-                            CustomBox(modifier,"Awards",imageResId = R.drawable.awards)
-                            CustomBox(modifier,"Settings",imageResId = R.drawable.settings)
-                        }
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceEvenly
+                        ) {
+                            CustomBox(
+                                modifier = Modifier.clickable {
 
+                                },
+                                title = "My Profile",
+                                imageResId = R.drawable.outline_person_24
+                            )
+                            CustomBox(modifier, "Top picks", imageResId = R.drawable.outline_person_24)
+                            CustomBox(modifier, "Challenge", imageResId = R.drawable.outline_person_24)
+                        }
+                        Spacer(modifier = Modifier.height(20.dp))
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceEvenly
+                        ) {
+                            CustomBox(modifier, "Friends", imageResId = R.drawable.outline_group_24)
+                            CustomBox(
+                                modifier = Modifier.clickable {
+                                    navController.navigate("groups")
+                                },
+                                title = "Groups",
+                                imageResId = R.drawable.sharp_groups_24
+                            )
+                            CustomBox(modifier, "Giveaways", imageResId = R.drawable.outline_person_24)
+                        }
+                        Spacer(modifier = Modifier.height(20.dp))
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceEvenly
+                        ) {
+                            CustomBox(modifier, "Awards", imageResId = R.drawable.awards)
+                            CustomBox(modifier, "Settings", imageResId = R.drawable.settings)
+                        }
                     }
-
                 }
             }
+
         },
 
     content ={ paddingValues ->
@@ -194,6 +215,8 @@ fun BottomBarScreen(navController: NavController,modifier: Modifier=Modifier) {
                 composable("booksIWantToRead") { ToRead(viewModel = BooksViewModel()) }
                 composable("currentlyReading") { ReadingNow(viewModel = BooksViewModel()) }
                 composable("search_screen") { SearchScreen(navController = navController) }
+                composable("groups") { GroupsPage() }
+
                 composable(
                     "otherProfile/{userName}/{userImageResId}",
                     arguments = listOf(

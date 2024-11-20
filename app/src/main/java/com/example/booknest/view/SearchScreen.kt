@@ -156,12 +156,7 @@ fun SearchScreen (navController: NavController,modifier: Modifier=Modifier){
                                     containerColor = PrimaryColor,
                                     headlineColor = Color.Black,
 
-                                )
-
-
-                                ,
-
-                                modifier=Modifier.padding(top = 10.dp, start = 10.dp, end = 10.dp).height(70.dp).clip(shape = RoundedCornerShape(15.dp)).clickable {  }
+                                ), modifier=Modifier.padding(top = 10.dp, start = 10.dp, end = 10.dp).height(70.dp).clip(shape = RoundedCornerShape(15.dp)).clickable {  }
                             )
                         }
                     }
@@ -170,8 +165,4 @@ fun SearchScreen (navController: NavController,modifier: Modifier=Modifier){
             }
         }
     }
-
-
-
-
-    }
+}

@@ -83,7 +83,6 @@ import com.example.booknest.ui.theme.PrimaryColor
 fun BottomBarScreen(navController: NavController,modifier: Modifier=Modifier) {
     val navItemList = listOf(
         NavItem("Home", Icons.Default.Home),
-        NavItem("Profile", Icons.Default.Person),
         NavItem("Search", Icons.Default.Search),
         NavItem("MyBooks", Icons.Default.Book),
         NavItem("More", Icons.Default.Menu),
@@ -115,10 +114,9 @@ fun BottomBarScreen(navController: NavController,modifier: Modifier=Modifier) {
                             selectedIndex = index
                             when (index) {
                                 0 -> navController.navigate("Home") // Home sayfasına yönlendir
-                                1 -> navController.navigate("profile") // Profile sayfasına yönlendir
-                                2 -> navController.navigate("search") // Notifications sayfasına yönlendir
-                                3 -> navController.navigate("myBooks") // MyBooks sayfasına yönlendir
-                                4 -> {
+                                1 -> navController.navigate("search") // Notifications sayfasına yönlendir
+                                2 -> navController.navigate("myBooks") // MyBooks sayfasına yönlendir
+                                3 -> {
 
                                     showBottomSheet = true
                                 }
@@ -182,11 +180,11 @@ fun BottomBarScreen(navController: NavController,modifier: Modifier=Modifier) {
                                 showBottomSheet = false
                                 navController.navigate(route)
                             })
-                            CustomBox(modifier, title = "Groups", imageResId = R.drawable.sharp_groups_24, navController = navController,"groups",onNavigate = { route ->
+                            CustomBox(modifier, "Awards", imageResId = R.drawable.awards,navController = navController,"",onNavigate = { route ->
                                 showBottomSheet = false
                                 navController.navigate(route)
                             })
-                            CustomBox(modifier, "Giveaways", imageResId = R.drawable.outline_person_24,navController = navController,"",onNavigate = { route ->
+                            CustomBox(modifier, title = "Groups", imageResId = R.drawable.sharp_groups_24, navController = navController,"groups",onNavigate = { route ->
                                 showBottomSheet = false
                                 navController.navigate(route)
                             })
@@ -196,11 +194,8 @@ fun BottomBarScreen(navController: NavController,modifier: Modifier=Modifier) {
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceEvenly
                         ) {
-                            CustomBox(modifier, "Awards", imageResId = R.drawable.awards,navController = navController,"",onNavigate = { route ->
-                                showBottomSheet = false
-                                navController.navigate(route)
-                            })
-                            CustomBox(modifier, "Settings", imageResId = R.drawable.settings,navController = navController,"",onNavigate = { route ->
+
+                            CustomBox(modifier, "Settings", imageResId = R.drawable.settings,navController = navController,"settings",onNavigate = { route ->
                                 showBottomSheet = false
                                 navController.navigate(route)
                             })
@@ -227,6 +222,7 @@ fun BottomBarScreen(navController: NavController,modifier: Modifier=Modifier) {
                 composable("booksIWantToRead") { ToRead(viewModel = BooksViewModel()) }
                 composable("currentlyReading") { ReadingNow(viewModel = BooksViewModel()) }
                 composable("search_screen") { SearchScreen(navController = navController) }
+                composable("settings"){ SettingsScreen(modifier) }
                 composable("groups") { GroupsPage() }
 
                 composable(

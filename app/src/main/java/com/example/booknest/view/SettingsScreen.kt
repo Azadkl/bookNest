@@ -20,7 +20,7 @@ import androidx.compose.material.icons.filled.Group
 import androidx.compose.ui.graphics.vector.ImageVector
 
 @Composable
-fun SettingsScreen() {
+fun SettingsScreen(modifier: Modifier) {
 
 
     Box(modifier = Modifier.fillMaxSize()) {

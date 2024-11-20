@@ -26,6 +26,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Search
@@ -172,7 +173,7 @@ fun StatusCard() {
                         Button(
                             onClick = {},
                             modifier = Modifier
-                                .size(width = 120.dp, height = 32.dp),
+                                .size(width = 130.dp, height = 32.dp),
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = Color(0xFF2E8B57)
                             ),
@@ -189,14 +190,15 @@ fun StatusCard() {
                         Button(
                             onClick = { dropdownExpanded = !dropdownExpanded },
                             modifier = Modifier
-                                .size(width = 32.dp, height = 32.dp),
+                                .size(width = 130.dp, height = 32.dp),
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = Color(0xFF2E8B57)
                             ),
                             shape = RoundedCornerShape(12.dp)
                         ) {
-                            Text("⋮", color = Color.White)
+                            Icon(imageVector = Icons.Default.ArrowDropDown, contentDescription = null, tint = Color.White, modifier = Modifier.align(Alignment.CenterVertically))
                         }
+
                     }
 
 

@@ -86,7 +86,7 @@ fun SearchScreen (navController: NavController,modifier: Modifier=Modifier){
             placeholder = { Text(text = "Search users or books")},
             active =active , onActiveChange ={active=it},
             colors = SearchBarDefaults.colors(
-                containerColor = Color.Gray,
+                containerColor = Color.White,
                 dividerColor = Color.Black,
 
             ),

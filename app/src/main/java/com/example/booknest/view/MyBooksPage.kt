@@ -71,7 +71,6 @@ import com.example.booknest.Book
 import com.example.booknest.R
 import com.example.booknest.ui.theme.ButtonColor1
 import com.example.booknest.ui.theme.PrimaryColor
-import com.google.android.mediahome.books.BookItem
 
 @Composable
 fun MyBooksPage(navController: NavController, modifier: Modifier = Modifier) {
@@ -125,7 +124,8 @@ fun MyBooksPage(navController: NavController, modifier: Modifier = Modifier) {
                         style = TextStyle(fontSize = 25.sp)
 
                     )
-                    Divider(color = Color.Black, thickness = 1.dp, modifier = Modifier.fillMaxWidth(0.8f))                    BookCard(onClick = { navController.navigate("booksIveRead") })
+                    Divider(color = Color.Black, thickness = 1.dp, modifier = Modifier.fillMaxWidth(0.8f))
+                    BookCard( navController=navController,"booksIveRead")
 
                 }
                 Spacer(modifier = Modifier.padding(8.dp))
@@ -144,7 +144,8 @@ fun MyBooksPage(navController: NavController, modifier: Modifier = Modifier) {
                         modifier = Modifier.padding(bottom = 10.dp),
                         style = TextStyle(fontSize = 25.sp)
                     )
-                    Divider(color = Color.Black, thickness = 1.dp, modifier = Modifier.fillMaxWidth(0.8f))                    BookCard(onClick = { navController.navigate("booksIWantToRead") })
+                    Divider(color = Color.Black, thickness = 1.dp, modifier = Modifier.fillMaxWidth(0.8f))
+                    BookCard( navController=navController,"booksIWantToRead")
 
                 }
                 Spacer(modifier = Modifier.padding(8.dp))
@@ -164,7 +165,7 @@ fun MyBooksPage(navController: NavController, modifier: Modifier = Modifier) {
                         style = TextStyle(fontSize = 25.sp)
                     )
                     Divider(color = Color.Black, thickness = 1.dp, modifier = Modifier.fillMaxWidth(0.8f))
-                    BookCard(onClick = { navController.navigate("currentlyReading") })
+                    BookCard( navController=navController,"currentlyReading")
 
                 }
                 Spacer(modifier = Modifier.padding(8.dp))
@@ -174,7 +175,7 @@ fun MyBooksPage(navController: NavController, modifier: Modifier = Modifier) {
     }
 }
 @Composable
-fun BookCard(onClick: () -> Unit) {
+fun BookCard(navController: NavController,route:String) {
 
         Spacer(modifier = Modifier.padding(3.dp))
         Row(
@@ -185,6 +186,7 @@ fun BookCard(onClick: () -> Unit) {
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Image(
+                modifier = Modifier.clickable {navController.navigate(route) },
                 painter = painterResource(R.drawable.farelerveinsanlar),
                 contentDescription = "Book Cover Image",
             )

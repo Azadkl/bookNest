@@ -36,6 +36,8 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DividerDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -80,7 +82,7 @@ fun HomePageScreen(modifier: Modifier = Modifier) {
     Column(
         modifier = Modifier
             .fillMaxHeight()
-            .fillMaxWidth() 
+            //.fillMaxWidth()
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
@@ -88,7 +90,7 @@ fun HomePageScreen(modifier: Modifier = Modifier) {
             modifier = Modifier
                 .fillMaxHeight()
                 .fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(8.dp), 
+            verticalArrangement = Arrangement.spacedBy(8.dp),
             contentPadding = PaddingValues(bottom = 90.dp)
         ) {
             item {
@@ -109,7 +111,7 @@ fun HomePageScreen(modifier: Modifier = Modifier) {
                     )
                 }
             }
-            items(3) { 
+            items(3) {
                 StatusCard()
             }
         }
@@ -118,16 +120,18 @@ fun HomePageScreen(modifier: Modifier = Modifier) {
 
 @Composable
 fun StatusCard() {
+    var dropdownExpanded by remember { mutableStateOf(false) }
+
     Card(
         modifier = Modifier
-            .fillMaxWidth() 
-            .padding(horizontal = 0.dp) 
-            .padding(vertical = 8.dp) 
-            .border(1.dp, Color.Gray), 
-        elevation = CardDefaults.cardElevation(4.dp), 
-        shape = RoundedCornerShape(8.dp), 
+            .fillMaxWidth()
+            .padding(horizontal = 0.dp)
+            .padding(vertical = 8.dp)
+            .border(1.dp, Color.Gray),
+        elevation = CardDefaults.cardElevation(4.dp),
+        shape = RoundedCornerShape(8.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color.White 
+            containerColor = Color.White
         )
     ) {
         Column(
@@ -135,7 +139,7 @@ fun StatusCard() {
                 .padding(16.dp)
         ) {
             Text(
-                text = "Emir gave 5 stars to Crime and Punishment by Fyodor Dostoyevsky",
+                text = "Emir gave 5 stars to Of Mice and Men by John Steinback",
                 modifier = Modifier.padding(bottom = 8.dp)
             )
 
@@ -144,7 +148,7 @@ fun StatusCard() {
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Image(
-                    painter = painterResource(R.drawable.farelerveinsanlar), 
+                    painter = painterResource(R.drawable.farelerveinsanlar),
                     contentDescription = "Book Cover Image",
                     modifier = Modifier
                         .size(80.dp)
@@ -154,31 +158,72 @@ fun StatusCard() {
                     verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
                     Text(
-                        text = "Crime and Punishment",
+                        text = "Of Mice and Man",
                         modifier = Modifier.fillMaxWidth()
                     )
                     Text(
-                        text = "by Fyodor Dostoyevsky",
+                        text = "by John Steinback",
                         modifier = Modifier.fillMaxWidth()
                     )
-                    Button(
-                        onClick = {},
-                        modifier = Modifier
-                            .padding(top = 8.dp)
-                            .size(width = 120.dp, height = 32.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF2E8B57)
-                        ),
-                        shape = RoundedCornerShape(12.dp)
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Text(
-                            fontSize = 13.sp,
-                            text = "Want to Read",
-                            color = Color.White
-                        )
+                        Button(
+                            onClick = {},
+                            modifier = Modifier
+                                .size(width = 120.dp, height = 32.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(0xFF2E8B57)
+                            ),
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            Text(
+                                fontSize = 13.sp,
+                                text = "Want to Read",
+                                color = Color.White
+                            )
+                        }
+
+
+                        Button(
+                            onClick = { dropdownExpanded = !dropdownExpanded },
+                            modifier = Modifier
+                                .size(width = 32.dp, height = 32.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(0xFF2E8B57)
+                            ),
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            Text("⋮", color = Color.White)
+                        }
+                    }
+
+
+                    if (dropdownExpanded) {
+                        DropdownMenu(
+                            expanded = dropdownExpanded,
+                            onDismissRequest = { dropdownExpanded = false }
+                        ) {
+                            DropdownMenuItem(
+                                text = { Text("Already Read") },
+                                onClick = {
+
+                                    dropdownExpanded = false
+                                }
+                            )
+                            DropdownMenuItem(
+                                text = { Text("Reading Now") },
+                                onClick = {
+
+                                    dropdownExpanded = false
+                                }
+                            )
+                        }
                     }
                 }
             }
         }
     }
 }
+

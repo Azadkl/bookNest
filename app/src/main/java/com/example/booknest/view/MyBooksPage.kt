@@ -40,6 +40,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
@@ -70,6 +71,7 @@ import com.example.booknest.Book
 import com.example.booknest.R
 import com.example.booknest.ui.theme.ButtonColor1
 import com.example.booknest.ui.theme.PrimaryColor
+import com.google.android.mediahome.books.BookItem
 
 @Composable
 fun MyBooksPage(navController: NavController, modifier: Modifier = Modifier) {
@@ -78,7 +80,8 @@ fun MyBooksPage(navController: NavController, modifier: Modifier = Modifier) {
     Column(
         modifier = Modifier
             .fillMaxHeight()
-            .padding(16.dp),
+            .fillMaxWidth(),
+
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         OutlinedTextField(
@@ -90,8 +93,8 @@ fun MyBooksPage(navController: NavController, modifier: Modifier = Modifier) {
                 .size(width = 320.dp, height = 56.dp),
             shape = RoundedCornerShape(20.dp),
             colors = TextFieldDefaults.colors(
-                focusedIndicatorColor = Color.DarkGray,
-                unfocusedIndicatorColor = Color.DarkGray,
+                focusedIndicatorColor = Color.White,
+                unfocusedIndicatorColor = Color.White,
             ),
             leadingIcon = {
                 Icon(imageVector = Icons.Outlined.Search, contentDescription = null)
@@ -102,9 +105,11 @@ fun MyBooksPage(navController: NavController, modifier: Modifier = Modifier) {
         )
 
         LazyColumn(
+
             modifier = Modifier
                 .fillMaxHeight()
-                .padding(horizontal = 20.dp),
+                .fillMaxWidth(),
+
             horizontalAlignment = Alignment.CenterHorizontally,
             contentPadding = PaddingValues(bottom = 90.dp)
         ) {
@@ -118,8 +123,9 @@ fun MyBooksPage(navController: NavController, modifier: Modifier = Modifier) {
                         text = "Books I've Read",
                         modifier = Modifier.padding(bottom = 10.dp),
                         style = TextStyle(fontSize = 25.sp)
+
                     )
-                    BookCard(onClick = { navController.navigate("booksIveRead") })
+                    Divider(color = Color.Black, thickness = 1.dp, modifier = Modifier.fillMaxWidth(0.8f))                    BookCard(onClick = { navController.navigate("booksIveRead") })
 
                 }
                 Spacer(modifier = Modifier.padding(8.dp))
@@ -138,7 +144,7 @@ fun MyBooksPage(navController: NavController, modifier: Modifier = Modifier) {
                         modifier = Modifier.padding(bottom = 10.dp),
                         style = TextStyle(fontSize = 25.sp)
                     )
-                    BookCard(onClick = { navController.navigate("booksIWantToRead") })
+                    Divider(color = Color.Black, thickness = 1.dp, modifier = Modifier.fillMaxWidth(0.8f))                    BookCard(onClick = { navController.navigate("booksIWantToRead") })
 
                 }
                 Spacer(modifier = Modifier.padding(8.dp))
@@ -157,6 +163,7 @@ fun MyBooksPage(navController: NavController, modifier: Modifier = Modifier) {
                         modifier = Modifier.padding(bottom = 10.dp),
                         style = TextStyle(fontSize = 25.sp)
                     )
+                    Divider(color = Color.Black, thickness = 1.dp, modifier = Modifier.fillMaxWidth(0.8f))
                     BookCard(onClick = { navController.navigate("currentlyReading") })
 
                 }
@@ -166,33 +173,22 @@ fun MyBooksPage(navController: NavController, modifier: Modifier = Modifier) {
 
     }
 }
-
-
 @Composable
 fun BookCard(onClick: () -> Unit) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(190.dp)
-            .clickable { onClick() },
-        elevation = CardDefaults.cardElevation(5.dp),
-    ) {
+
+        Spacer(modifier = Modifier.padding(3.dp))
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .fillMaxHeight(),
+                .fillMaxHeight()
+                .padding(horizontal = 30.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Image(
-                painter = painterResource(R.drawable.loginimage),
+                painter = painterResource(R.drawable.farelerveinsanlar),
                 contentDescription = "Book Cover Image",
             )
         }
-    }
+    Spacer(modifier = Modifier.padding(3.dp))
+        Divider(color = Color.Black, thickness = 1.dp, modifier = Modifier.fillMaxWidth())
 }
-
-
-
-
-
-

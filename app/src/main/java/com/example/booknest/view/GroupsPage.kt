@@ -21,11 +21,11 @@ fun GroupsPage() {
     Log.d("Navigation", "Navigated to GroupsPage")
     var searchQuery by remember { mutableStateOf(TextFieldValue("")) }
     val groupList = listOf(
-        "Tech Enthusiasts",
-        "Book Lovers",
-        "Fitness Fanatics",
-        "Travel Buddies",
-        "Cooking Masters"
+        "Group 1",
+        "Group 2",
+        "Group 3",
+        "Group 4",
+        "Group 5"
     )
 
     Column(

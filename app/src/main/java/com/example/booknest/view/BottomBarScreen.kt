@@ -130,9 +130,26 @@ fun BottomBarScreen(navController: NavController,modifier: Modifier=Modifier) {
                         val currentRoute by navController.currentBackStackEntryFlow.collectAsState(initial = null)
 
                         if (currentRoute?.destination?.route in listOf("search","Home","myBooks")){
+                            Box(
+                                modifier = Modifier
+                                    .let { if (active) it.size(0.dp) else it}
+                                    .padding(top = 30.dp)
+                                    .clip(shape = CircleShape)
+                                    .clickable { navController.navigate("profile") }
+                                    .size(56.dp)
+                                    .background(Color.White)
+                                ,
+                            ) {
+
+                                Image(painter = painterResource(id=R.drawable.azad), contentDescription ="User Image" ,
+                                    contentScale = ContentScale.Fit,
+                                    modifier=Modifier.size(56.dp)
+                                        .clip(CircleShape)
+                                )
+                            }
                             SearchBar(
                                 modifier = Modifier
-                                    .let { if (active) it.fillMaxWidth() else it.width(330.dp) }
+                                    .let { if (active) it.fillMaxWidth() else it.width(280.dp) }
                                     .border(width = 0.dp, color = Color.Transparent),
                                 query = searchQuery,
                                 onQueryChange ={searchQuery=it},
@@ -164,6 +181,7 @@ fun BottomBarScreen(navController: NavController,modifier: Modifier=Modifier) {
                                 })
 
                             {
+
                                 LazyColumn {
                                     items(filteredResult){result->
                                         when(result){
@@ -299,10 +317,10 @@ fun BottomBarScreen(navController: NavController,modifier: Modifier=Modifier) {
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceEvenly
                         ) {
-                            CustomBox(modifier, title = "My Profile", imageResId = R.drawable.outline_person_24,navController = navController,"profile",onNavigate = { route ->
+                            CustomBox(modifier, title = "My Profile", imageResId = R.drawable.azad,navController = navController,"profile",onNavigate = { route ->
                                 showBottomSheet = false
                                 navController.navigate(route)
-                            })
+                            }, size = 80.dp)
                             CustomBox(modifier, "Top picks", imageResId = R.drawable.outline_person_24,navController = navController,"",onNavigate = { route ->
                                 showBottomSheet = false
                                 navController.navigate(route)
@@ -387,7 +405,7 @@ fun BottomBarScreen(navController: NavController,modifier: Modifier=Modifier) {
 
 
 @Composable
-fun CustomBox(modifier: Modifier = Modifier, title: String, imageResId: Int,navController: NavController,route:String,onNavigate: (String) -> Unit) {
+fun CustomBox(modifier: Modifier = Modifier, title: String, imageResId: Int,navController: NavController,route:String,onNavigate: (String) -> Unit,size:Dp=60.dp) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -404,7 +422,7 @@ fun CustomBox(modifier: Modifier = Modifier, title: String, imageResId: Int,navC
                 contentDescription = title,
                 modifier = Modifier
                     .align(Alignment.Center)
-                    .size(60.dp)
+                    .size(size)
                 ,
             )
         }

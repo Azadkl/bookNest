@@ -58,7 +58,7 @@ import com.example.booknest.ui.theme.PrimaryColor
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchScreen (navController: NavController,modifier: Modifier=Modifier){
-    var allResults = DummyData().dummyData
+   /* var allResults = DummyData().dummyData
     var searchQuery by remember{ mutableStateOf("") }
     var active by remember { mutableStateOf(false) }
     val filteredResult= if (searchQuery.isEmpty()){
@@ -71,7 +71,7 @@ fun SearchScreen (navController: NavController,modifier: Modifier=Modifier){
             }
     }
 
-    }
+    }*/
     Column (modifier=Modifier
         .fillMaxHeight()
         .fillMaxWidth(),

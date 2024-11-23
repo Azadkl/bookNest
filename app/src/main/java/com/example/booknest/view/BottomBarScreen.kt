@@ -230,7 +230,11 @@ fun BottomBarScreen(navController: NavController,modifier: Modifier=Modifier) {
                                                         containerColor = PrimaryColor,
                                                         headlineColor = Color.Black,
 
-                                                        ), modifier=Modifier.padding(top = 10.dp, start = 10.dp, end = 10.dp).height(70.dp).clip(shape = RoundedCornerShape(15.dp)).clickable {  }
+                                                        ), modifier=Modifier.padding(top = 10.dp, start = 10.dp, end = 10.dp).height(70.dp).clip(shape = RoundedCornerShape(15.dp)).clickable {
+                                                        navController.navigate("books/${result.id}/${result.title}/${result.author}/${result.imageResId}/${result.rating}")
+
+
+                                                    }
                                                 )
                                             }
                                         }
@@ -384,6 +388,26 @@ fun BottomBarScreen(navController: NavController,modifier: Modifier=Modifier) {
                 composable("settings"){ SettingsScreen(modifier) }
                 composable("groups") { GroupsPage() }
                 composable("notifications"){ NotificationsScreen() }
+                composable(
+                    route = "books/{id}/{title}/{author}/{imageResId}/{rating}",
+                    arguments = listOf(
+                        navArgument("id") { type = NavType.StringType },
+                        navArgument("title") { type = NavType.StringType },
+                        navArgument("author") { type = NavType.StringType },
+                        navArgument("imageResId") { type = NavType.IntType },
+                        navArgument("rating") { type = NavType.StringType }
+                    )
+                ) { backStackEntry ->
+                    val id = backStackEntry.arguments?.getString("id") ?: "-1"
+                    val title = backStackEntry.arguments?.getString("title") ?: "Unknown Title"
+                    val author = backStackEntry.arguments?.getString("author") ?: "Unknown Author"
+                    val imageResId = backStackEntry.arguments?.getInt("imageResId") ?: R.drawable.farelerveinsanlar
+                    val rating = backStackEntry.arguments?.getString("rating") ?: "no rating"
+
+                    BooksScreen(navController, result = SearchResult.Book(id = id, title = title, author = author, imageResId = imageResId, rating = rating))
+                }
+
+
 
                 composable(
                     "otherProfile/{userName}/{userImageResId}",

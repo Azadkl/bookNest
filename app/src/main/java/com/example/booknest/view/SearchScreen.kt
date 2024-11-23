@@ -76,7 +76,7 @@ fun SearchScreen (navController: NavController,modifier: Modifier=Modifier){
         .fillMaxHeight()
         .fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally){
-        SearchBar(
+        /*SearchBar(
             modifier = Modifier
                 .border(width = 0.dp, color = Color.Transparent)
             ,
@@ -163,6 +163,6 @@ fun SearchScreen (navController: NavController,modifier: Modifier=Modifier){
 
                 }
             }
-        }
+        }*/
     }
 }

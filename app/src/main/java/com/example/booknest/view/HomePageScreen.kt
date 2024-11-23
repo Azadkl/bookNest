@@ -84,7 +84,7 @@ fun HomePageScreen(modifier: Modifier = Modifier) {
         modifier = Modifier
             .fillMaxHeight()
             //.fillMaxWidth()
-            .padding(16.dp),
+            .padding( top = 100.dp, end = 16.dp, start = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         LazyColumn(

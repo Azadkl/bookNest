@@ -74,7 +74,6 @@ import com.example.booknest.ui.theme.PrimaryColor
 
 @Composable
 fun MyBooksPage(navController: NavController, modifier: Modifier = Modifier) {
-    var search by remember { mutableStateOf("") }
 
     Column(
         modifier = Modifier
@@ -83,31 +82,13 @@ fun MyBooksPage(navController: NavController, modifier: Modifier = Modifier) {
 
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        OutlinedTextField(
-            value = search,
-            placeholder = { Text("Search my books") },
-            onValueChange = { search = it },
-            modifier = Modifier
-                .padding(vertical = 20.dp)
-                .size(width = 320.dp, height = 56.dp),
-            shape = RoundedCornerShape(20.dp),
-            colors = TextFieldDefaults.colors(
-                focusedIndicatorColor = Color.White,
-                unfocusedIndicatorColor = Color.White,
-            ),
-            leadingIcon = {
-                Icon(imageVector = Icons.Outlined.Search, contentDescription = null)
-            },
-            keyboardOptions = KeyboardOptions(
-                imeAction = ImeAction.Search
-            ),
-        )
 
         LazyColumn(
 
             modifier = Modifier
                 .fillMaxHeight()
-                .fillMaxWidth(),
+                .fillMaxWidth()
+                .padding(top = 100.dp),
 
             horizontalAlignment = Alignment.CenterHorizontally,
             contentPadding = PaddingValues(bottom = 90.dp)

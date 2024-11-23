@@ -21,10 +21,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Book
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Group
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Menu
@@ -32,20 +36,27 @@ import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemColors
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SearchBar
+import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -59,6 +70,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.DefaultShadowColor
 import androidx.compose.ui.graphics.vector.DefaultTintColor
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
@@ -70,6 +82,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.booknest.Model.DummyData
 import com.example.booknest.Model.SearchResult
 import com.example.booknest.NavItem
 import com.example.booknest.R
@@ -95,7 +108,135 @@ fun BottomBarScreen(navController: NavController,modifier: Modifier=Modifier) {
         skipPartiallyExpanded = false,
     )
     var selectedIndex by remember { mutableIntStateOf(0) }
+    var allResults = DummyData().dummyData
+    var searchQuery by remember{ mutableStateOf("") }
+    var active by remember { mutableStateOf(false) }
+    val filteredResult= if (searchQuery.isEmpty()){
+        emptyList<SearchResult>()
+    }else{
+        allResults.filter {
+            when(it){
+                is SearchResult.User -> it.name.contains(searchQuery, ignoreCase = true)
+                is SearchResult.Book -> it.title.contains(searchQuery, ignoreCase = true)
+            }
+        }
+
+    }
     Scaffold (
+            topBar = {
+                    Row (modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceEvenly,
+                        verticalAlignment = Alignment.CenterVertically) {
+                        val currentRoute by navController.currentBackStackEntryFlow.collectAsState(initial = null)
+
+                        if (currentRoute?.destination?.route in listOf("search","Home","myBooks")){
+                            SearchBar(
+                                modifier = Modifier
+                                    .let { if (active) it.fillMaxWidth() else it.width(330.dp) }
+                                    .border(width = 0.dp, color = Color.Transparent),
+                                query = searchQuery,
+                                onQueryChange ={searchQuery=it},
+                                onSearch ={active=false },
+                                placeholder = { Text(text = "Search users or books")},
+                                active =active , onActiveChange ={active=it},
+                                colors = SearchBarDefaults.colors(
+                                    containerColor = Color.White,
+                                    dividerColor = Color.Black,
+
+                                    ),
+                                leadingIcon = {
+                                    Icon(imageVector = Icons.Outlined.Search, contentDescription = null)
+                                },
+                                trailingIcon = {
+                                    if(active){
+                                        Icon(
+                                            modifier = Modifier.clickable {
+                                                if (searchQuery.isNotEmpty()){
+                                                    searchQuery = ""
+                                                }else{
+                                                    active=false
+                                                }
+                                            },
+                                            imageVector = Icons.Default.Close,
+                                            contentDescription = "CloseIcon"
+                                        )
+                                    }
+                                })
+
+                            {
+                                LazyColumn {
+                                    items(filteredResult){result->
+                                        when(result){
+                                            is SearchResult.User->{
+                                                ListItem(
+                                                    headlineContent = {
+                                                        Row (verticalAlignment = Alignment.CenterVertically,
+                                                            modifier = Modifier.fillMaxWidth().padding(start = 10.dp)){
+                                                            Image(painter = painterResource(id=result.imageResId), contentDescription ="User Image" ,
+                                                                contentScale = ContentScale.Fit,
+                                                                modifier=Modifier.size(50.dp)
+                                                                    .clip(CircleShape)
+                                                            )
+                                                            Spacer(modifier = Modifier.width(8.dp))
+                                                            Text(result.name)
+                                                        }
+                                                    },
+                                                    colors = ListItemDefaults.colors(
+                                                        containerColor = PrimaryColor,
+                                                        headlineColor = Color.Black,
+                                                    ),
+                                                    modifier=Modifier.padding(top = 10.dp, start = 10.dp, end = 10.dp).height(70.dp).clip(shape = RoundedCornerShape(15.dp)).clickable {
+                                                        navController.navigate("otherProfile/${result.name}/${result.imageResId}")
+                                                    }
+                                                )
+                                            }
+                                            is SearchResult.Book->{
+                                                ListItem(
+                                                    headlineContent = {
+                                                        Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically,)
+                                                        {
+                                                            Image(painter = painterResource(id = result.imageResId), contentDescription = "Book Cover",
+
+                                                                modifier = Modifier
+                                                                    .size(70.dp))
+                                                            Spacer(modifier = Modifier.width(8.dp))
+                                                            Column(modifier = Modifier.weight(1f)) {
+                                                                Text(result.title,)
+                                                                Text(result.author,style= MaterialTheme.typography.bodySmall)
+                                                            }
+                                                            Text(result.rating, style = MaterialTheme.typography.bodySmall, color = Color.Red
+                                                            )
+                                                        }
+                                                    },
+                                                    colors = ListItemDefaults.colors(
+                                                        containerColor = PrimaryColor,
+                                                        headlineColor = Color.Black,
+
+                                                        ), modifier=Modifier.padding(top = 10.dp, start = 10.dp, end = 10.dp).height(70.dp).clip(shape = RoundedCornerShape(15.dp)).clickable {  }
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            Box(
+                                modifier = Modifier
+                                    .padding(top = 30.dp)
+                                    .clip(shape = CircleShape)
+                                    .clickable { navController.navigate("notifications") }
+                                    .size(56.dp)
+                                    .background(Color.White)
+                                   ,
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Notifications,
+                                    contentDescription = null,
+                                    modifier = Modifier.align(Alignment.Center)
+                                )
+                            }
+
+                        }
+                    } },
         bottomBar = {
             Box(
                 modifier = Modifier
@@ -224,6 +365,7 @@ fun BottomBarScreen(navController: NavController,modifier: Modifier=Modifier) {
                 composable("search_screen") { SearchScreen(navController = navController) }
                 composable("settings"){ SettingsScreen(modifier) }
                 composable("groups") { GroupsPage() }
+                composable("notifications"){ NotificationsScreen() }
 
                 composable(
                     "otherProfile/{userName}/{userImageResId}",

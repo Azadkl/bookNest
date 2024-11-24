@@ -96,7 +96,7 @@ fun SearchScreen (navController: NavController,modifier: Modifier=Modifier){
                    .padding(top = 15.dp, bottom = 15.dp)){
                     item {
                         Image(
-                            painter = painterResource(id = R.drawable.farelerveinsanlar),
+                            painter = painterResource(id = R.drawable.houseoflame),
                             contentDescription = "Book Cover",
                             modifier = Modifier
                                 .size(160.dp)
@@ -189,7 +189,7 @@ fun SearchScreen (navController: NavController,modifier: Modifier=Modifier){
 
                     item {
                         Image(
-                            painter = painterResource(id = R.drawable.farelerveinsanlar),
+                            painter = painterResource(id = R.drawable.houseoflame),
                             contentDescription = "Book Cover",
                             modifier = Modifier
                                 .size(160.dp)
@@ -236,7 +236,7 @@ fun SearchScreen (navController: NavController,modifier: Modifier=Modifier){
 
                     item {
                         Image(
-                            painter = painterResource(id = R.drawable.images),
+                            painter = painterResource(id = R.drawable.houseoflame),
                             contentDescription = "Book Cover",
                             modifier = Modifier
                                 .size(160.dp)

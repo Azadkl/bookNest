@@ -182,7 +182,10 @@ fun BottomBarScreen(navController: NavController,modifier: Modifier=Modifier) {
 
                             {
 
-                                LazyColumn {
+                                LazyColumn(   modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(top = 10.dp),
+                                    contentPadding = PaddingValues(bottom = 100.dp),) {
                                     items(filteredResult){result->
                                         when(result){
                                             is SearchResult.User->{
@@ -405,6 +408,11 @@ fun BottomBarScreen(navController: NavController,modifier: Modifier=Modifier) {
                     val rating = backStackEntry.arguments?.getString("rating") ?: "no rating"
 
                     BooksScreen(navController, result = SearchResult.Book(id = id, title = title, author = author, imageResId = imageResId, rating = rating))
+                }
+                composable("book_list_screen/{title}") { backStackEntry ->
+                    val title = backStackEntry.arguments?.getString("title") ?: "Books"
+                    val books = DummyData().dummyData.filterIsInstance<SearchResult.Book>() // Listeyi filtrele
+                    BookListScreen(navController, title, books)
                 }
 
 

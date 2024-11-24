@@ -1,8 +1,11 @@
 package com.example.booknest.view
 
 import androidx.compose.runtime.mutableStateListOf
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.booknest.Model.Book
+import com.example.booknest.Model.DummyData
+import com.example.booknest.Model.SearchResult
 
 class BooksViewModel : ViewModel() {
     val books = mutableStateListOf(
@@ -21,3 +24,4 @@ class BooksViewModel : ViewModel() {
         books.remove(book)
     }
 }
+

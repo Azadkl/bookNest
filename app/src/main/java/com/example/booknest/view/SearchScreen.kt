@@ -99,7 +99,7 @@ fun SearchScreen (navController: NavController,modifier: Modifier=Modifier){
                             painter = painterResource(id = R.drawable.houseoflame),
                             contentDescription = "Book Cover",
                             modifier = Modifier
-                                .size(160.dp)
+                                .size(140.dp)
                         )
                     }
 
@@ -108,7 +108,7 @@ fun SearchScreen (navController: NavController,modifier: Modifier=Modifier){
                            painter = painterResource(id = R.drawable.images),
                            contentDescription = "Book Cover",
                            modifier = Modifier
-                               .size(160.dp)
+                               .size(140.dp)
                        )
                    }
 
@@ -117,7 +117,7 @@ fun SearchScreen (navController: NavController,modifier: Modifier=Modifier){
                            painter = painterResource(id = R.drawable.farelerveinsanlar),
                            contentDescription = "Book Cover",
                            modifier = Modifier
-                               .size(160.dp)
+                               .size(140.dp)
                        )
                    }
 
@@ -126,7 +126,7 @@ fun SearchScreen (navController: NavController,modifier: Modifier=Modifier){
                            painter = painterResource(id = R.drawable.images),
                            contentDescription = "Book Cover",
                            modifier = Modifier
-                               .size(160.dp)
+                               .size(140.dp)
                        )
                    }
                }
@@ -165,7 +165,7 @@ fun SearchScreen (navController: NavController,modifier: Modifier=Modifier){
                             painter = painterResource(id = R.drawable.images),
                             contentDescription = "Book Cover",
                             modifier = Modifier
-                                .size(160.dp)
+                                .size(140.dp)
                         )
                     }
 
@@ -174,7 +174,7 @@ fun SearchScreen (navController: NavController,modifier: Modifier=Modifier){
                             painter = painterResource(id = R.drawable.farelerveinsanlar),
                             contentDescription = "Book Cover",
                             modifier = Modifier
-                                .size(160.dp)
+                                .size(140.dp)
                         )
                     }
 
@@ -183,7 +183,7 @@ fun SearchScreen (navController: NavController,modifier: Modifier=Modifier){
                             painter = painterResource(id = R.drawable.images),
                             contentDescription = "Book Cover",
                             modifier = Modifier
-                                .size(160.dp)
+                                .size(140.dp)
                         )
                     }
 
@@ -192,7 +192,7 @@ fun SearchScreen (navController: NavController,modifier: Modifier=Modifier){
                             painter = painterResource(id = R.drawable.houseoflame),
                             contentDescription = "Book Cover",
                             modifier = Modifier
-                                .size(160.dp)
+                                .size(140.dp)
                         )
                     }
                 }
@@ -230,7 +230,7 @@ fun SearchScreen (navController: NavController,modifier: Modifier=Modifier){
                             painter = painterResource(id = R.drawable.farelerveinsanlar),
                             contentDescription = "Book Cover",
                             modifier = Modifier
-                                .size(160.dp)
+                                .size(140.dp)
                         )
                     }
 
@@ -239,7 +239,7 @@ fun SearchScreen (navController: NavController,modifier: Modifier=Modifier){
                             painter = painterResource(id = R.drawable.houseoflame),
                             contentDescription = "Book Cover",
                             modifier = Modifier
-                                .size(160.dp)
+                                .size(140.dp)
                         )
                     }
 
@@ -248,7 +248,7 @@ fun SearchScreen (navController: NavController,modifier: Modifier=Modifier){
                             painter = painterResource(id = R.drawable.farelerveinsanlar),
                             contentDescription = "Book Cover",
                             modifier = Modifier
-                                .size(160.dp)
+                                .size(140.dp)
                         )
                     }
 
@@ -257,7 +257,7 @@ fun SearchScreen (navController: NavController,modifier: Modifier=Modifier){
                             painter = painterResource(id = R.drawable.images),
                             contentDescription = "Book Cover",
                             modifier = Modifier
-                                .size(160.dp)
+                                .size(140.dp)
                         )
                     }
                 }

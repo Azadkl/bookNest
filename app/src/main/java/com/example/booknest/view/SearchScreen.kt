@@ -77,7 +77,7 @@ fun SearchScreen (navController: NavController,modifier: Modifier=Modifier){
                    Text(text = "MOST READ THIS WEEK", style = TextStyle(
                        fontSize = 15.sp,
                        fontWeight = FontWeight.Medium,
-                       color = Color.LightGray
+                       color = Color.DarkGray
                    )
                    )
                    Text(modifier = Modifier.clickable {
@@ -88,7 +88,7 @@ fun SearchScreen (navController: NavController,modifier: Modifier=Modifier){
                        text = "SEE ALL", style = TextStyle(
                            fontSize = 15.sp,
                            fontWeight = FontWeight.Medium,
-                           color = Color.LightGray
+                           color = Color.DarkGray
                        )
                    )
                }
@@ -144,7 +144,7 @@ fun SearchScreen (navController: NavController,modifier: Modifier=Modifier){
                     Text(text = "NEW RELEASES THIS MONTH", style = TextStyle(
                         fontSize = 15.sp,
                         fontWeight = FontWeight.Medium,
-                        color = Color.LightGray
+                        color = Color.DarkGray
                     )
                     )
                     Text(modifier = Modifier.clickable { val books = DummyData().dummyData.filterIsInstance<SearchResult.Book>()
@@ -154,7 +154,7 @@ fun SearchScreen (navController: NavController,modifier: Modifier=Modifier){
                         text = "SEE ALL", style = TextStyle(
                             fontSize = 15.sp,
                             fontWeight = FontWeight.Medium,
-                            color = Color.LightGray
+                            color = Color.DarkGray
                         )
                     )
                 }
@@ -210,7 +210,7 @@ fun SearchScreen (navController: NavController,modifier: Modifier=Modifier){
                     Text(text = "NEW RELEASES THIS YEAR", style = TextStyle(
                         fontSize = 15.sp,
                         fontWeight = FontWeight.Medium,
-                        color = Color.LightGray
+                        color = Color.DarkGray
                     )
                     )
                     Text(modifier = Modifier.clickable { val books = DummyData().dummyData.filterIsInstance<SearchResult.Book>()
@@ -219,7 +219,7 @@ fun SearchScreen (navController: NavController,modifier: Modifier=Modifier){
                         text = "SEE ALL", style = TextStyle(
                             fontSize = 15.sp,
                             fontWeight = FontWeight.Medium,
-                            color = Color.LightGray
+                            color = Color.DarkGray
                         )
                     )
                 }

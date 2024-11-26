@@ -2,6 +2,7 @@ package com.example.booknest.view
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -68,7 +69,7 @@ fun BookListScreen(navController: NavController, title: String, books: List<Sear
         ) {
             items(books) { book ->
 
-                BookItem(book)
+                BookItem(navController,book)
 
             }
         }
@@ -76,26 +77,26 @@ fun BookListScreen(navController: NavController, title: String, books: List<Sear
 }
 
 @Composable
-fun BookItem(book: SearchResult.Book) {
-    Column {
-
+fun BookItem(navController: NavController, book: SearchResult.Book) {
+    Column(modifier = Modifier.clickable {
+        // Yönlendirme sırasında kitabın tüm özelliklerini geçiyoruz
+        navController.navigate(
+            "books/${book.id}/${book.title}/${book.author}/${book.imageResId}/${book.rating}"
+        )
+    }) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(8.dp, top = 15.dp, bottom = 15.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-
             Image(
                 painter = painterResource(id = book.imageResId),
                 contentDescription = book.title,
                 modifier = Modifier
                     .size(100.dp)
-
             )
             Spacer(modifier = Modifier.width(16.dp))
-
-
             Column(
                 verticalArrangement = Arrangement.SpaceEvenly,
             ) {
@@ -121,11 +122,9 @@ fun BookItem(book: SearchResult.Book) {
                         fontSize = 14.sp
                     )
                 }
-
             }
         }
         Divider(color = Color.Black, thickness = 1.dp, modifier = Modifier.fillMaxWidth())
-
     }
-
 }
+

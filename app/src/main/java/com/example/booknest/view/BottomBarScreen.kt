@@ -149,7 +149,7 @@ fun BottomBarScreen(navController: NavController,modifier: Modifier=Modifier) {
                             }
                             SearchBar(
                                 modifier = Modifier
-                                    .let { if (active) it.fillMaxWidth() else it.width(280.dp) }
+                                    .let { if (active) it.fillMaxWidth() else it.width(273.dp) }
                                     .border(width = 0.dp, color = Color.Transparent),
                                 query = searchQuery,
                                 onQueryChange ={searchQuery=it},
@@ -414,7 +414,7 @@ fun BottomBarScreen(navController: NavController,modifier: Modifier=Modifier) {
                     val books = DummyData().dummyData.filterIsInstance<SearchResult.Book>() // Listeyi filtrele
                     BookListScreen(navController, title, books)
                 }
-
+                composable("comment"){ CommentScreen(navController) }
 
 
                 composable(
@@ -428,6 +428,7 @@ fun BottomBarScreen(navController: NavController,modifier: Modifier=Modifier) {
                     val userImageResId = backStackEntry.arguments?.getInt("userImageResId") ?: R.drawable.loginimage
                     OtherProfilePage(userName = userName, userImageResId = userImageResId)
                 }
+
             }
             }
 

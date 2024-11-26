@@ -116,7 +116,7 @@ fun BooksScreen(navController: NavController,result: SearchResult.Book) {
         Row(modifier = Modifier.fillMaxWidth().padding(start = 20.dp, end = 20.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween) {
-            Column {
+            Column(modifier = Modifier.clickable {  navController.navigate("comment") }) {
                 RatingStars(result.rating.toFloatOrNull()?:0f)
                 Text(text = result.rating,
                     style = TextStyle(fontSize = 25.sp, fontWeight = FontWeight.Medium),

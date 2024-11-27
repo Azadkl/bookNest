@@ -390,7 +390,7 @@ fun BottomBarScreen(navController: NavController,modifier: Modifier=Modifier) {
                 composable("search_screen") { SearchScreen(navController = navController) }
                 composable("settings"){ SettingsScreen() }
                 composable("groups") { GroupsPage() }
-                composable("notifications"){ NotificationsScreen() }
+                composable("notifications"){ NotificationsScreen(navController) }
                 composable(
                     route = "books/{id}/{title}/{author}/{imageResId}/{rating}",
                     arguments = listOf(

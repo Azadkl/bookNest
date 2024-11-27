@@ -388,7 +388,7 @@ fun BottomBarScreen(navController: NavController,modifier: Modifier=Modifier) {
                 composable("booksIWantToRead") { ToRead(viewModel = BooksViewModel()) }
                 composable("currentlyReading") { ReadingNow(viewModel = BooksViewModel()) }
                 composable("search_screen") { SearchScreen(navController = navController) }
-                composable("settings"){ SettingsScreen(modifier) }
+                composable("settings"){ SettingsScreen() }
                 composable("groups") { GroupsPage() }
                 composable("notifications"){ NotificationsScreen() }
                 composable(

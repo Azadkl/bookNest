@@ -23,10 +23,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.booknest.R
 
+
 @Composable
-fun ProfileScreen() {
+fun ProfileScreen(navController: NavController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -41,8 +43,14 @@ fun ProfileScreen() {
         Spacer(modifier = Modifier.height(24.dp))
         ActionSection(
             buttonTitles = listOf("Books Read", "Medals", "Friends", "Challenge"),
-            onClick = { title ->  }
+            onClick = { title ->
+                when (title) {
+                    "Books Read" -> navController.navigate("booksIveRead")
+                    "Medals" -> navController.navigate("medals") 
+                    "Friends" -> navController.navigate("friends") 
+                    "Challenge" -> navController.navigate("challenge") 
+                }
+            }
         )
     }
 }
-

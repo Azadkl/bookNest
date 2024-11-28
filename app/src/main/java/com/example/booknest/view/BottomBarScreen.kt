@@ -332,7 +332,7 @@ fun BottomBarScreen(navController: NavController,modifier: Modifier=Modifier) {
                                 showBottomSheet = false
                                 navController.navigate(route)
                             })
-                            CustomBox(modifier, "Challenge", imageResId = R.drawable.outline_person_24,navController = navController,"",onNavigate = { route ->
+                            CustomBox(modifier, "Challenge", imageResId = R.drawable.outline_person_24,navController = navController,"challenge",onNavigate = { route ->
                                 showBottomSheet = false
                                 navController.navigate(route)
                             })
@@ -380,8 +380,8 @@ fun BottomBarScreen(navController: NavController,modifier: Modifier=Modifier) {
             color = PrimaryColor
         ) {
             NavHost(navController = navController, startDestination = "Home") {
-                composable("Home") { HomePageScreen() }
-                composable("profile") { ProfileScreen() }
+                composable("Home") { HomePageScreen(modifier, navController ) }
+                composable("profile") { ProfileScreen(navController) }
                 composable("search") { SearchScreen(navController) }
                 composable("myBooks") { MyBooksPage(navController) }
                 composable("booksIveRead") { BooksIveRead(viewModel = BooksViewModel()) }
@@ -390,6 +390,7 @@ fun BottomBarScreen(navController: NavController,modifier: Modifier=Modifier) {
                 composable("search_screen") { SearchScreen(navController = navController) }
                 composable("settings"){ SettingsScreen() }
                 composable("groups") { GroupsPage() }
+                composable("challenge") { Challenge(navController) }
                 composable("notifications"){ NotificationsScreen(navController) }
                 composable(
                     route = "books/{id}/{title}/{author}/{imageResId}/{rating}",

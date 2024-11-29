@@ -17,9 +17,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.font.FontWeight
+import androidx.navigation.NavController
 
 @Composable
-fun OtherProfilePage(userName: String, userImageResId: Int) {
+fun OtherProfilePage(userName: String, userImageResId: Int, navController: NavController, currentUser: String) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -28,7 +29,6 @@ fun OtherProfilePage(userName: String, userImageResId: Int) {
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -42,7 +42,14 @@ fun OtherProfilePage(userName: String, userImageResId: Int) {
         Spacer(modifier = Modifier.height(24.dp))
         ActionSection(
             buttonTitles = listOf("Books Read", "Medals", "Friends", "Challenge"),
-            onClick = { title ->  }
+            onClick = { title ->
+                when (title) {
+                    "Books Read" -> navController.navigate("booksIveRead")
+                    "Medals" -> navController.navigate("medals")
+                    "Friends" -> navController.navigate("friends/$userName") // Pass userName as currentUser
+                    "Challenge" -> navController.navigate("challenge")
+                }
+            }
         )
     }
 }

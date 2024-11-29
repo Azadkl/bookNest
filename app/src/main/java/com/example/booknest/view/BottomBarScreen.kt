@@ -100,7 +100,7 @@ fun BottomBarScreen(navController: NavController,modifier: Modifier=Modifier) {
         NavItem("MyBooks", Icons.Default.Book),
         NavItem("More", Icons.Default.Menu),
 
-    )
+        )
     val contentPadding = PaddingValues(0.dp)
     var navController = rememberNavController()
     var showBottomSheet by remember { mutableStateOf(false) }
@@ -123,145 +123,145 @@ fun BottomBarScreen(navController: NavController,modifier: Modifier=Modifier) {
 
     }
     Scaffold (
-            topBar = {
-                    Row (modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceEvenly,
-                        verticalAlignment = Alignment.CenterVertically) {
-                        val currentRoute by navController.currentBackStackEntryFlow.collectAsState(initial = null)
+        topBar = {
+            Row (modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically) {
+                val currentRoute by navController.currentBackStackEntryFlow.collectAsState(initial = null)
 
-                        if (currentRoute?.destination?.route in listOf("search","Home","myBooks")){
-                            Box(
-                                modifier = Modifier
-                                    .let { if (active) it.size(0.dp) else it}
-                                    .padding(top = 30.dp)
-                                    .clip(shape = CircleShape)
-                                    .clickable { navController.navigate("profile") }
-                                    .size(56.dp)
-                                    .background(Color.White)
-                                ,
-                            ) {
+                if (currentRoute?.destination?.route in listOf("search","Home","myBooks")){
+                    Box(
+                        modifier = Modifier
+                            .let { if (active) it.size(0.dp) else it}
+                            .padding(top = 30.dp)
+                            .clip(shape = CircleShape)
+                            .clickable { navController.navigate("profile") }
+                            .size(56.dp)
+                            .background(Color.White)
+                        ,
+                    ) {
 
-                                Image(painter = painterResource(id=R.drawable.azad), contentDescription ="User Image" ,
-                                    contentScale = ContentScale.Fit,
-                                    modifier=Modifier.size(56.dp)
-                                        .clip(CircleShape)
+                        Image(painter = painterResource(id=R.drawable.azad), contentDescription ="User Image" ,
+                            contentScale = ContentScale.Fit,
+                            modifier=Modifier.size(56.dp)
+                                .clip(CircleShape)
+                        )
+                    }
+                    SearchBar(
+                        modifier = Modifier
+                            .let { if (active) it.fillMaxWidth() else it.width(273.dp) }
+                            .border(width = 0.dp, color = Color.Transparent),
+                        query = searchQuery,
+                        onQueryChange ={searchQuery=it},
+                        onSearch ={active=false },
+                        placeholder = { Text(text = "Search users or books")},
+                        active =active , onActiveChange ={active=it},
+                        colors = SearchBarDefaults.colors(
+                            containerColor = Color.White,
+                            dividerColor = Color.Black,
+
+                            ),
+                        leadingIcon = {
+                            Icon(imageVector = Icons.Outlined.Search, contentDescription = null)
+                        },
+                        trailingIcon = {
+                            if(active){
+                                Icon(
+                                    modifier = Modifier.clickable {
+                                        if (searchQuery.isNotEmpty()){
+                                            searchQuery = ""
+                                        }else{
+                                            active=false
+                                        }
+                                    },
+                                    imageVector = Icons.Default.Close,
+                                    contentDescription = "CloseIcon"
                                 )
                             }
-                            SearchBar(
-                                modifier = Modifier
-                                    .let { if (active) it.fillMaxWidth() else it.width(273.dp) }
-                                    .border(width = 0.dp, color = Color.Transparent),
-                                query = searchQuery,
-                                onQueryChange ={searchQuery=it},
-                                onSearch ={active=false },
-                                placeholder = { Text(text = "Search users or books")},
-                                active =active , onActiveChange ={active=it},
-                                colors = SearchBarDefaults.colors(
-                                    containerColor = Color.White,
-                                    dividerColor = Color.Black,
+                        })
 
-                                    ),
-                                leadingIcon = {
-                                    Icon(imageVector = Icons.Outlined.Search, contentDescription = null)
-                                },
-                                trailingIcon = {
-                                    if(active){
-                                        Icon(
-                                            modifier = Modifier.clickable {
-                                                if (searchQuery.isNotEmpty()){
-                                                    searchQuery = ""
-                                                }else{
-                                                    active=false
+                    {
+
+                        LazyColumn(   modifier = Modifier
+                            .fillMaxSize()
+                            .padding(top = 10.dp),
+                            contentPadding = PaddingValues(bottom = 100.dp),) {
+                            items(filteredResult){result->
+                                when(result){
+                                    is SearchResult.User->{
+                                        ListItem(
+                                            headlineContent = {
+                                                Row (verticalAlignment = Alignment.CenterVertically,
+                                                    modifier = Modifier.fillMaxWidth().padding(start = 10.dp)){
+                                                    Image(painter = painterResource(id=result.imageResId), contentDescription ="User Image" ,
+                                                        contentScale = ContentScale.Fit,
+                                                        modifier=Modifier.size(50.dp)
+                                                            .clip(CircleShape)
+                                                    )
+                                                    Spacer(modifier = Modifier.width(8.dp))
+                                                    Text(result.name)
                                                 }
                                             },
-                                            imageVector = Icons.Default.Close,
-                                            contentDescription = "CloseIcon"
+                                            colors = ListItemDefaults.colors(
+                                                containerColor = PrimaryColor,
+                                                headlineColor = Color.Black,
+                                            ),
+                                            modifier=Modifier.padding(top = 10.dp, start = 10.dp, end = 10.dp).height(70.dp).clip(shape = RoundedCornerShape(15.dp)).clickable {
+                                                navController.navigate("otherProfile/${result.name}/${result.imageResId}")
+                                            }
                                         )
                                     }
-                                })
+                                    is SearchResult.Book->{
+                                        ListItem(
+                                            headlineContent = {
+                                                Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically,)
+                                                {
+                                                    Image(painter = painterResource(id = result.imageResId), contentDescription = "Book Cover",
 
-                            {
-
-                                LazyColumn(   modifier = Modifier
-                                    .fillMaxSize()
-                                    .padding(top = 10.dp),
-                                    contentPadding = PaddingValues(bottom = 100.dp),) {
-                                    items(filteredResult){result->
-                                        when(result){
-                                            is SearchResult.User->{
-                                                ListItem(
-                                                    headlineContent = {
-                                                        Row (verticalAlignment = Alignment.CenterVertically,
-                                                            modifier = Modifier.fillMaxWidth().padding(start = 10.dp)){
-                                                            Image(painter = painterResource(id=result.imageResId), contentDescription ="User Image" ,
-                                                                contentScale = ContentScale.Fit,
-                                                                modifier=Modifier.size(50.dp)
-                                                                    .clip(CircleShape)
-                                                            )
-                                                            Spacer(modifier = Modifier.width(8.dp))
-                                                            Text(result.name)
-                                                        }
-                                                    },
-                                                    colors = ListItemDefaults.colors(
-                                                        containerColor = PrimaryColor,
-                                                        headlineColor = Color.Black,
-                                                    ),
-                                                    modifier=Modifier.padding(top = 10.dp, start = 10.dp, end = 10.dp).height(70.dp).clip(shape = RoundedCornerShape(15.dp)).clickable {
-                                                        navController.navigate("otherProfile/${result.name}/${result.imageResId}")
+                                                        modifier = Modifier
+                                                            .size(70.dp))
+                                                    Spacer(modifier = Modifier.width(8.dp))
+                                                    Column(modifier = Modifier.weight(1f)) {
+                                                        Text(result.title,)
+                                                        Text(result.author,style= MaterialTheme.typography.bodySmall)
                                                     }
-                                                )
+                                                    Text(result.rating, style = MaterialTheme.typography.bodySmall, color = Color.Red
+                                                    )
+                                                }
+                                            },
+                                            colors = ListItemDefaults.colors(
+                                                containerColor = PrimaryColor,
+                                                headlineColor = Color.Black,
+
+                                                ), modifier=Modifier.padding(top = 10.dp, start = 10.dp, end = 10.dp).height(70.dp).clip(shape = RoundedCornerShape(15.dp)).clickable {
+                                                navController.navigate("books/${result.id}/${result.title}/${result.author}/${result.imageResId}/${result.rating}")
+
+
                                             }
-                                            is SearchResult.Book->{
-                                                ListItem(
-                                                    headlineContent = {
-                                                        Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically,)
-                                                        {
-                                                            Image(painter = painterResource(id = result.imageResId), contentDescription = "Book Cover",
-
-                                                                modifier = Modifier
-                                                                    .size(70.dp))
-                                                            Spacer(modifier = Modifier.width(8.dp))
-                                                            Column(modifier = Modifier.weight(1f)) {
-                                                                Text(result.title,)
-                                                                Text(result.author,style= MaterialTheme.typography.bodySmall)
-                                                            }
-                                                            Text(result.rating, style = MaterialTheme.typography.bodySmall, color = Color.Red
-                                                            )
-                                                        }
-                                                    },
-                                                    colors = ListItemDefaults.colors(
-                                                        containerColor = PrimaryColor,
-                                                        headlineColor = Color.Black,
-
-                                                        ), modifier=Modifier.padding(top = 10.dp, start = 10.dp, end = 10.dp).height(70.dp).clip(shape = RoundedCornerShape(15.dp)).clickable {
-                                                        navController.navigate("books/${result.id}/${result.title}/${result.author}/${result.imageResId}/${result.rating}")
-
-
-                                                    }
-                                                )
-                                            }
-                                        }
+                                        )
                                     }
                                 }
                             }
-                            Box(
-                                modifier = Modifier
-                                    .padding(top = 30.dp)
-                                    .clip(shape = CircleShape)
-                                    .clickable { navController.navigate("notifications") }
-                                    .size(56.dp)
-                                    .background(Color.White)
-                                   ,
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Notifications,
-                                    contentDescription = null,
-                                    modifier = Modifier.align(Alignment.Center)
-                                )
-                            }
-
                         }
-                    } },
+                    }
+                    Box(
+                        modifier = Modifier
+                            .padding(top = 30.dp)
+                            .clip(shape = CircleShape)
+                            .clickable { navController.navigate("notifications") }
+                            .size(56.dp)
+                            .background(Color.White)
+                        ,
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Notifications,
+                            contentDescription = null,
+                            modifier = Modifier.align(Alignment.Center)
+                        )
+                    }
+
+                }
+            } },
         bottomBar = {
             Box(
                 modifier = Modifier
@@ -269,44 +269,44 @@ fun BottomBarScreen(navController: NavController,modifier: Modifier=Modifier) {
                     .height(90.dp)
                     .clip(RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp))
             ){
-            NavigationBar(
-                modifier=Modifier.fillMaxWidth().height(90.dp),
-                containerColor = Color.White,) {
-                navItemList.forEachIndexed { index, navItem ->
-                    NavigationBarItem(
-                        modifier = Modifier.padding(top = 30.dp),
-                        selected = selectedIndex == index,
-                        onClick = {
-                            selectedIndex = index
-                            when (index) {
-                                0 -> navController.navigate("Home") // Home sayfasına yönlendir
-                                1 -> navController.navigate("search") // Notifications sayfasına yönlendir
-                                2 -> navController.navigate("myBooks") // MyBooks sayfasına yönlendir
-                                3 -> {
+                NavigationBar(
+                    modifier=Modifier.fillMaxWidth().height(90.dp),
+                    containerColor = Color.White,) {
+                    navItemList.forEachIndexed { index, navItem ->
+                        NavigationBarItem(
+                            modifier = Modifier.padding(top = 30.dp),
+                            selected = selectedIndex == index,
+                            onClick = {
+                                selectedIndex = index
+                                when (index) {
+                                    0 -> navController.navigate("Home") // Home sayfasına yönlendir
+                                    1 -> navController.navigate("search") // Notifications sayfasına yönlendir
+                                    2 -> navController.navigate("myBooks") // MyBooks sayfasına yönlendir
+                                    3 -> {
 
-                                    showBottomSheet = true
+                                        showBottomSheet = true
+                                    }
                                 }
-                            }
-                        },
-                        icon = {
-                            Icon(imageVector = navItem.icon, contentDescription = "home")
-                        },
-                        label = {
-                            Text(text = navItem.label)
-                        },
-                        colors = NavigationBarItemColors(
-                            selectedIndicatorColor = PrimaryColor,
-                            selectedIconColor = DefaultShadowColor,
-                            unselectedIconColor = DefaultShadowColor,
-                            selectedTextColor = DefaultShadowColor,
-                            unselectedTextColor = DefaultShadowColor,
-                            disabledTextColor = DefaultShadowColor,
-                            disabledIconColor = DefaultShadowColor
-                        )
+                            },
+                            icon = {
+                                Icon(imageVector = navItem.icon, contentDescription = "home")
+                            },
+                            label = {
+                                Text(text = navItem.label)
+                            },
+                            colors = NavigationBarItemColors(
+                                selectedIndicatorColor = PrimaryColor,
+                                selectedIconColor = DefaultShadowColor,
+                                unselectedIconColor = DefaultShadowColor,
+                                selectedTextColor = DefaultShadowColor,
+                                unselectedTextColor = DefaultShadowColor,
+                                disabledTextColor = DefaultShadowColor,
+                                disabledIconColor = DefaultShadowColor
+                            )
 
-                    )
+                        )
+                    }
                 }
-            }
             }
             if (showBottomSheet) {
                 ModalBottomSheet(
@@ -372,69 +372,71 @@ fun BottomBarScreen(navController: NavController,modifier: Modifier=Modifier) {
 
         },
 
-    content ={ paddingValues ->
-        Surface(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(contentPadding),
-            color = PrimaryColor
-        ) {
-            NavHost(navController = navController, startDestination = "Home") {
-                composable("Home") { HomePageScreen(modifier, navController ) }
-                composable("profile") { ProfileScreen(navController) }
-                composable("search") { SearchScreen(navController) }
-                composable("myBooks") { MyBooksPage(navController) }
-                composable("booksIveRead") { BooksIveRead(viewModel = BooksViewModel()) }
-                composable("booksIWantToRead") { ToRead(viewModel = BooksViewModel()) }
-                composable("currentlyReading") { ReadingNow(viewModel = BooksViewModel()) }
-                composable("search_screen") { SearchScreen(navController = navController) }
-                composable("settings"){ SettingsScreen() }
-                composable("groups") { GroupsPage() }
-                composable("challenge") { Challenge(navController) }
-                composable("notifications"){ NotificationsScreen(navController) }
-                composable(
-                    route = "books/{id}/{title}/{author}/{imageResId}/{rating}",
-                    arguments = listOf(
-                        navArgument("id") { type = NavType.StringType },
-                        navArgument("title") { type = NavType.StringType },
-                        navArgument("author") { type = NavType.StringType },
-                        navArgument("imageResId") { type = NavType.IntType },
-                        navArgument("rating") { type = NavType.StringType }
-                    )
-                ) { backStackEntry ->
-                    val id = backStackEntry.arguments?.getString("id") ?: "-1"
-                    val title = backStackEntry.arguments?.getString("title") ?: "Unknown Title"
-                    val author = backStackEntry.arguments?.getString("author") ?: "Unknown Author"
-                    val imageResId = backStackEntry.arguments?.getInt("imageResId") ?: R.drawable.farelerveinsanlar
-                    val rating = backStackEntry.arguments?.getString("rating") ?: "no rating"
+        content ={ paddingValues ->
+            Surface(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(contentPadding),
+                color = PrimaryColor
+            ) {
+                NavHost(navController = navController, startDestination = "Home") {
+                    composable("Home") { HomePageScreen(modifier ) }
+                    composable("profile") { ProfileScreen(navController) }
+                    composable("search") { SearchScreen(navController) }
+                    composable("myBooks") { MyBooksPage(navController) }
+                    composable("booksIveRead") { BooksIveRead(viewModel = BooksViewModel()) }
+                    composable("booksIWantToRead") { ToRead(viewModel = BooksViewModel()) }
+                    composable("currentlyReading") { ReadingNow(viewModel = BooksViewModel()) }
+                    composable("search_screen") { SearchScreen(navController = navController) }
+                    composable("settings"){ SettingsScreen() }
+                    composable("groups") { GroupsPage() }
+                    composable("challenge") { Challenge(navController) }
+                    composable("medals") { MedalsPage(navController) }
+                    composable("notifications"){ NotificationsScreen(navController) }
+                    composable(
+                        route = "books/{id}/{title}/{author}/{imageResId}/{rating}",
+                        arguments = listOf(
+                            navArgument("id") { type = NavType.StringType },
+                            navArgument("title") { type = NavType.StringType },
+                            navArgument("author") { type = NavType.StringType },
+                            navArgument("imageResId") { type = NavType.IntType },
+                            navArgument("rating") { type = NavType.StringType }
+                        )
+                    ) { backStackEntry ->
+                        val id = backStackEntry.arguments?.getString("id") ?: "-1"
+                        val title = backStackEntry.arguments?.getString("title") ?: "Unknown Title"
+                        val author = backStackEntry.arguments?.getString("author") ?: "Unknown Author"
+                        val imageResId = backStackEntry.arguments?.getInt("imageResId") ?: R.drawable.farelerveinsanlar
+                        val rating = backStackEntry.arguments?.getString("rating") ?: "no rating"
 
-                    BooksScreen(navController, result = SearchResult.Book(id = id, title = title, author = author, imageResId = imageResId, rating = rating))
+                        BooksScreen(navController, result = SearchResult.Book(id = id, title = title, author = author, imageResId = imageResId, rating = rating))
+                    }
+                    composable("book_list_screen/{title}") { backStackEntry ->
+                        val title = backStackEntry.arguments?.getString("title") ?: "Books"
+                        val books = DummyData().dummyData.filterIsInstance<SearchResult.Book>() // Listeyi filtrele
+                        BookListScreen(navController, title, books)
+                    }
+                    composable("comment"){ CommentScreen(navController) }
+
+
+                    composable(
+                        "otherProfile/{userName}/{userImageResId}",
+                        arguments = listOf(
+                            navArgument("userName") { type = NavType.StringType },
+                            navArgument("userImageResId") { type = NavType.IntType }
+                        )
+                    ) { backStackEntry ->
+                        val userName = backStackEntry.arguments?.getString("userName") ?: ""
+                        val userImageResId = backStackEntry.arguments?.getInt("userImageResId") ?: R.drawable.loginimage
+                        OtherProfilePage(userName = userName, userImageResId = userImageResId, navController = navController)
+
+                    }
+
                 }
-                composable("book_list_screen/{title}") { backStackEntry ->
-                    val title = backStackEntry.arguments?.getString("title") ?: "Books"
-                    val books = DummyData().dummyData.filterIsInstance<SearchResult.Book>() // Listeyi filtrele
-                    BookListScreen(navController, title, books)
-                }
-                composable("comment"){ CommentScreen(navController) }
-
-
-                composable(
-                    "otherProfile/{userName}/{userImageResId}",
-                    arguments = listOf(
-                        navArgument("userName") { type = NavType.StringType },
-                        navArgument("userImageResId") { type = NavType.IntType }
-                    )
-                ) { backStackEntry ->
-                    val userName = backStackEntry.arguments?.getString("userName") ?: ""
-                    val userImageResId = backStackEntry.arguments?.getInt("userImageResId") ?: R.drawable.loginimage
-                    OtherProfilePage(userName = userName, userImageResId = userImageResId)
-                }
-
-            }
             }
 
         })
-    }
+}
 
 
 
@@ -466,5 +468,4 @@ fun CustomBox(modifier: Modifier = Modifier, title: String, imageResId: Int,navC
         )
     }
 }
-
 

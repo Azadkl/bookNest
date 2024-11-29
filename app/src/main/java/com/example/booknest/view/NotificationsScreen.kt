@@ -302,7 +302,7 @@ fun getTimeAgo(time: Long): String {
         seconds < 60 -> "$seconds s ago"
         minutes < 60 -> "$minutes m ago"
         hours < 24 -> "$hours h ago"
-        days < 7 -> "$days days ago"
-        else -> "$days days ago"
+        days < 7 -> "$days d ago"
+        else -> "$days d ago"
     }
 }

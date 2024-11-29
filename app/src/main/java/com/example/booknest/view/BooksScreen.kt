@@ -42,11 +42,16 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -83,6 +88,7 @@ fun BooksScreen(navController: NavController,result: SearchResult.Book) {
     var expanded by remember { mutableStateOf(false) }
     var selectedTabIndex by remember { mutableIntStateOf(0) }
     val tabTitles = listOf("ABOUT", "DETAILS","REVIEWS")
+    var userComment by remember { mutableStateOf("") }
 
     // Durum seçenekleri
     val statusOptions = listOf("Want to Read", "Currently Reading", "I've Read")
@@ -95,6 +101,24 @@ fun BooksScreen(navController: NavController,result: SearchResult.Book) {
         language = "English",
         characters = listOf("Jay Gatsby", "Nick Carraway", "Daisy Buchanan")
     )
+    var reviews by remember { mutableStateOf(
+        listOf(
+            Review(
+                userName = "John Doe",
+                userImageResId = R.drawable.azad,
+                rating = 4.5f,
+                comment = "A wonderful book! The story was gripping and the characters were well-developed.",
+                time = System.currentTimeMillis() - (2 * 1000 * 60 * 60 * 24)
+            ),
+            Review(
+                userName = "Jane Smith",
+                userImageResId = R.drawable.azad,
+                rating = 3.0f,
+                comment = "The book was decent, but I felt the pacing was a bit slow.",
+                time = System.currentTimeMillis() - (2 * 1000 * 60 * 60 * 24)
+            )
+        )
+    )}
     val dominantColor = palette?.dominantSwatch?.rgb?.let { Color(it) } ?: Color.Yellow
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -271,7 +295,65 @@ fun BooksScreen(navController: NavController,result: SearchResult.Book) {
                     )
                 }
             }
+            // Yıldızların altında slider ile değerlendirme yapma
+            Spacer(modifier = Modifier.height(16.dp))
+            Text("Set rating:", fontSize = 18.sp, color = Color.Gray)
+
+            // Slider
+            Slider(
+                value = userRating,
+                onValueChange = { newValue ->
+                    // Yarı yıldızları 0.5 adım olarak yuvarla
+                    userRating = (newValue * 2).toInt() / 2f // 0.5'lik adımlarla yuvarlama
+                },
+                valueRange = 0f..5f, // 0 ile 5 arasında bir değer aralığı
+                modifier = Modifier.width(150.dp),
+                colors = SliderDefaults.colors(
+                    thumbColor = Color(0xFF2E8B57),
+                    activeTrackColor = Color(0xFF2E8B57),
+
+                )
+            )
+
+            // Yorum
+            OutlinedTextField(
+                value = userComment,
+                onValueChange = { userComment = it },
+                placeholder = { Text("Your Comment") },
+                modifier = Modifier.width(350.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    unfocusedContainerColor = Color.White,
+                    focusedContainerColor = Color.White,
+                    unfocusedBorderColor = Color.White,
+                    focusedBorderColor = Color.White
+                ),
+                maxLines = 3,
+            )
+            // Gönder butonu
+            Button(onClick = {
+                // Yorum gönderildiğinde, yeni yorum verisini ekleme
+                val newReview = Review(
+                    userName = "Azad Köl",  // Buraya mevcut kullanıcı adı eklenebilir
+                    userImageResId = R.drawable.azad,  // Kullanıcı resmi
+                    rating = userRating,
+                    comment = userComment,
+                    time = System.currentTimeMillis()
+                )
+
+                // Yeni yorumu listeye ekle
+                reviews = reviews + newReview
+
+                // Yorumlar alanını temizle
+                userRating = 0f
+                userComment = ""
+            },
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2E8B57)),
+                shape = RoundedCornerShape(5.dp)
+            ) {
+                Text("Submit Review")
+            }
         }
+
         item {
             TabRow(
                 selectedTabIndex = selectedTabIndex,
@@ -304,7 +386,7 @@ fun BooksScreen(navController: NavController,result: SearchResult.Book) {
                     series = bookDetails.series,
                     language = bookDetails.language,
                     characters = bookDetails.characters))
-                2 -> (ReviewContent())
+                2 -> (ReviewContent(reviews))
             }
 
         }
@@ -399,39 +481,8 @@ fun DetailRow(label: String, value: String) {
     }
 }
 @Composable
-fun ReviewContent() {
+fun ReviewContent(reviews:List<Review>) {
 
-    // Örnek yorumlar listesi
-    val reviews = listOf(
-        Review(
-            userName = "John Doe",
-            userImageResId = R.drawable.azad,
-            rating = 4.5f,
-            comment =  "A wonderful book! The story was gripping and the characters were well-developed.",
-            time = System.currentTimeMillis() - (2 * 1000 * 60 * 60 * 24) // Örnek: 2 gün önce
-        ),
-        Review(
-            userName = "Jane Smith",
-            userImageResId = R.drawable.azad,
-            rating = 3.0f,
-            comment = "The book was decent, but I felt the pacing was a bit slow.",
-            time = System.currentTimeMillis() - (2 * 1000 * 60 * 60 * 24) // Örnek: 2 gün önce
-        ),
-        Review(
-            userName = "John Doe",
-            userImageResId = R.drawable.azad,
-            rating = 4.5f,
-            comment =  "A wonderful book! The story was gripping and the characters were well-developed.",
-            time = System.currentTimeMillis() - (2 * 1000 * 60 * 60 * 24) // Örnek: 2 gün önce
-    ),
-        Review(
-            userName = "Jane Smith",
-            userImageResId = R.drawable.azad,
-            rating = 3.0f,
-            comment = "The book was decent, but I felt the pacing was a bit slow.",
-            time = System.currentTimeMillis() - (2 * 1000 * 60 * 60 * 24) // Örnek: 2 gün önce
-    )
-    )
 
     // LazyColumn'u doğrudan Tab içinde kullan
     Column() {
@@ -484,8 +535,6 @@ fun ReviewCard(review: Review) {
                 Text(
                     text = review.comment,
                     style = TextStyle(fontSize = 14.sp),
-                    maxLines = 3,
-                    overflow = TextOverflow.Ellipsis
                 )
 
                 Spacer(modifier = Modifier.height(4.dp))
@@ -506,7 +555,7 @@ fun ReviewCard(review: Review) {
 
                 // Yıldız Sayısı
                 Text(
-                    text = "${review.rating} / 5",
+                    text = "${review.rating}",
                     style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Bold)
                 )
             }
@@ -522,23 +571,6 @@ data class Review(
     val time: Long, // Unix timestamp
 )
 
-fun getTimeAgo1(time: Long): String {
-    val currentTime = System.currentTimeMillis()
-    val duration = currentTime - time
-
-    val seconds = duration / 1000
-    val minutes = duration / (1000 * 60)
-    val hours = duration / (1000 * 60 * 60)
-    val days = duration / (1000 * 60 * 60 * 24)
-
-    return when {
-        seconds < 60 -> "$seconds s ago"
-        minutes < 60 -> "$minutes m ago"
-        hours < 24 -> "$hours h ago"
-        days < 7 -> "$days days ago"
-        else -> "$days days ago"
-    }
-}
 
 @Composable
 fun RatingStars(rating: Float) {

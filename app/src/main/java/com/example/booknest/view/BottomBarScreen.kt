@@ -381,7 +381,7 @@ fun BottomBarScreen(navController: NavController,modifier: Modifier=Modifier) {
         ) {
             NavHost(navController = navController, startDestination = "Home") {
                 composable("Home") { HomePageScreen() }
-                composable("profile") { ProfileScreen() }
+                composable("profile") { ProfileScreen(navController) }
                 composable("search") { SearchScreen(navController) }
                 composable("myBooks") { MyBooksPage(navController) }
                 composable("booksIveRead") { BooksIveRead(viewModel = BooksViewModel()) }
@@ -415,7 +415,11 @@ fun BottomBarScreen(navController: NavController,modifier: Modifier=Modifier) {
                     BookListScreen(navController, title, books)
                 }
                 composable("comment"){ CommentScreen(navController) }
-
+                composable("medals"){ MedalsPage(navController) }
+                composable("challenge"){ Challenge(navController) }
+                composable("friends/{currentUser}"){backStackEntry ->
+                    val currentUser = backStackEntry.arguments?.getString("currentUser") ?: ""
+                    FriendsPage(navController = navController, currentUser = currentUser) }
 
                 composable(
                     "otherProfile/{userName}/{userImageResId}",
@@ -426,7 +430,7 @@ fun BottomBarScreen(navController: NavController,modifier: Modifier=Modifier) {
                 ) { backStackEntry ->
                     val userName = backStackEntry.arguments?.getString("userName") ?: ""
                     val userImageResId = backStackEntry.arguments?.getInt("userImageResId") ?: R.drawable.loginimage
-                    OtherProfilePage(userName = userName, userImageResId = userImageResId)
+                    OtherProfilePage(navController,userName = userName, userImageResId = userImageResId, currentUser =userName )
                 }
 
             }

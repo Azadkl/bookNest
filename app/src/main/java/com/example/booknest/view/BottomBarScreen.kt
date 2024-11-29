@@ -380,7 +380,7 @@ fun BottomBarScreen(navController: NavController,modifier: Modifier=Modifier) {
                 color = PrimaryColor
             ) {
                 NavHost(navController = navController, startDestination = "Home") {
-                    composable("Home") { HomePageScreen(modifier ) }
+                    composable("Home") { HomePageScreen(modifier) }
                     composable("profile") { ProfileScreen(navController) }
                     composable("search") { SearchScreen(navController) }
                     composable("myBooks") { MyBooksPage(navController) }
@@ -388,51 +388,26 @@ fun BottomBarScreen(navController: NavController,modifier: Modifier=Modifier) {
                     composable("booksIWantToRead") { ToRead(viewModel = BooksViewModel()) }
                     composable("currentlyReading") { ReadingNow(viewModel = BooksViewModel()) }
                     composable("search_screen") { SearchScreen(navController = navController) }
-                    composable("settings"){ SettingsScreen() }
+                    composable("settings") { SettingsScreen() }
                     composable("groups") { GroupsPage() }
+                    composable("friends/{currentUser}") { backStackEntry ->
+                        val currentUser = backStackEntry.arguments?.getString("currentUser") ?: ""
+                        FriendsPage(navController = navController, currentUser = currentUser)
+                    }
                     composable("challenge") { Challenge(navController) }
                     composable("medals") { MedalsPage(navController) }
-                    composable("notifications"){ NotificationsScreen(navController) }
-                    composable(
-                        route = "books/{id}/{title}/{author}/{imageResId}/{rating}",
-                        arguments = listOf(
-                            navArgument("id") { type = NavType.StringType },
-                            navArgument("title") { type = NavType.StringType },
-                            navArgument("author") { type = NavType.StringType },
-                            navArgument("imageResId") { type = NavType.IntType },
-                            navArgument("rating") { type = NavType.StringType }
-                        )
-                    ) { backStackEntry ->
-                        val id = backStackEntry.arguments?.getString("id") ?: "-1"
-                        val title = backStackEntry.arguments?.getString("title") ?: "Unknown Title"
-                        val author = backStackEntry.arguments?.getString("author") ?: "Unknown Author"
-                        val imageResId = backStackEntry.arguments?.getInt("imageResId") ?: R.drawable.farelerveinsanlar
-                        val rating = backStackEntry.arguments?.getString("rating") ?: "no rating"
-
-                        BooksScreen(navController, result = SearchResult.Book(id = id, title = title, author = author, imageResId = imageResId, rating = rating))
-                    }
-                    composable("book_list_screen/{title}") { backStackEntry ->
-                        val title = backStackEntry.arguments?.getString("title") ?: "Books"
-                        val books = DummyData().dummyData.filterIsInstance<SearchResult.Book>() // Listeyi filtrele
-                        BookListScreen(navController, title, books)
-                    }
-                    composable("comment"){ CommentScreen(navController) }
-
-
-                    composable(
-                        "otherProfile/{userName}/{userImageResId}",
-                        arguments = listOf(
-                            navArgument("userName") { type = NavType.StringType },
-                            navArgument("userImageResId") { type = NavType.IntType }
-                        )
-                    ) { backStackEntry ->
+                    composable("notifications") { NotificationsScreen(navController) }
+                    composable("otherProfile/{userName}/{userImageResId}", arguments = listOf(
+                        navArgument("userName") { type = NavType.StringType },
+                        navArgument("userImageResId") { type = NavType.IntType }
+                    )) { backStackEntry ->
                         val userName = backStackEntry.arguments?.getString("userName") ?: ""
                         val userImageResId = backStackEntry.arguments?.getInt("userImageResId") ?: R.drawable.loginimage
-                        OtherProfilePage(userName = userName, userImageResId = userImageResId, navController = navController)
-
+                        OtherProfilePage(userName = userName, userImageResId = userImageResId, navController = navController, currentUser = userName)
                     }
-
                 }
+
+
             }
 
         })

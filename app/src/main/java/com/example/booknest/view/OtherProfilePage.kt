@@ -20,7 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.navigation.NavController
 
 @Composable
-fun OtherProfilePage(navController: NavController,userName: String, userImageResId: Int,  currentUser: String) {
+fun OtherProfilePage(userName: String, userImageResId: Int, navController: NavController, currentUser: String) {
     Column(
         modifier = Modifier
             .fillMaxSize()

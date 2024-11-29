@@ -332,7 +332,7 @@ fun BottomBarScreen(navController: NavController,modifier: Modifier=Modifier) {
                                 showBottomSheet = false
                                 navController.navigate(route)
                             })
-                            CustomBox(modifier, "Challenge", imageResId = R.drawable.outline_person_24,navController = navController,"",onNavigate = { route ->
+                            CustomBox(modifier, "Challenge", imageResId = R.drawable.outline_person_24,navController = navController,"challenge",onNavigate = { route ->
                                 showBottomSheet = false
                                 navController.navigate(route)
                             })
@@ -342,11 +342,11 @@ fun BottomBarScreen(navController: NavController,modifier: Modifier=Modifier) {
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceEvenly
                         ) {
-                            CustomBox(modifier, "Friends", imageResId = R.drawable.outline_group_24,navController = navController,"",onNavigate = { route ->
+                            CustomBox(modifier, "Friends", imageResId = R.drawable.outline_group_24,navController = navController,"friends/Azad Kol",onNavigate = { route ->
                                 showBottomSheet = false
                                 navController.navigate(route)
                             })
-                            CustomBox(modifier, "Awards", imageResId = R.drawable.awards,navController = navController,"",onNavigate = { route ->
+                            CustomBox(modifier, "Awards", imageResId = R.drawable.awards,navController = navController,"medals",onNavigate = { route ->
                                 showBottomSheet = false
                                 navController.navigate(route)
                             })

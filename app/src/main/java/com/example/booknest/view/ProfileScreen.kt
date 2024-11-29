@@ -46,9 +46,9 @@ fun ProfileScreen(navController: NavController) {
             onClick = { title ->
                 when (title) {
                     "Books Read" -> navController.navigate("booksIveRead")
-                    "Medals" -> navController.navigate("medals") 
-                    "Friends" -> navController.navigate("friends") 
-                    "Challenge" -> navController.navigate("challenge") 
+                    "Medals" -> navController.navigate("medals")
+                    "Friends" -> navController.navigate("friends/Azad Kol")
+                    "Challenge" -> navController.navigate("challenge")
                 }
             }
         )

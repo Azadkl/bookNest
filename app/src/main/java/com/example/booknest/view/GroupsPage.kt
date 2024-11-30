@@ -197,7 +197,7 @@ fun GroupsPage(navController: NavController) {
 
 
             Button( onClick = { showBottomSheet = true },
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2E8B57)),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFA500)),
                 shape = RoundedCornerShape(5.dp),
                 modifier = Modifier.padding(end = 25.dp, top = 15.dp).width(175.dp).height(45.dp).align(Alignment.End)
             ) {

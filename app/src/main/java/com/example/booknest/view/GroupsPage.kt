@@ -63,6 +63,8 @@ fun GroupsPage(navController: NavController) {
     var active by remember { mutableStateOf(false) }
     var showBottomSheet by remember { mutableStateOf(false) }
     val dummyData = DummyDataGroups()
+    val joinStates = remember { mutableStateMapOf<Int, Boolean>() }
+
     var allGroups by remember { mutableStateOf(dummyData.dummyGroups) }
     val addGroup: (String) -> Unit = { groupName ->
         val newGroup = Group(id = allGroups.size + 1, name = groupName, imageResId = R.drawable.sharp_groups_24)
@@ -144,17 +146,27 @@ fun GroupsPage(navController: NavController) {
                     contentPadding = PaddingValues(bottom = 100.dp),) {
 
                     items(filteredGroups){result->
+                        val isJoining = joinStates[result.id] ?: false // Varsayılan olarak false
                         ListItem(
                             headlineContent = {
                                 Row (verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.SpaceBetween,
                                     modifier = Modifier.fillMaxWidth().padding(start = 10.dp)){
                                     Image(painter = painterResource(R.drawable.sharp_groups_24), contentDescription ="User Image" ,
                                         contentScale = ContentScale.Fit,
                                         modifier=Modifier.size(50.dp)
                                             .clip(CircleShape)
                                     )
-                                    Spacer(modifier = Modifier.width(8.dp))
+
                                     Text(result.name)
+                                    Button( onClick = {  joinStates[result.id] = !(joinStates[result.id] ?: false)  },
+                                        colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
+                                        shape = RoundedCornerShape(5.dp),
+                                        modifier = Modifier.width(95.dp).height(35.dp)
+                                    ) {
+                                        Text(if (isJoining)"Waiting" else "Join in")
+
+                                    }
                                 }
                             },
                             colors = ListItemDefaults.colors(
@@ -216,6 +228,7 @@ fun GroupsPage(navController: NavController) {
                                 )
                                 Spacer(modifier = Modifier.width(48.dp))
                                 Text(groupName.name, fontSize = 20.sp)
+
 
 
 

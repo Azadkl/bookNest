@@ -1,56 +1,183 @@
 package com.example.booknest.view
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.Image
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.foundation.clickable
 import androidx.navigation.NavController
+import com.example.booknest.Model.SearchResult
+import com.example.booknest.R // Ensure this imports your drawable resources
 
 @Composable
-fun OtherProfilePage(userName: String, userImageResId: Int, navController: NavController, currentUser: String) {
+fun OtherProfilePage(
+    userName: String,
+    userImageResId: Int,
+    navController: NavController,
+    currentUser: String
+) {
+    var isFriendRequestSent by remember { mutableStateOf(false) }
+
+    // Dummy list of books
+    val books = listOf(
+        SearchResult.Book("101", "The Great Gatsby", "F. Scott Fitzgerald", R.drawable.farelerveinsanlar, "4.0"),
+        SearchResult.Book("102", "1984", "George Orwell", R.drawable.farelerveinsanlar, "4.5"),
+        SearchResult.Book("103", "Fareler ve İnsanlar", "John Steinbeck", R.drawable.farelerveinsanlar, "4.6"),
+        SearchResult.Book("104", "Shadows of Self", "Brandon Sanderson", R.drawable.images, "3.6"),
+        SearchResult.Book("105", "House of Flame and Shadow", "Sarah J. Maas", R.drawable.houseoflame, "5.0"),
+        SearchResult.Book("106", "1984", "George Orwell", R.drawable.farelerveinsanlar, "4.5")
+    )
+
+    // Main Column for layout
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White)
-            .verticalScroll(rememberScrollState())
+            .background(Color(0xFFF8F8F8)) // Light background
+            .verticalScroll(rememberScrollState()) // Scrollable content
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        // Profile Header and Stats
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             ProfileHeader(userName = userName, userImageResId = userImageResId)
-            Spacer(modifier = Modifier.width(0.dp))
+
+            Spacer(modifier = Modifier.width(8.dp))
+
             StatsRow()
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
-        ActionSection(
-            buttonTitles = listOf("Books Read", "Medals", "Friends", "Challenge"),
-            onClick = { title ->
-                when (title) {
-                    "Books Read" -> navController.navigate("booksIveRead")
-                    "Medals" -> navController.navigate("medals")
-                    "Friends" -> navController.navigate("friends/$userName") // Pass userName as currentUser
-                    "Challenge" -> navController.navigate("challenge")
-                }
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Friendship and Follow Buttons
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            // Friend Request Button
+            Button(
+                onClick = { isFriendRequestSent = !isFriendRequestSent },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = if (isFriendRequestSent) Color.Red else Color.Blue
+                ),
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(
+                    text = if (isFriendRequestSent) "Pending" else "Add Friend",
+                    color = Color.White,
+                    style = MaterialTheme.typography.bodyMedium
+                )
             }
+
+            Spacer(modifier = Modifier.width(8.dp))
+
+            // Follow Button
+            Button(
+                onClick = { /* Handle Follow Action */ },
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Gray),
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(
+                    text = "Follow",
+                    color = Color.White,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // Books Section
+        Text(
+            text = "BOOKS",
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(vertical = 8.dp)
         )
+
+        // Recently Read and Want to Read Sections
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            // Pass the books list to the BookSection composable
+            BookSection(title = "Recently Read", isRecentlyRead = true, books = books, navController = navController)
+
+        }
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // Want to Read Section
+        BookSection(title = "Want to Read", isRecentlyRead = false, books = books, navController = navController)
+
     }
 }
 
+@Composable
+fun BookSection(
+    title: String,
+    isRecentlyRead: Boolean,
+    books: List<SearchResult.Book>,
+    navController: NavController
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .padding(8.dp)
+    ) {
+        // Title for the section (e.g., "Recently Read", "Want to Read")
+        Text(
+            text = title,
+            style = MaterialTheme.typography.bodyMedium,
+            color = Color.Black
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Displaying books in a horizontal row (LazyRow)
+        LazyRow(
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            items(books) { book ->
+                // Display each book item as an image with a clickable action
+                Image(
+                    painter = painterResource(id = book.imageResId),
+                    contentDescription = book.title,
+                    modifier = Modifier
+                        .width(100.dp)
+                        .height(150.dp)
+                        .padding(end = 10.dp)
+                        .clickable {
+                            navController.navigate(
+                                "books/${book.id}/${book.title}/${book.author}/${book.imageResId}/${book.rating}"
+                            )
+                        },
+                    contentScale = ContentScale.Crop
+                )
+            }
+        }
+    }
+}

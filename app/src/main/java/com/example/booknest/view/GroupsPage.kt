@@ -68,7 +68,15 @@ fun GroupsPage(navController: NavController) {
         val newGroup = Group(id = allGroups.size + 1, name = groupName, imageResId = R.drawable.sharp_groups_24)
         allGroups = allGroups + newGroup
     }
+    val filteredGroups = if(searchQuery.isEmpty()){
+        allGroups
+    }else{
 
+        allGroups.filter {
+          it.name.contains(searchQuery, ignoreCase = true)
+
+        }
+    }
     Column (modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally){
         Row(modifier = Modifier.fillMaxWidth()) {
@@ -96,7 +104,7 @@ fun GroupsPage(navController: NavController) {
         }
         SearchBar(
             modifier = Modifier
-                .let { if (active) it.fillMaxWidth() else it.width(273.dp) }
+                .let { if (active) it.fillMaxWidth() else it.width(350.dp) }
                 .border(width = 0.dp, color = Color.Transparent),
             query = searchQuery,
             onQueryChange ={searchQuery=it},
@@ -129,12 +137,36 @@ fun GroupsPage(navController: NavController) {
 
         {
 
-            LazyColumn(   modifier = Modifier
-                .fillMaxSize()
-                .padding(top = 10.dp),
-                contentPadding = PaddingValues(bottom = 100.dp),) {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = 10.dp),
+                    contentPadding = PaddingValues(bottom = 100.dp),) {
 
+                    items(filteredGroups){result->
+                        ListItem(
+                            headlineContent = {
+                                Row (verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier.fillMaxWidth().padding(start = 10.dp)){
+                                    Image(painter = painterResource(R.drawable.sharp_groups_24), contentDescription ="User Image" ,
+                                        contentScale = ContentScale.Fit,
+                                        modifier=Modifier.size(50.dp)
+                                            .clip(CircleShape)
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text(result.name)
+                                }
+                            },
+                            colors = ListItemDefaults.colors(
+                                containerColor = PrimaryColor,
+                                headlineColor = Color.Black,
+                            ),
+                            modifier=Modifier.padding(top = 10.dp, start = 10.dp, end = 10.dp).height(70.dp).clip(shape = RoundedCornerShape(15.dp)).clickable {
 
+                            }
+                        )
+
+                    }
             }
         }
         Spacer(modifier = Modifier.padding(25.dp))

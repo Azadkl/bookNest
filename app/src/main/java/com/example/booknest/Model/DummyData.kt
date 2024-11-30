@@ -26,3 +26,13 @@ class DummyData {
     )
 
 }
+class DummyDataGroups {
+    val dummyGroups = listOf(
+        Group(id = 1, name = "Book Lovers", imageResId = R.drawable.sharp_groups_24),
+        Group(id = 2, name = "Sci-Fi Readers", imageResId = R.drawable.sharp_groups_24),
+        Group(id = 3, name = "Mystery Novels", imageResId = R.drawable.sharp_groups_24),
+        Group(id = 4, name = "Fantasy Adventures", imageResId = R.drawable.sharp_groups_24),
+        Group(id = 5, name = "Fantasy Adventures", imageResId = R.drawable.sharp_groups_24),
+
+    )
+}

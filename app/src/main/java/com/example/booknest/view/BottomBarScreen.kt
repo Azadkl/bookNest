@@ -389,7 +389,7 @@ fun BottomBarScreen(navController: NavController,modifier: Modifier=Modifier) {
                     composable("currentlyReading") { ReadingNow(viewModel = BooksViewModel()) }
                     composable("search_screen") { SearchScreen(navController = navController) }
                     composable("settings"){ SettingsScreen() }
-                    composable("groups") { GroupsPage() }
+                    composable("groups") { GroupsPage(navController) }
                     composable("friends/{currentUser}") { backStackEntry ->
                         val currentUser = backStackEntry.arguments?.getString("currentUser") ?: ""
                         FriendsPage(navController = navController, currentUser = currentUser)

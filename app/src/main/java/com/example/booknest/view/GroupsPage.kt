@@ -81,68 +81,59 @@ fun GroupsPage(navController: NavController) {
     }
     Column (modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally){
-        Row(modifier = Modifier.fillMaxWidth()) {
-            Box(modifier = Modifier.fillMaxWidth().background(Color.White)) {
-                Row(modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                    IconButton(
-                        onClick = { navController.popBackStack() },
-                        modifier = Modifier.align(Alignment.Top).padding(top = 15.dp)
-                    ) {
+
+        Row (modifier = Modifier.fillMaxWidth()){
+            IconButton(
+                onClick = { navController.popBackStack() },
+                modifier = Modifier.align(Alignment.Top).padding(top = 40.dp)
+                    .let { if (active) it.size(0.dp) else it}
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.ArrowBackIosNew,
+                    contentDescription = "Back",
+                    tint = Color.Black,
+                    modifier = Modifier.padding(bottom = 12.dp).size(35.dp)
+                )
+            }
+            SearchBar(
+                modifier = Modifier
+                    .let { if (active) it.fillMaxWidth() else it.width(350.dp) }
+                    .border(width = 0.dp, color = Color.Transparent),
+                query = searchQuery,
+                onQueryChange ={searchQuery=it},
+                onSearch ={active=false },
+                placeholder = { Text(text = "Search groups")},
+                active =active , onActiveChange ={active=it},
+                colors = SearchBarDefaults.colors(
+                    containerColor = Color.White,
+                    dividerColor = Color.Black,
+
+                    ),
+                leadingIcon = {
+                    Icon(imageVector = Icons.Outlined.Search, contentDescription = null)
+                },
+                trailingIcon = {
+                    if(active){
                         Icon(
-                            imageVector = Icons.Filled.ArrowBackIosNew,
-                            contentDescription = "Back",
-                            tint = Color.Black,
-                            modifier = Modifier.padding(bottom = 12.dp).size(35.dp)
+                            modifier = Modifier.clickable {
+                                if (searchQuery.isNotEmpty()){
+                                    searchQuery = ""
+                                }else{
+                                    active=false
+                                }
+                            },
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "CloseIcon"
                         )
                     }
-                    Spacer(modifier = Modifier.width(85.dp))
-                    Text("Groups Page", fontSize = 25.sp)
-                }
+                })
 
-            }
+            {
 
-        }
-        SearchBar(
-            modifier = Modifier
-                .let { if (active) it.fillMaxWidth() else it.width(350.dp) }
-                .border(width = 0.dp, color = Color.Transparent),
-            query = searchQuery,
-            onQueryChange ={searchQuery=it},
-            onSearch ={active=false },
-            placeholder = { Text(text = "Search groups")},
-            active =active , onActiveChange ={active=it},
-            colors = SearchBarDefaults.colors(
-                containerColor = Color.White,
-                dividerColor = Color.Black,
-
-                ),
-            leadingIcon = {
-                Icon(imageVector = Icons.Outlined.Search, contentDescription = null)
-            },
-            trailingIcon = {
-                if(active){
-                    Icon(
-                        modifier = Modifier.clickable {
-                            if (searchQuery.isNotEmpty()){
-                                searchQuery = ""
-                            }else{
-                                active=false
-                            }
-                        },
-                        imageVector = Icons.Default.Close,
-                        contentDescription = "CloseIcon"
-                    )
-                }
-            })
-
-        {
-
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(top = 10.dp),
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(top = 10.dp),
                     contentPadding = PaddingValues(bottom = 100.dp),) {
 
                     items(filteredGroups){result->
@@ -174,14 +165,17 @@ fun GroupsPage(navController: NavController) {
                                 headlineColor = Color.Black,
                             ),
                             modifier=Modifier.padding(top = 10.dp, start = 10.dp, end = 10.dp).height(70.dp).clip(shape = RoundedCornerShape(15.dp)).clickable {
+                                navController.navigate("info/${result.name}")
 
                             }
                         )
 
                     }
+                }
             }
         }
-        Spacer(modifier = Modifier.padding(25.dp))
+
+        Spacer(modifier = Modifier.padding(15.dp))
         Column(modifier = Modifier.fillMaxSize()) {
             Text("My Groups",
                 modifier = Modifier.align(Alignment.CenterHorizontally),
@@ -192,7 +186,7 @@ fun GroupsPage(navController: NavController) {
                 .padding(8.dp)
                 .clip(shape = RoundedCornerShape(8.dp)),
                 colors = CardDefaults.cardColors(
-                    containerColor = Color.White
+                    containerColor = Color.Transparent
                 )){
                 LazyColumn (  modifier = Modifier
                     .padding(top = 30.dp, start = 10.dp, end = 10.dp)
@@ -207,7 +201,7 @@ fun GroupsPage(navController: NavController) {
                                 .padding(8.dp)
                                 .clip(shape = RoundedCornerShape(8.dp))
 
-                                .clickable {  },
+                                .clickable { navController.navigate("status/${groupName.name}") },
                             shape = RoundedCornerShape(8.dp),
                             colors = CardDefaults.cardColors(
                                 containerColor =  Color(0xFFFFA500)

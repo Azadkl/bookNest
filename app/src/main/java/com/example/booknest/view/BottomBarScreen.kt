@@ -388,7 +388,7 @@ fun BottomBarScreen(navController: NavController,modifier: Modifier=Modifier) {
                     composable("booksIWantToRead") { ToRead(viewModel = BooksViewModel()) }
                     composable("currentlyReading") { ReadingNow(viewModel = BooksViewModel()) }
                     composable("search_screen") { SearchScreen(navController = navController) }
-                    composable("settings"){ SettingsScreen() }
+                    composable("settings"){ SettingsScreen(navController) }
                     composable("groups") { GroupsPage(navController) }
                     composable("friends/{currentUser}") { backStackEntry ->
                         val currentUser = backStackEntry.arguments?.getString("currentUser") ?: ""
@@ -421,6 +421,20 @@ fun BottomBarScreen(navController: NavController,modifier: Modifier=Modifier) {
                         BookListScreen(navController, title, books)
                     }
                     composable("comment"){ CommentScreen(navController) }
+                    composable(
+                        route = "status/{groupName}",
+                        arguments = listOf(navArgument("groupName") { type = NavType.StringType })
+                    ) { backStackEntry ->
+                        val groupName = backStackEntry.arguments?.getString("groupName") ?: "Group"
+                        GroupsStatusPage(navController = navController, groupName = groupName)
+                    }
+                    composable(
+                        route = "info/{groupName}",
+                        arguments = listOf(navArgument("groupName") { type = NavType.StringType })
+                    ) { backStackEntry ->
+                        val groupName = backStackEntry.arguments?.getString("groupName") ?: "Group"
+                        GroupInfoPage(navController = navController, groupName=groupName)
+                    }
 
 
                     composable("otherProfile/{userName}/{userImageResId}", arguments = listOf(

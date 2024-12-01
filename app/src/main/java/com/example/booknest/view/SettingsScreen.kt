@@ -27,11 +27,12 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.navigation.NavController
 import com.example.booknest.R
 import com.example.booknest.ui.theme.PrimaryColor
 
 @Composable
-fun SettingsScreen() {
+fun SettingsScreen(navController: NavController) {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -40,7 +41,7 @@ fun SettingsScreen() {
     ) {
         item { HeaderText() }
         item { ProfileCardUI() }
-        item { GeneralOptionsUI() }
+        item { GeneralOptionsUI(navController) }
         item { SupportOptionsUI() }
     }
 }
@@ -125,7 +126,7 @@ fun ProfileCardUI() {
 
 
 @Composable
-fun GeneralOptionsUI() {
+fun GeneralOptionsUI(navController: NavController) {
     Column(
         modifier = Modifier
             .padding(horizontal = 14.dp)
@@ -150,7 +151,7 @@ fun GeneralOptionsUI() {
             imageVector = Icons.Default.ExitToApp,
             mainText = "Sign out",
             subText = "log out of the application",
-            onClick = {}
+            onClick = {navController.navigate("login")}
         )
 
     }

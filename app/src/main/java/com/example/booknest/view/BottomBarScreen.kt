@@ -426,7 +426,9 @@ fun BottomBarScreen(navController: NavController,modifier: Modifier=Modifier) {
                         arguments = listOf(navArgument("groupName") { type = NavType.StringType })
                     ) { backStackEntry ->
                         val groupName = backStackEntry.arguments?.getString("groupName") ?: "Group"
-                        GroupsStatusPage(navController = navController, groupName = groupName)
+                        val isAdmin = true // Bu değeri, grup yöneticisini belirleyen mantığa göre değiştirebilirsiniz
+                        val dummyData = DummyData().booksOnly // DummyData'dan kitapları alıyoruz
+                        GroupsStatusPage(navController = navController, groupName = groupName,isAdmin=isAdmin,books=dummyData)
                     }
                     composable(
                         route = "info/{groupName}",

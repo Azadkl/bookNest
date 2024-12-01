@@ -24,8 +24,10 @@ class DummyData {
         SearchResult.Book("115","House of Flame and Shadow", "Sarah J. Maas",R.drawable.houseoflame,"5.0"),
         SearchResult.Book("116","Shadows of Self","Brandon Sanderson",R.drawable.images,"3.6")
     )
+    val booksOnly: List<SearchResult.Book> = dummyData.filterIsInstance<SearchResult.Book>()
 
 }
+
 class DummyDataGroups {
     val dummyGroups = listOf(
         Group(id = 1, name = "Book Lovers", imageResId = R.drawable.sharp_groups_24),

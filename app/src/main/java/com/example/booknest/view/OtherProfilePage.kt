@@ -42,12 +42,12 @@ fun OtherProfilePage(
 
     // Dummy list of books
     val books = listOf(
-        SearchResult.Book("101", "The Great Gatsby", "F. Scott Fitzgerald", R.drawable.farelerveinsanlar, "4.0"),
-        SearchResult.Book("102", "1984", "George Orwell", R.drawable.farelerveinsanlar, "4.5"),
-        SearchResult.Book("103", "Fareler ve İnsanlar", "John Steinbeck", R.drawable.farelerveinsanlar, "4.6"),
-        SearchResult.Book("104", "Shadows of Self", "Brandon Sanderson", R.drawable.images, "3.6"),
-        SearchResult.Book("105", "House of Flame and Shadow", "Sarah J. Maas", R.drawable.houseoflame, "5.0"),
-        SearchResult.Book("106", "1984", "George Orwell", R.drawable.farelerveinsanlar, "4.5")
+        SearchResult.Book("101", "The Great Gatsby", "F. Scott Fitzgerald", R.drawable.farelerveinsanlar, "4.0",pageNumber = 300),
+        SearchResult.Book("102", "1984", "George Orwell", R.drawable.farelerveinsanlar, "4.5",pageNumber = 300),
+        SearchResult.Book("103", "Fareler ve İnsanlar", "John Steinbeck", R.drawable.farelerveinsanlar, "4.6",pageNumber = 300),
+        SearchResult.Book("104", "Shadows of Self", "Brandon Sanderson", R.drawable.images, "3.6",pageNumber = 300),
+        SearchResult.Book("105", "House of Flame and Shadow", "Sarah J. Maas", R.drawable.houseoflame, "5.0",pageNumber = 300),
+        SearchResult.Book("106", "1984", "George Orwell", R.drawable.farelerveinsanlar, "4.5",pageNumber = 300)
     )
 
     // Main Column for layout

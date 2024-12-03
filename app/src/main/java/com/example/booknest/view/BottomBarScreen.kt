@@ -384,9 +384,9 @@ fun BottomBarScreen(navController: NavController,modifier: Modifier=Modifier) {
                     composable("profile") { ProfileScreen(navController) }
                     composable("search") { SearchScreen(navController) }
                     composable("myBooks") { MyBooksPage(navController) }
-                    composable("booksIveRead") { BooksIveRead(viewModel = BooksViewModel()) }
-                    composable("booksIWantToRead") { ToRead(viewModel = BooksViewModel()) }
-                    composable("currentlyReading") { ReadingNow(viewModel = BooksViewModel()) }
+                    composable("booksIveRead") { BooksIveRead(viewModel = BooksViewModel(),navController=navController) }
+                    composable("booksIWantToRead") { ToRead(viewModel = BooksViewModel(),navController=navController) }
+                    composable("currentlyReading") { ReadingNow(viewModel = BooksViewModel(),navController=navController) }
                     composable("search_screen") { SearchScreen(navController = navController) }
                     composable("settings"){ SettingsScreen(navController) }
                     composable("groups") { GroupsPage(navController) }
@@ -398,7 +398,7 @@ fun BottomBarScreen(navController: NavController,modifier: Modifier=Modifier) {
                     composable("medals") { MedalsPage(navController) }
                     composable("notifications"){ NotificationsScreen(navController) }
                     composable(
-                        route = "books/{id}/{title}/{author}/{imageResId}/{rating}",
+                        route = "books/{id}/{title}/{author}/{imageResId}/{rating}/{pageNumber}",
                         arguments = listOf(
                             navArgument("id") { type = NavType.StringType },
                             navArgument("title") { type = NavType.StringType },
@@ -412,8 +412,8 @@ fun BottomBarScreen(navController: NavController,modifier: Modifier=Modifier) {
                         val author = backStackEntry.arguments?.getString("author") ?: "Unknown Author"
                         val imageResId = backStackEntry.arguments?.getInt("imageResId") ?: R.drawable.farelerveinsanlar
                         val rating = backStackEntry.arguments?.getString("rating") ?: "no rating"
-
-                        BooksScreen(navController, result = SearchResult.Book(id = id, title = title, author = author, imageResId = imageResId, rating = rating))
+                        val pageNumber = backStackEntry.arguments?.getString("pageNumber")?.toIntOrNull() ?: -1
+                        BooksScreen(navController, result = SearchResult.Book(id = id, title = title, author = author, imageResId = imageResId, rating = rating, pageNumber = pageNumber))
                     }
                     composable("book_list_screen/{title}") { backStackEntry ->
                         val title = backStackEntry.arguments?.getString("title") ?: "Books"

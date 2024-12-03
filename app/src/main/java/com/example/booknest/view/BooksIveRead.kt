@@ -1,5 +1,7 @@
 package com.example.booknest.view
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -16,11 +18,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.booknest.Model.Book
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.painterResource
+import androidx.navigation.NavController
 
 
 @Composable
-fun BooksIveRead(viewModel: BooksViewModel) {
+fun BooksIveRead(viewModel: BooksViewModel,navController: NavController) {
     val books = viewModel.books
 
     Column(
@@ -51,45 +58,70 @@ fun BooksIveRead(viewModel: BooksViewModel) {
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(8.dp),
-                    shape = RoundedCornerShape(16.dp),  // Rounded corners for the Card
+                        .padding(8.dp)
+                        .clip(shape = RoundedCornerShape(16.dp))
+                        .clickable {
+                            navController.navigate(
+                                "books/${book.id}/${book.title}/${book.author}/${book.imageResId}/${book.rating}"
+                            ) },
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = Color.White
+                    )
+                    // Rounded corners for the Card
                    // Use dp for CardElevation
                 ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp)  // Inner padding for content
-                    ) {
-                        // Book title, author, and genre
-                        Text(
-                            text = book.title,  // Book title
-                            style = TextStyle(fontSize = 22.sp, fontWeight = FontWeight.Bold)
+                    Row (modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically){
+                        Image(
+                            painter = painterResource(id = book.imageResId),
+                            contentDescription = book.title,
+                            modifier = Modifier.size(100.dp)
                         )
-
-                        book.author?.let {
-                            Text(
-                                text = "by $it",  // Author name (if available)
-                                style = TextStyle(fontSize = 18.sp, color = Color.Gray)
-                            )
-                        }
-
-                        book.genre?.let {
-                            Text(
-                                text = "Genre: $it",  // Genre of the book
-                                style = TextStyle(fontSize = 16.sp, color = Color.Gray)
-                            )
-                        }
-
-                        // Remove Button for each book
-                        Button(
-                            onClick = {
-                                viewModel.removeBook(book)
-                            },
-                            modifier = Modifier.padding(top = 8.dp)
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp)  // Inner padding for content
                         ) {
-                            Text(text = "Remove")
+                            // Book title, author, and genre
+                            Text(
+                                text = book.title,  // Book title
+                                style = TextStyle(fontSize = 22.sp, fontWeight = FontWeight.Bold)
+                            )
+
+                            book.author?.let {
+                                Text(
+                                    text = "by $it",  // Author name (if available)
+                                    style = TextStyle(fontSize = 18.sp, color = Color.Gray)
+                                )
+                            }
+                            Row(modifier = Modifier.fillMaxWidth()) {
+                                RatingStars(rating = book.rating.toFloatOrNull() ?: 0f)
+                                Spacer(modifier = Modifier.width(8.dp))
+                                book.rating?.let {
+                                    Text(
+                                        text = "$it",  // Genre of the book
+                                        style = TextStyle(fontSize = 16.sp, color = Color.Gray)
+                                    )
+                                }
+                            }
+
+
+                            // Remove Button for each book
+                            Button(
+                                onClick = {
+                                    viewModel.removeBook(book)
+                                },
+                                modifier = Modifier.padding(top = 8.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    Color(0xFF2E8B57)
+                                )
+                            ) {
+                                Text(text = "Remove")
+                            }
                         }
                     }
+
                 }
 
             }

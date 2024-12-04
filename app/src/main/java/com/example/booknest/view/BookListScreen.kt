@@ -81,7 +81,7 @@ fun BookItem(navController: NavController, book: SearchResult.Book) {
     Column(modifier = Modifier.clickable {
         // Yönlendirme sırasında kitabın tüm özelliklerini geçiyoruz
         navController.navigate(
-            "books/${book.id}/${book.title}/${book.author}/${book.imageResId}/${book.rating}"
+            "books/${book.id}/${book.title}/${book.author}/${book.imageResId}/${book.rating}/${book.pageNumber}"
         )
     }) {
         Row(

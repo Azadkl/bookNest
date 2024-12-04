@@ -37,12 +37,14 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -57,6 +59,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -176,7 +179,7 @@ fun GroupsStatusPage(
 
                         // Seçilen Kitap Bilgileri
                         selectedBook?.let { book ->
-                            SelectedBookInfoCard(book)
+                            SelectedBookInfoCard(book,navController)
                         }
 
                     } else {
@@ -185,7 +188,7 @@ fun GroupsStatusPage(
                             Text(text = "No book selected yet", fontSize = 18.sp)
                         } else {
                             // Üye için seçilen kitap bilgilerini göster
-                            SelectedBookInfoCard(selectedBook!!)
+                            SelectedBookInfoCard(selectedBook!!,navController)
                         }
                     }
 
@@ -200,7 +203,9 @@ fun GroupsStatusPage(
                                 } else 0
 
                                 Card(
-                                    modifier = Modifier.fillMaxWidth().padding(start = 20.dp, end = 20.dp).size(width = 45.dp, height = 105.dp),
+                                    modifier = Modifier.fillMaxWidth()
+
+                                        .padding(start = 20.dp, end = 20.dp).size(width = 45.dp, height = 105.dp),
                                     shape = RoundedCornerShape(8.dp),
                                     colors = CardDefaults.cardColors(
                                         containerColor = Color.White
@@ -209,13 +214,17 @@ fun GroupsStatusPage(
                                     Column(modifier = Modifier.padding(16.dp)) {
                                         Text(text = "Book: ${book.title}", fontSize = 18.sp)
                                         Text(text = "Pages Read: $pagesRead/${book.pageNumber}", fontSize = 16.sp)
-                                        Slider(
-                                            value = percentage.toFloat(),
-                                            onValueChange = {},
-                                            valueRange = 0f..100f,
-                                            enabled = false,
-                                            modifier = Modifier.fillMaxWidth()
+                                        LinearProgressIndicator(
+                                            progress = percentage / 100f, // Progress için 0-1 arası bir değer gerekiyor
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .height(8.dp)
+                                                .clip(RoundedCornerShape(4.dp)),
+                                            color = Color(0xFF3CB371), // Aktif track rengi
+                                            trackColor = Color(0xFFD3D3D3) // Pasif track rengi
                                         )
+
+
                                         Text(text = "Completion: $percentage%", fontSize = 14.sp)
                                     }
                                 }
@@ -275,7 +284,7 @@ fun BottomSheet_1(
         shape = RoundedCornerShape(0.dp)
     ) {
         Column(
-            modifier = Modifier.fillMaxSize().background(Color.White),
+            modifier = Modifier.fillMaxSize().background(Color.Transparent),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
@@ -325,11 +334,16 @@ fun BookSelectionList(
     }
 }
 @Composable
-fun SelectedBookInfoCard(book: SearchResult.Book) {
+fun SelectedBookInfoCard(book: SearchResult.Book,navController: NavController) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp),
+            .padding(16.dp)
+            .clip(shape = RoundedCornerShape(15.dp))
+            .clickable { navController.navigate("books/${book.id}/${book.title}/${book.author}/${book.imageResId}/${book.rating}/${book.pageNumber}") }
+
+            ,
+        shape = RoundedCornerShape(15.dp),
         colors = CardDefaults.cardColors(
             containerColor = Color.White
         )

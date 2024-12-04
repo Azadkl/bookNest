@@ -234,7 +234,7 @@ fun BottomBarScreen(navController: NavController,modifier: Modifier=Modifier) {
                                                 headlineColor = Color.Black,
 
                                                 ), modifier=Modifier.padding(top = 10.dp, start = 10.dp, end = 10.dp).height(70.dp).clip(shape = RoundedCornerShape(15.dp)).clickable {
-                                                navController.navigate("books/${result.id}/${result.title}/${result.author}/${result.imageResId}/${result.rating}")
+                                                navController.navigate("books/${result.id}/${result.title}/${result.author}/${result.imageResId}/${result.rating}/${result.pageNumber}")
 
 
                                             }

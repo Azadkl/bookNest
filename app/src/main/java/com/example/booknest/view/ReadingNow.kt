@@ -69,7 +69,7 @@ fun ReadingNow(viewModel: BooksViewModel,navController: NavController) {
                         .clip(shape = RoundedCornerShape(16.dp))
                         .clickable {
                             navController.navigate(
-                            "books/${book.id}/${book.title}/${book.author}/${book.imageResId}/${book.rating}"
+                            "books/${book.id}/${book.title}/${book.author}/${book.imageResId}/${book.rating}/${book.pageNumber}"
                         ) },
 
 

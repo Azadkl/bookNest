@@ -37,7 +37,9 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -54,6 +56,7 @@ import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -93,7 +96,8 @@ import com.example.booknest.ui.theme.PrimaryColor
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BottomBarScreen(navController: NavController,modifier: Modifier=Modifier) {
+fun BottomBarScreen(mainNavController:NavController,modifier: Modifier=Modifier) {
+    var showDialog by remember { mutableStateOf(false) } // Dialog kontrolü için state
     val navItemList = listOf(
         NavItem("Home", Icons.Default.Home),
         NavItem("Search", Icons.Default.Search),
@@ -180,69 +184,108 @@ fun BottomBarScreen(navController: NavController,modifier: Modifier=Modifier) {
                             }
                         })
 
-                    {
-
-                        LazyColumn(   modifier = Modifier
-                            .fillMaxSize()
-                            .padding(top = 10.dp),
-                            contentPadding = PaddingValues(bottom = 100.dp),) {
-                            items(filteredResult){result->
-                                when(result){
-                                    is SearchResult.User->{
-                                        ListItem(
-                                            headlineContent = {
-                                                Row (verticalAlignment = Alignment.CenterVertically,
-                                                    modifier = Modifier.fillMaxWidth().padding(start = 10.dp)){
-                                                    Image(painter = painterResource(id=result.imageResId), contentDescription ="User Image" ,
-                                                        contentScale = ContentScale.Fit,
-                                                        modifier=Modifier.size(50.dp)
-                                                            .clip(CircleShape)
-                                                    )
-                                                    Spacer(modifier = Modifier.width(8.dp))
-                                                    Text(result.name)
-                                                }
-                                            },
-                                            colors = ListItemDefaults.colors(
-                                                containerColor = PrimaryColor,
-                                                headlineColor = Color.Black,
-                                            ),
-                                            modifier=Modifier.padding(top = 10.dp, start = 10.dp, end = 10.dp).height(70.dp).clip(shape = RoundedCornerShape(15.dp)).clickable {
-                                                navController.navigate("otherProfile/${result.name}/${result.imageResId}")
-                                            }
-                                        )
-                                    }
-                                    is SearchResult.Book->{
-                                        ListItem(
-                                            headlineContent = {
-                                                Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically,)
-                                                {
-                                                    Image(painter = painterResource(id = result.imageResId), contentDescription = "Book Cover",
-
-                                                        modifier = Modifier
-                                                            .size(70.dp))
-                                                    Spacer(modifier = Modifier.width(8.dp))
-                                                    Column(modifier = Modifier.weight(1f)) {
-                                                        Text(result.title,)
-                                                        Text(result.author,style= MaterialTheme.typography.bodySmall)
+                    {      // Eğer sonuçlar boşsa, kullanıcıya mesaj göster ve buton ekle
+                        if (filteredResult.isEmpty()) {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(16.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Text(
+                                    text = "If you think the book you're looking for is missing, please contact us to add it.",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = Color.Gray,
+                                    modifier = Modifier.padding(bottom = 20.dp)
+                                )
+                                Button(
+                                    onClick = {
+                                       showDialog=true
+                                    },
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = Color(0xFF2E8B57)
+                                    )
+                                ) {
+                                    Text("Contact Admin")
+                                }
+                                // Dialog gösterme
+                                if (showDialog) {
+                                    ContactAdminDialog(
+                                        onConfirm = { bookTitle, authorName, isbn ->
+                                            // Admin ile iletişime geçilecek işlem yapılabilir
+                                            println("Book Title: $bookTitle, Author: $authorName, ISBN: $isbn")
+                                            showDialog = false // Dialogu kapat
+                                        },
+                                        onDismiss = { showDialog = false } // Dialogu kapatma
+                                    )
+                                }
+                            }
+                        }
+                        else{
+                            LazyColumn(   modifier = Modifier
+                                .fillMaxSize()
+                                .padding(top = 10.dp),
+                                contentPadding = PaddingValues(bottom = 100.dp),) {
+                                items(filteredResult){result->
+                                    when(result){
+                                        is SearchResult.User->{
+                                            ListItem(
+                                                headlineContent = {
+                                                    Row (verticalAlignment = Alignment.CenterVertically,
+                                                        modifier = Modifier.fillMaxWidth().padding(start = 10.dp)){
+                                                        Image(painter = painterResource(id=result.imageResId), contentDescription ="User Image" ,
+                                                            contentScale = ContentScale.Fit,
+                                                            modifier=Modifier.size(50.dp)
+                                                                .clip(CircleShape)
+                                                        )
+                                                        Spacer(modifier = Modifier.width(8.dp))
+                                                        Text(result.name)
                                                     }
-                                                    Text(result.rating, style = MaterialTheme.typography.bodySmall, color = Color.Red
-                                                    )
+                                                },
+                                                colors = ListItemDefaults.colors(
+                                                    containerColor = PrimaryColor,
+                                                    headlineColor = Color.Black,
+                                                ),
+                                                modifier=Modifier.padding(top = 10.dp, start = 10.dp, end = 10.dp).height(70.dp).clip(shape = RoundedCornerShape(15.dp)).clickable {
+                                                    navController.navigate("otherProfile/${result.name}/${result.imageResId}")
                                                 }
-                                            },
-                                            colors = ListItemDefaults.colors(
-                                                containerColor = PrimaryColor,
-                                                headlineColor = Color.Black,
+                                            )
+                                        }
+                                        is SearchResult.Book->{
+                                            ListItem(
+                                                headlineContent = {
+                                                    Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically,)
+                                                    {
+                                                        Image(painter = painterResource(id = result.imageResId), contentDescription = "Book Cover",
 
-                                                ), modifier=Modifier.padding(top = 10.dp, start = 10.dp, end = 10.dp).height(70.dp).clip(shape = RoundedCornerShape(15.dp)).clickable {
-                                                navController.navigate("books/${result.id}/${result.title}/${result.author}/${result.imageResId}/${result.rating}/${result.pageNumber}")
+                                                            modifier = Modifier
+                                                                .size(70.dp))
+                                                        Spacer(modifier = Modifier.width(8.dp))
+                                                        Column(modifier = Modifier.weight(1f)) {
+                                                            Text(result.title,)
+                                                            Text(result.author,style= MaterialTheme.typography.bodySmall)
+                                                        }
+                                                        Text(result.rating, style = MaterialTheme.typography.bodySmall, color = Color.Red
+                                                        )
+                                                    }
+                                                },
+                                                colors = ListItemDefaults.colors(
+                                                    containerColor = PrimaryColor,
+                                                    headlineColor = Color.Black,
+
+                                                    ), modifier=Modifier.padding(top = 10.dp, start = 10.dp, end = 10.dp).height(70.dp).clip(shape = RoundedCornerShape(15.dp)).clickable {
+                                                    navController.navigate("books/${result.id}/${result.title}/${result.author}/${result.imageResId}/${result.rating}/${result.pageNumber}")
 
 
-                                            }
-                                        )
+                                                }
+                                            )
+                                        }
                                     }
                                 }
                             }
                         }
+
+
                     }
                     Box(
                         modifier = Modifier
@@ -388,7 +431,7 @@ fun BottomBarScreen(navController: NavController,modifier: Modifier=Modifier) {
                     composable("booksIWantToRead") { ToRead(viewModel = BooksViewModel(),navController=navController) }
                     composable("currentlyReading") { ReadingNow(viewModel = BooksViewModel(),navController=navController) }
                     composable("search_screen") { SearchScreen(navController = navController) }
-                    composable("settings"){ SettingsScreen(navController) }
+                    composable("settings"){ SettingsScreen(mainNavController) }
                     composable("groups") { GroupsPage(navController) }
                     composable("friends/{currentUser}") { backStackEntry ->
                         val currentUser = backStackEntry.arguments?.getString("currentUser") ?: ""
@@ -455,6 +498,63 @@ fun BottomBarScreen(navController: NavController,modifier: Modifier=Modifier) {
 }
 
 
+@Composable
+fun ContactAdminDialog(onConfirm: (String, String, String) -> Unit, onDismiss: () -> Unit) {
+    var bookTitle by remember { mutableStateOf("") }
+    var authorName by remember { mutableStateOf("") }
+    var isbn by remember { mutableStateOf("") }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        containerColor = Color.White,
+        title = { Text("Contact Admin") },
+        text = {
+            Column(modifier = Modifier.fillMaxWidth()) {
+                // Kitap adı
+                Text(text = "Book Title:")
+                TextField(
+                    value = bookTitle,
+                    onValueChange = { bookTitle = it },
+                    modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
+                )
+
+                // Yazar adı
+                Text(text = "Author Name:")
+                TextField(
+                    value = authorName,
+                    onValueChange = { authorName = it },
+                    modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
+                )
+
+                // ISBN
+                Text(text = "ISBN:")
+                TextField(
+                    value = isbn,
+                    onValueChange = { isbn = it },
+                    modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
+                )
+            }
+        },
+        confirmButton = {
+            Button(onClick = {
+                onConfirm(bookTitle, authorName, isbn)
+            },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF2E8B57)
+                )) {
+                Text("Submit")
+            }
+        },
+        dismissButton = {
+            Button(onClick = onDismiss,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF2E8B57)
+                )) {
+                Text("Cancel")
+            }
+        }
+    )
+}
 
 @Composable
 fun CustomBox(modifier: Modifier = Modifier, title: String, imageResId: Int,navController: NavController,route:String,onNavigate: (String) -> Unit,size:Dp=60.dp) {

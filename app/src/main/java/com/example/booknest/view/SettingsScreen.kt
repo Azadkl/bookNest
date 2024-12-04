@@ -32,7 +32,7 @@ import com.example.booknest.R
 import com.example.booknest.ui.theme.PrimaryColor
 
 @Composable
-fun SettingsScreen(navController: NavController) {
+fun SettingsScreen(mainNavController: NavController) {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -41,7 +41,7 @@ fun SettingsScreen(navController: NavController) {
     ) {
         item { HeaderText() }
         item { ProfileCardUI() }
-        item { GeneralOptionsUI(navController) }
+        item { GeneralOptionsUI(mainNavController = mainNavController) }
         item { SupportOptionsUI() }
     }
 }
@@ -126,7 +126,9 @@ fun ProfileCardUI() {
 
 
 @Composable
-fun GeneralOptionsUI(navController: NavController) {
+fun GeneralOptionsUI(mainNavController: NavController) {
+    var showLogoutDialog by remember { mutableStateOf(false) } // Dialog kontrolü için state
+
     Column(
         modifier = Modifier
             .padding(horizontal = 14.dp)
@@ -134,7 +136,6 @@ fun GeneralOptionsUI(navController: NavController) {
     ) {
         Text(
             text = "General",
-
             fontSize = 14.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier
@@ -144,18 +145,59 @@ fun GeneralOptionsUI(navController: NavController) {
             imageVector = Icons.Default.Settings,
             mainText = "Notifications",
             subText = "Customize notifications",
-            onClick = {}
+            onClick = {} // Boş tıklama işlevi
         )
         DarkModeSettingItem()
         GeneralSettingItem(
             imageVector = Icons.Default.ExitToApp,
             mainText = "Sign out",
-            subText = "log out of the application",
-            onClick = {navController.navigate("login")}
+            subText = "Log out of the application",
+            onClick = { showLogoutDialog = true } // Dialogu aç
         )
 
+        // Çıkış Onay Dialogu
+        if (showLogoutDialog) {
+            LogoutDialog(
+                onConfirm = {
+                    // Login ekranına git
+                    mainNavController.navigate("login") {
+                        popUpTo("login") { inclusive = true }
+                    }
+                },
+                onDismiss = { showLogoutDialog = false }
+            )
+        }
     }
 }
+
+@Composable
+fun LogoutDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        containerColor = Color.White,
+        title = { Text("Sign Out") },
+        text = { Text("Are you sure you want to sign out?") },
+        confirmButton = {
+            Button(onClick = {
+                onConfirm()
+            },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF2E8B57)
+                )) {
+                Text("Yes")
+            }
+        },
+        dismissButton = {
+            Button(onClick = onDismiss,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF2E8B57)
+                )) {
+                Text("No")
+            }
+        }
+    )
+}
+
 
 @Composable
 fun GeneralSettingItem(imageVector: ImageVector, mainText: String, subText: String, onClick: () -> Unit) {

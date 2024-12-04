@@ -53,6 +53,6 @@ fun NavigationExample(){
         composable("login"){ LoginScreen(navController) }
         composable("SignIn"){ SignInScreen(navController) }
         composable("SignUp"){ SignUpScreen(navController) }
-        composable("home"){ BottomBarScreen(navController) }
+        composable("home"){ BottomBarScreen(mainNavController=navController) }
     }
 }

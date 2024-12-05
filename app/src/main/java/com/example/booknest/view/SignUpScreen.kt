@@ -23,6 +23,7 @@ import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.Mail
+import androidx.compose.material.icons.outlined.Numbers
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -50,6 +51,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
@@ -94,9 +96,11 @@ fun SignUpScreen(navController: NavController) {
             val focusManager = LocalFocusManager.current
             val usernameFocusRequester = remember { FocusRequester() }
             val emailFocusRequester = remember { FocusRequester() }
+            val ageFocusRequester = remember { FocusRequester() }
             val passwordFocusRequester = remember { FocusRequester() }
             var username by remember { mutableStateOf("") }
             var email by remember { mutableStateOf("") }
+            var age by remember { mutableStateOf("") }
             var password by remember { mutableStateOf("") }
             var passwordVisible by remember { mutableStateOf(false) }
             Column(
@@ -166,6 +170,36 @@ fun SignUpScreen(navController: NavController) {
                     ),
                     keyboardActions = KeyboardActions(
                         onNext = {
+                            ageFocusRequester.requestFocus()
+                        }
+                    )
+                )
+                OutlinedTextField(
+                    value = age,
+                    placeholder = { Text("Your age") },
+                    onValueChange = { age = it },
+                    modifier = Modifier
+                        .padding(top = 30.dp)
+                        .size(width = 355.dp, height = 55.dp)
+                        .border(width = 0.dp, color = Color.Transparent)
+                        .focusRequester(ageFocusRequester),
+                    shape = RoundedCornerShape(15.dp),
+                    colors = TextFieldDefaults.colors(
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent,
+                    ),
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Outlined.Numbers,
+                            contentDescription = null
+                        )
+                    },
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Next
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onNext = {
                             passwordFocusRequester.requestFocus()
                         }
                     )
@@ -224,7 +258,7 @@ fun SignUpScreen(navController: NavController) {
                 }
                 Button(
                     onClick = {},
-                    modifier = Modifier.padding(top = 40.dp).size(width = 280.dp, height = 40.dp),
+                    modifier = Modifier.padding(top = 10.dp).size(width = 280.dp, height = 40.dp),
                     shape = RoundedCornerShape(5.dp),
                     colors = ButtonDefaults.buttonColors(ButtonColor2)
 
@@ -235,7 +269,7 @@ fun SignUpScreen(navController: NavController) {
                         )
                     )
                 }
-                Spacer(modifier = Modifier.padding(20.dp))
+                Spacer(modifier = Modifier.padding(15.dp))
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
 

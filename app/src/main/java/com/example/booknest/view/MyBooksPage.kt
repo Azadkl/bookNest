@@ -163,18 +163,18 @@ fun MyBooksPage(navController: NavController, modifier: Modifier = Modifier,view
 @Composable
 fun BookCard(navController: NavController, route: String, books: List<SearchResult.Book>) {
     Spacer(modifier = Modifier.padding(3.dp))
+Row (modifier = Modifier.fillMaxWidth()){
 
     LazyRow(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+            .padding(vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         item {
             books.forEachIndexed { index, book ->
                 Box(
                     modifier = Modifier
-                        .offset(x = (-40 * index).dp) // Her kitap arasına 40.dp kadar kaydırma
+                        .offset(x = (-30 * (index-2)).dp) // Her kitap arasına 40.dp kadar kaydırma
                         .zIndex(books.size - index.toFloat()) // Önde görünmesi için zIndex kullanılıyor
                 ) {
                     Image(
@@ -190,6 +190,17 @@ fun BookCard(navController: NavController, route: String, books: List<SearchResu
         }
 
     }
+    Box(modifier = Modifier){
+        Card(modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp)
+                .clip(shape = RoundedCornerShape(16.dp))){
+                    Text("More")
+                }
+    }
+
+}
+
 
     Spacer(modifier = Modifier.padding(3.dp))
     Divider(

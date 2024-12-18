@@ -90,6 +90,7 @@ import com.example.booknest.R
 import com.example.booknest.ui.theme.ButtonColor1
 import com.example.booknest.ui.theme.PrimaryColor
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 
 data class User(
     val userName: String,
@@ -147,7 +148,10 @@ fun FriendItem(friend: User, onClick: () -> Unit) {
             .fillMaxWidth()
             .clickable(onClick = onClick)
             .padding(8.dp),
-        shape = RoundedCornerShape(12.dp)
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color.White
+        )
     ) {
         Row(
             modifier = Modifier

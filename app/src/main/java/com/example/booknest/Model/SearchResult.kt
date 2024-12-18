@@ -13,3 +13,9 @@ data class Group(
     val imageResId: Int
 )
 
+data class Group_2(
+    val name: String,
+    val members: List<String>, // List of member names
+    val currentBook: Book, // The book currently being read by the group
+    val books: List<Book> // List of books associated with the group
+)

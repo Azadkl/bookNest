@@ -1,5 +1,6 @@
 package com.example.booknest.view
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -52,8 +53,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.booknest.R
+import com.example.booknest.api.LoginRequest
+import com.example.booknest.api.api
 import com.example.booknest.ui.theme.ButtonColor1
 import com.example.booknest.ui.theme.ButtonColor2
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @Composable
 fun SignInScreen(navController: NavController) {
@@ -170,7 +176,23 @@ fun SignInScreen(navController: NavController) {
                 ErrorMessage(errorMessage)
                 Button(
                     onClick = {
-                        navController.navigate("home")
+//                        CoroutineScope(Dispatchers.IO).launch {
+//                            try {
+//                                val response = api.login(LoginRequest(username, password))
+//                                if (response.isSuccessful) {
+//                                    val token = response.body()?.token
+//                                    Log.d("Login", "Login successful. Token: $token")
+//                                    // Token'ı kaydet ve bir sonraki sayfaya git
+                                    navController.navigate("home")
+//                                } else {
+//                                    errorMessage = "Login failed"
+//                                    Log.e("Login", "Login failed with code: ${response.code()}")
+//                                }
+//                            } catch (e: Exception) {
+//                                errorMessage = "An error occurred: ${e.message}"
+//                                Log.e("Login", "Exception occurred: ${e.message}")
+//                            }
+//                        }
                     },
                     modifier = Modifier.padding(top = 40.dp).size(width = 280.dp, height = 40.dp),
                     shape = RoundedCornerShape(5.dp),

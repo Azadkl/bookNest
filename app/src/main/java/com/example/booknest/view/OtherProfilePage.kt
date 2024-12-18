@@ -94,20 +94,7 @@ fun OtherProfilePage(
                 )
             }
 
-            Spacer(modifier = Modifier.width(8.dp))
 
-            // Follow Button
-            Button(
-                onClick = { /* Handle Follow Action */ },
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Gray),
-                modifier = Modifier.weight(1f)
-            ) {
-                Text(
-                    text = "Follow",
-                    color = Color.White,
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            }
         }
 
         Spacer(modifier = Modifier.height(24.dp))

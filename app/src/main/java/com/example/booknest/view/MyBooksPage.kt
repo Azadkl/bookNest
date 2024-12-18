@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 
 import androidx.compose.foundation.layout.size
@@ -62,19 +63,21 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.booknest.Book
+import com.example.booknest.Model.SearchResult
 import com.example.booknest.R
 import com.example.booknest.ui.theme.ButtonColor1
 import com.example.booknest.ui.theme.PrimaryColor
 
 @Composable
-fun MyBooksPage(navController: NavController, modifier: Modifier = Modifier) {
-
+fun MyBooksPage(navController: NavController, modifier: Modifier = Modifier,viewModel: BooksViewModel) {
+    val books = viewModel.books.take(3) // Get the first 3 books from the list
     Column(
         modifier = Modifier
             .fillMaxHeight()
@@ -106,7 +109,7 @@ fun MyBooksPage(navController: NavController, modifier: Modifier = Modifier) {
 
                     )
                     Divider(color = Color.Black, thickness = 1.dp, modifier = Modifier.fillMaxWidth(0.8f))
-                    BookCard( navController=navController,"booksIveRead")
+                    BookCard( navController=navController,"booksIveRead",books)
 
                 }
                 Spacer(modifier = Modifier.padding(8.dp))
@@ -126,7 +129,7 @@ fun MyBooksPage(navController: NavController, modifier: Modifier = Modifier) {
                         style = TextStyle(fontSize = 25.sp)
                     )
                     Divider(color = Color.Black, thickness = 1.dp, modifier = Modifier.fillMaxWidth(0.8f))
-                    BookCard( navController=navController,"booksIWantToRead")
+                    BookCard( navController=navController,"booksIWantToRead",books)
 
                 }
                 Spacer(modifier = Modifier.padding(8.dp))
@@ -146,7 +149,7 @@ fun MyBooksPage(navController: NavController, modifier: Modifier = Modifier) {
                         style = TextStyle(fontSize = 25.sp)
                     )
                     Divider(color = Color.Black, thickness = 1.dp, modifier = Modifier.fillMaxWidth(0.8f))
-                    BookCard( navController=navController,"currentlyReading")
+                    BookCard( navController=navController,"currentlyReading",books)
 
                 }
                 Spacer(modifier = Modifier.padding(8.dp))
@@ -156,22 +159,27 @@ fun MyBooksPage(navController: NavController, modifier: Modifier = Modifier) {
     }
 }
 @Composable
-fun BookCard(navController: NavController,route:String) {
+fun BookCard(navController: NavController, route: String, books: List<SearchResult.Book>) {
 
-        Spacer(modifier = Modifier.padding(3.dp))
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight()
-                .padding(horizontal = 30.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
+    Spacer(modifier = Modifier.padding(3.dp))
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 30.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        books.forEach { book ->
+
             Image(
-                modifier = Modifier.clickable {navController.navigate(route) },
-                painter = painterResource(R.drawable.farelerveinsanlar),
+                modifier = Modifier
+                    .clickable { navController.navigate(route) },
+                painter = painterResource(id = book.imageResId),
                 contentDescription = "Book Cover Image",
             )
         }
+    }
+
     Spacer(modifier = Modifier.padding(3.dp))
-        Divider(color = Color.Black, thickness = 1.dp, modifier = Modifier.fillMaxWidth())
+    Divider(color = Color.Black, thickness = 1.dp, modifier = Modifier.fillMaxWidth())
 }

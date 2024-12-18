@@ -371,10 +371,6 @@ fun BottomBarScreen(mainNavController:NavController,modifier: Modifier=Modifier)
                                 showBottomSheet = false
                                 navController.navigate(route)
                             }, size = 80.dp)
-                            CustomBox(modifier, "Top picks", imageResId = R.drawable.outline_person_24,navController = navController,"",onNavigate = { route ->
-                                showBottomSheet = false
-                                navController.navigate(route)
-                            })
                             CustomBox(modifier, "Challenge", imageResId = R.drawable.outline_person_24,navController = navController,"challenge",onNavigate = { route ->
                                 showBottomSheet = false
                                 navController.navigate(route)
@@ -426,7 +422,7 @@ fun BottomBarScreen(mainNavController:NavController,modifier: Modifier=Modifier)
                     composable("Home") { HomePageScreen() }
                     composable("profile") { ProfileScreen(navController) }
                     composable("search") { SearchScreen(navController) }
-                    composable("myBooks") { MyBooksPage(navController) }
+                    composable("myBooks") { MyBooksPage(navController, viewModel = BooksViewModel()) }
                     composable("booksIveRead") { BooksIveRead(viewModel = BooksViewModel(),navController=navController) }
                     composable("booksIWantToRead") { ToRead(viewModel = BooksViewModel(),navController=navController) }
                     composable("currentlyReading") { ReadingNow(viewModel = BooksViewModel(),navController=navController) }

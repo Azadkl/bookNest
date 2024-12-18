@@ -12,7 +12,7 @@ class BooksViewModel : ViewModel() {
     val books = mutableStateListOf(
         SearchResult.Book("101", "The Great Gatsby", "F. Scott Fitzgerald",
             R.drawable.houseoflame,"4.0", pageNumber = 300),
-        SearchResult.Book("102", "1984", "George Orwell", R.drawable.farelerveinsanlar,"4.5",pageNumber = 300),
+        SearchResult.Book("102", "1984", "George Orwell", R.drawable.images,"4.5",pageNumber = 300),
         SearchResult.Book("103","Fareler ve İnsanlar","John Steinbeck",
             R.drawable.farelerveinsanlar,"4.6",pageNumber = 300),
         SearchResult.Book("104","Shadows of Self","Brandon Sanderson", R.drawable.images,"3.6",pageNumber = 300),

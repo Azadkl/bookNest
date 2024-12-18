@@ -5,6 +5,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -55,6 +56,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.ModifierInfo
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
@@ -77,7 +79,7 @@ import com.example.booknest.ui.theme.PrimaryColor
 
 @Composable
 fun MyBooksPage(navController: NavController, modifier: Modifier = Modifier,viewModel: BooksViewModel) {
-    val books = viewModel.books.take(3) // Get the first 3 books from the list
+    val books = viewModel.books.take(6) // Get the first 3 books from the list
     Column(
         modifier = Modifier
             .fillMaxHeight()
@@ -160,26 +162,41 @@ fun MyBooksPage(navController: NavController, modifier: Modifier = Modifier,view
 }
 @Composable
 fun BookCard(navController: NavController, route: String, books: List<SearchResult.Book>) {
-
     Spacer(modifier = Modifier.padding(3.dp))
 
-    Row(
+    LazyRow(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 30.dp),
-        verticalAlignment = Alignment.CenterVertically,
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        books.forEach { book ->
-
-            Image(
-                modifier = Modifier
-                    .clickable { navController.navigate(route) },
-                painter = painterResource(id = book.imageResId),
-                contentDescription = "Book Cover Image",
-            )
+        item {
+            books.forEachIndexed { index, book ->
+                Box(
+                    modifier = Modifier
+                        .offset(x = (-40 * index).dp) // Her kitap arasına 40.dp kadar kaydırma
+                        .zIndex(books.size - index.toFloat()) // Önde görünmesi için zIndex kullanılıyor
+                ) {
+                    Image(
+                        modifier = Modifier
+                            .size(120.dp, 180.dp) // Sabit genişlik ve yükseklik
+                            .clickable { navController.navigate(route) },
+                        painter = painterResource(id = book.imageResId),
+                        contentDescription = "Book Cover Image",
+                        contentScale = ContentScale.Crop
+                    )
+                }
+            }
         }
+
     }
 
     Spacer(modifier = Modifier.padding(3.dp))
-    Divider(color = Color.Black, thickness = 1.dp, modifier = Modifier.fillMaxWidth())
+    Divider(
+        color = Color.Black,
+        thickness = 1.dp,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
+    )
 }

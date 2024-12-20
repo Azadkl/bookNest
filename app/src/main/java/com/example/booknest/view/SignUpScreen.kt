@@ -1,5 +1,6 @@
 package com.example.booknest.view
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -27,6 +28,7 @@ import androidx.compose.material.icons.outlined.Numbers
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -34,7 +36,9 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -58,13 +62,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.booknest.R
+import com.example.booknest.ViewModel.SignUpViewModel
 import com.example.booknest.ui.theme.ButtonColor1
 import com.example.booknest.ui.theme.ButtonColor2
 
+@SuppressLint("UnrememberedMutableState")
 @Composable
-fun SignUpScreen(navController: NavController) {
+fun SignUpScreen(navController: NavController,viewModel: SignUpViewModel) {
     Box (modifier = Modifier.fillMaxSize()) {
         val image: Painter = painterResource(id = R.drawable.loginimage)
+        val _shortPasswordError = mutableStateOf(false)
+        val shortPasswordError: State<Boolean> = _shortPasswordError
         Image(
             painter = image,
             contentDescription = "My Image",
@@ -100,7 +108,7 @@ fun SignUpScreen(navController: NavController) {
             val passwordFocusRequester = remember { FocusRequester() }
             var username by remember { mutableStateOf("") }
             var email by remember { mutableStateOf("") }
-            var age by remember { mutableStateOf("") }
+            var age by remember { mutableIntStateOf(0) }
             var password by remember { mutableStateOf("") }
             var passwordVisible by remember { mutableStateOf(false) }
             Column(
@@ -175,9 +183,14 @@ fun SignUpScreen(navController: NavController) {
                     )
                 )
                 OutlinedTextField(
-                    value = age,
+                    value = age.toString(),  // Convert integer to string for display
                     placeholder = { Text("Your age") },
-                    onValueChange = { age = it },
+                    onValueChange = {
+                        // Ensure the input is numeric and update the state
+                        if (it.isEmpty() || it.all { char -> char.isDigit() }) {
+                            age = it.toIntOrNull() ?: 0
+                        }
+                    },
                     modifier = Modifier
                         .padding(top = 30.dp)
                         .size(width = 355.dp, height = 55.dp)
@@ -241,34 +254,60 @@ fun SignUpScreen(navController: NavController) {
                         }
                     )
                 )
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(16.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.ErrorOutline,
-                        contentDescription = "Error",
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
+//               if (shortPasswordError.value) {
+//                   Row(
+//                       verticalAlignment = Alignment.CenterVertically,
+//                       modifier = Modifier.padding(16.dp)
+//                   ) {
+//                       Icon(
+//                           imageVector = Icons.Filled.ErrorOutline,
+//                           contentDescription = "Error",
+//                       )
+//                       Spacer(modifier = Modifier.width(8.dp))
+//
+//                             viewModel.setErrorMessage("şifre 6")
+//
+//
+//
+//                   }
+//               }
+
+                if (viewModel.errorMessage.value.isNotEmpty()) {
                     Text(
-                        text = "Passwords must be at least 6 characters.",
-
-                        )
-
+                        text = viewModel.errorMessage.value,
+                        color = Color.Red,
+                        modifier = Modifier.padding(top = 10.dp)
+                    )
                 }
                 Button(
-                    onClick = {},
-                    modifier = Modifier.padding(top = 10.dp).size(width = 280.dp, height = 40.dp),
+                    onClick = {
+                    if (username.isEmpty() || password.isEmpty() ||email.isEmpty() || age.toString().isEmpty()) {
+                        viewModel.setErrorMessage("Please fill in all fields")
+                        return@Button
+                    }
+                        else if (password.length<7 ) {
+                        viewModel.setErrorMessage("şifre 6")
+                            return@Button
+                        }
+                        else{_shortPasswordError.value=false
+                            viewModel.signUp(username, firstName = "", lastName = "", email, password,age)}
+
+
+
+                    }, modifier = Modifier
+                        .padding(top = 10.dp)
+                        .size(width = 280.dp, height = 40.dp),
                     shape = RoundedCornerShape(5.dp),
                     colors = ButtonDefaults.buttonColors(ButtonColor2)
-
                 ) {
-                    Text(
-                        "Create account", style = TextStyle(
-                            fontSize = 20.sp
-                        )
-                    )
+                    if (viewModel.isLoading.value) {
+                        CircularProgressIndicator(modifier = Modifier.size(24.dp), color = Color.White)
+                    } else {
+                        Text("Create Account", style = TextStyle(fontSize = 20.sp))
+                    }
                 }
+
+                // Sign-In button
                 Spacer(modifier = Modifier.padding(15.dp))
                 Row(
                     verticalAlignment = Alignment.CenterVertically,

@@ -14,6 +14,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.booknest.ViewModel.LoginViewModel
+import com.example.booknest.ViewModel.SignUpViewModel
 import com.example.booknest.ui.theme.BookNestTheme
 import com.example.booknest.ui.theme.PrimaryColor
 import com.example.booknest.view.BooksIveRead
@@ -49,10 +51,11 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun NavigationExample(){
     val navController = rememberNavController()
+    val viewModel=LoginViewModel()
     NavHost(navController = navController, startDestination = "login") {
         composable("login"){ LoginScreen(navController) }
-        composable("SignIn"){ SignInScreen(navController) }
-        composable("SignUp"){ SignUpScreen(navController) }
-        composable("home"){ BottomBarScreen(mainNavController=navController) }
+        composable("SignIn"){ SignInScreen(navController, viewModel = viewModel) }
+        composable("SignUp"){ SignUpScreen(navController, viewModel = SignUpViewModel()) }
+        composable("home"){ BottomBarScreen(mainNavController=navController, viewModel = viewModel) }
     }
 }

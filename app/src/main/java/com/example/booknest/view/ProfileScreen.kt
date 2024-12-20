@@ -1,5 +1,6 @@
 package com.example.booknest.view
 
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
@@ -25,10 +26,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.booknest.R
+import com.example.booknest.ViewModel.LoginViewModel
 
 
 @Composable
-fun ProfileScreen(navController: NavController) {
+fun ProfileScreen(navController: NavController,viewModel: LoginViewModel) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -37,7 +39,8 @@ fun ProfileScreen(navController: NavController) {
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        ProfileHeader(userName = "Azad Köl", userImageResId = R.drawable.azad)
+        ProfileHeader(userName = viewModel.profileResponse.value?.username, userImageResId = viewModel.profileResponse.value?.avatar)
+        Log.d("ProfileHeader", "User image link: ${viewModel.profileResponse.value?.avatar}")
         Spacer(modifier = Modifier.height(24.dp))
         StatsRow()
         Spacer(modifier = Modifier.height(24.dp))

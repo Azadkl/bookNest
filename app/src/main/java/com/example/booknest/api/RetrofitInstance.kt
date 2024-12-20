@@ -10,13 +10,14 @@ val client = OkHttpClient.Builder()
     .readTimeout(30, TimeUnit.SECONDS)     // Okuma zaman aşımı
     .writeTimeout(30, TimeUnit.SECONDS)    // Yazma zaman aşımı
     .build()
-
 val retrofit = Retrofit.Builder()
-    .baseUrl("http://10.0.2.2:7129")
-    .client(client)  // OkHttpClient ile zaman aşımını artırıyoruz
+    .baseUrl("http://10.0.2.2:7129/")  // HTTPS yerine HTTP kullanmak
+    .client(client)
     .addConverterFactory(GsonConverterFactory.create())
     .build()
 
+
 val api = retrofit.create(BookNestApi::class.java)
+val apiSignUp = retrofit.create(SignUpApi::class.java)
 
 

@@ -30,13 +30,15 @@ import androidx.compose.foundation.clickable
 import androidx.navigation.NavController
 import com.example.booknest.Model.SearchResult
 import com.example.booknest.R // Ensure this imports your drawable resources
+import com.example.booknest.ViewModel.LoginViewModel
 
 @Composable
 fun OtherProfilePage(
     userName: String,
-    userImageResId: Int,
+    userImageResId: String,
     navController: NavController,
-    currentUser: String
+    currentUser: String,
+    viewModel: LoginViewModel
 ) {
     var isFriendRequestSent by remember { mutableStateOf(false) }
 

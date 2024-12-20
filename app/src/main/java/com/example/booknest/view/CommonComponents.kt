@@ -1,7 +1,9 @@
 package com.example.booknest.view
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -13,13 +15,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.rememberImagePainter
 
 @Composable
-fun ProfileHeader(userName: String, userImageResId: Int) {
+fun ProfileHeader(userName: String?, userImageResId: String?) {
     Column(
 
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -27,20 +31,35 @@ fun ProfileHeader(userName: String, userImageResId: Int) {
 
     ) {
         Spacer(modifier = Modifier.height(12.dp))
-        Image(
-            painter = painterResource(id = userImageResId),
-            contentDescription = "Profile Image",
-            modifier = Modifier
-                .size(80.dp)
-                .clip(RoundedCornerShape(50.dp))
-        )
+        userImageResId?.let {
+            Box(
+                modifier = Modifier
+                    .size(100.dp) // Dış boyutu belirtiyoruz
+                    .clip(RoundedCornerShape(95.dp)) // Resmin yuvarlatma şekli
+                    .border(1.dp, Color.Gray, RoundedCornerShape(95.dp)) // Çerçeve ekliyoruz
+            ) {
+                Image(
+                    painter = rememberImagePainter(userImageResId),
+                    contentDescription = "Profile Image",
+                    modifier = Modifier
+                        .fillMaxSize() // Resmi kutunun boyutuna göre doldur
+                        .offset(y = (2).dp), // Resmi yukarı doğru kaydırarak alttan kırp
+                    contentScale = ContentScale.Crop
+                )
+            }
+
+        }
+
         Spacer(modifier = Modifier.height(12.dp))
-        Text(
-            text = userName,
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.Black
-        )
+        userName?.let {
+            Text(
+                text = it,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.Black
+            )
+        }
+
     }
 }
 

@@ -65,6 +65,10 @@ import com.example.booknest.R
 import com.example.booknest.ViewModel.SignUpViewModel
 import com.example.booknest.ui.theme.ButtonColor1
 import com.example.booknest.ui.theme.ButtonColor2
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+
 
 @SuppressLint("UnrememberedMutableState")
 @Composable
@@ -73,6 +77,7 @@ fun SignUpScreen(navController: NavController,viewModel: SignUpViewModel) {
         val image: Painter = painterResource(id = R.drawable.loginimage)
         val _shortPasswordError = mutableStateOf(false)
         val shortPasswordError: State<Boolean> = _shortPasswordError
+        val snackbarHostState = remember { SnackbarHostState() }
         Image(
             painter = image,
             contentDescription = "My Image",
@@ -101,6 +106,7 @@ fun SignUpScreen(navController: NavController,viewModel: SignUpViewModel) {
                 )
 
             }
+            var errorMessage = viewModel.errorMessage.value
             val focusManager = LocalFocusManager.current
             val usernameFocusRequester = remember { FocusRequester() }
             val emailFocusRequester = remember { FocusRequester() }
@@ -254,39 +260,23 @@ fun SignUpScreen(navController: NavController,viewModel: SignUpViewModel) {
                         }
                     )
                 )
-//               if (shortPasswordError.value) {
-//                   Row(
-//                       verticalAlignment = Alignment.CenterVertically,
-//                       modifier = Modifier.padding(16.dp)
-//                   ) {
-//                       Icon(
-//                           imageVector = Icons.Filled.ErrorOutline,
-//                           contentDescription = "Error",
-//                       )
-//                       Spacer(modifier = Modifier.width(8.dp))
-//
-//                             viewModel.setErrorMessage("şifre 6")
-//
-//
-//
-//                   }
-//               }
 
-                if (viewModel.errorMessage.value.isNotEmpty()) {
-                    Text(
-                        text = viewModel.errorMessage.value,
-                        color = Color.Red,
-                        modifier = Modifier.padding(top = 10.dp)
-                    )
+                LaunchedEffect(errorMessage) {
+                    if (errorMessage.isNotEmpty()) {
+                        // Snackbar'ı göster
+                        snackbarHostState.showSnackbar(errorMessage)
+                        // Mesaj gösterildikten sonra sıfırla
+                        viewModel.setErrorMessage("") // Error mesajını sıfırlıyoruz
+                    }
                 }
                 Button(
                     onClick = {
-                    if (username.isEmpty() || password.isEmpty() ||email.isEmpty() || age.toString().isEmpty()) {
-                        viewModel.setErrorMessage("Please fill in all fields")
-                        return@Button
-                    }
+                        if (username.isEmpty() || password.isEmpty() ||email.isEmpty() || age.toString().isEmpty()) {
+                            viewModel.setErrorMessage("Please fill in all fields")
+                            return@Button
+                        }
                         else if (password.length<7 ) {
-                        viewModel.setErrorMessage("şifre 6")
+                            viewModel.setErrorMessage("Password must be at least 7 characters long")
                             return@Button
                         }
                         else{_shortPasswordError.value=false
@@ -343,5 +333,6 @@ fun SignUpScreen(navController: NavController,viewModel: SignUpViewModel) {
                 }
             }
         }
+        SnackbarHost(hostState = snackbarHostState)
     }
 }

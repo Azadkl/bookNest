@@ -1,5 +1,6 @@
 package com.example.booknest.view
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -134,6 +135,7 @@ fun ProfileCardUI(viewModel: LoginViewModel) {
 
 @Composable
 fun GeneralOptionsUI(mainNavController: NavController,viewModel: LoginViewModel) {
+    var deleteAccountDialog by remember { mutableStateOf(false) } // kontrol
     var showLogoutDialog by remember { mutableStateOf(false) } // Dialog kontrolü için state
 
     Column(
@@ -173,6 +175,32 @@ fun GeneralOptionsUI(mainNavController: NavController,viewModel: LoginViewModel)
                     }
                 },
                 onDismiss = { showLogoutDialog = false }
+            )
+        }
+        GeneralSettingItem(
+            imageVector = Icons.Default.ExitToApp,
+            mainText = "Delete Account",
+            subText = "Permanently delete your account",
+            onClick = { deleteAccountDialog = true }
+        )
+
+        if (deleteAccountDialog) {
+            LogoutDialog(
+                onConfirm = {
+                    viewModel.deleteAccount(
+                        token = viewModel.accessToken.value ?: "",  // Ensure you pass a valid token
+
+                        onSuccess = {
+                            mainNavController.navigate("login") {
+                                popUpTo("login") { inclusive = true }
+                            }
+                        },
+                        onFailure = { errorMessage ->
+                            Log.e("DeleteAccount", errorMessage)
+                        }
+                    )
+                },
+                onDismiss = { deleteAccountDialog = false }
             )
         }
 

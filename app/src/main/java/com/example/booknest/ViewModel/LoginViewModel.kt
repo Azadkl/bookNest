@@ -31,6 +31,9 @@ class LoginViewModel : ViewModel() {
     private val _usersResponse = mutableStateOf<List<ProfileBody>?>(null)
     val usersResponse: State<List<ProfileBody>?> = _usersResponse
 
+    private val _deleteAccountResponse = mutableStateOf<String?>(null)
+    val deleteAccountResponse: State<String?> = _deleteAccountResponse
+
 
     fun setTokens(accessToken: String, refreshToken: String?) {
         _accessToken.value = accessToken
@@ -225,7 +228,57 @@ class LoginViewModel : ViewModel() {
             Log.d("LoginViewModel", "No access token, logged out locally.")
         }
     }
+    fun deleteAccount(
+        token: String,
+        onSuccess: () -> Unit,
+        onFailure: (String) -> Unit
+    ) {
 
+        val formattedToken = token.replace("Bearer ", "")
+
+        Log.d("DeleteAccount", "Formatted Token: $formattedToken")
+
+
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val response = api.profile("Bearer $formattedToken")  // This is in the background thread
+                withContext(Dispatchers.Main) {  // Ensure UI updates happen on the main thread
+                    if (response.isSuccessful) {
+                        response.body()?.body?.let { profile ->
+                            val userId = profile.id
+
+                            // Proceed to delete account using the retrieved userId
+                            val deleteResponse = api.deleteAccount("Bearer $formattedToken", userId.toString())
+                            if (deleteResponse.isSuccessful) {
+                                _deleteAccountResponse.value = "Account deleted successfully"
+
+                                Log.d("LoginViewModel", "Account delete successful")
+                                onSuccess()
+                                _accessToken.value = null
+                                _refreshToken.value = null
+                                _isLoggedIn.value = false
+                            } else {
+                                _deleteAccountResponse.value = "Failed to delete account: ${deleteResponse.message()}"
+                                onFailure("Failed to delete account: ${deleteResponse.message()}")
+                            }
+                        } ?: run {
+                            _deleteAccountResponse.value = "Profile response body is null."
+                            onFailure("Profile response body is null.")
+                        }
+                    } else {
+                        _deleteAccountResponse.value =
+                            "Failed to fetch user profile. Server response: ${response.code()}"
+                        onFailure("Failed to fetch user profile. Server response: ${response.code()}")
+                    }
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {  // Ensure error handling happens on the main thread
+                    _deleteAccountResponse.value = "Error: ${e.message}"
+                    onFailure("Error: ${e.message}")
+                }
+            }
+        }
+    }
 
 
     // Hata mesajını değiştiren bir fonksiyon

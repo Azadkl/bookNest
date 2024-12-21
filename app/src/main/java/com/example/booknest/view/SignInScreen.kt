@@ -201,6 +201,7 @@ fun SignInScreen(navController: NavController,viewModel: LoginViewModel) {
                         // API çağrısı ViewModel üzerinden yapılır
                         viewModel.login(username, password)
 
+
                     },
                     modifier = Modifier.padding(top = 40.dp).size(width = 280.dp, height = 40.dp),
                     shape = RoundedCornerShape(5.dp),
@@ -223,6 +224,7 @@ fun SignInScreen(navController: NavController,viewModel: LoginViewModel) {
                 LaunchedEffect(viewModel.isLoggedIn.value) {
                     if (viewModel.isLoggedIn.value) {
                         navController.navigate("home")
+                        viewModel.fetchProfile()
                     }
                 }
 

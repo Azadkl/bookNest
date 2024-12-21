@@ -59,7 +59,7 @@ class LoginViewModel : ViewModel() {
                             _accessToken.value = accessToken
                             _refreshToken.value = refreshToken
                             _isLoggedIn.value = true
-                            _errorMessage.value = "Login Successful"
+                            _errorMessage.value = "Sign-out Successful"
                             Log.d("LoginViewModel", "Login Successful - AccessToken: $accessToken")
                         } else {
                             _isLoggedIn.value = false // Başarısız giriş

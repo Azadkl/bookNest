@@ -24,15 +24,19 @@ import androidx.compose.material.icons.filled.PrivacyTip
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import coil.compose.rememberImagePainter
 import com.example.booknest.R
+import com.example.booknest.ViewModel.LoginViewModel
 import com.example.booknest.ui.theme.PrimaryColor
 
 @Composable
-fun SettingsScreen(mainNavController: NavController) {
+fun SettingsScreen(mainNavController: NavController,viewModel: LoginViewModel) {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -40,8 +44,8 @@ fun SettingsScreen(mainNavController: NavController) {
         contentPadding = PaddingValues(bottom = 90.dp)
     ) {
         item { HeaderText() }
-        item { ProfileCardUI() }
-        item { GeneralOptionsUI(mainNavController = mainNavController) }
+        item { ProfileCardUI(viewModel) }
+        item { GeneralOptionsUI(mainNavController = mainNavController, viewModel) }
         item { SupportOptionsUI() }
     }
 }
@@ -62,7 +66,7 @@ fun HeaderText() {
 }
 
 @Composable
-fun ProfileCardUI() {
+fun ProfileCardUI(viewModel: LoginViewModel) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -86,13 +90,13 @@ fun ProfileCardUI() {
 
                 )
 
-                Text(
-                    text = "UI.Stack.YT@gmail.com",
+                viewModel.profileResponse.value?.email?.let {  Text(
+                    text =it,
 
                     color = Color.Gray,
-                    fontSize = 10.sp,
+                    fontSize = 15.sp,
 
-                )
+                )}
 
                 Button(
                     modifier = Modifier.padding(top = 10.dp),
@@ -116,9 +120,12 @@ fun ProfileCardUI() {
                 }
             }
             Image(
-                painter = painterResource(id = R.drawable.azad),
+                painter = rememberImagePainter(viewModel.profileResponse.value?.avatar),
                 contentDescription = "",
-                modifier = Modifier.height(120.dp).clip(shape = CircleShape)
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .size(90.dp)
+                    .clip(shape = CircleShape)
             )
         }
     }
@@ -126,7 +133,7 @@ fun ProfileCardUI() {
 
 
 @Composable
-fun GeneralOptionsUI(mainNavController: NavController) {
+fun GeneralOptionsUI(mainNavController: NavController,viewModel: LoginViewModel) {
     var showLogoutDialog by remember { mutableStateOf(false) } // Dialog kontrolü için state
 
     Column(
@@ -160,13 +167,15 @@ fun GeneralOptionsUI(mainNavController: NavController) {
             LogoutDialog(
                 onConfirm = {
                     // Login ekranına git
-                    mainNavController.navigate("login") {
-                        popUpTo("login") { inclusive = true }
+                    viewModel.logout()
+                    mainNavController.navigate("SignIn") {
+                        popUpTo("SignIn") { inclusive = true }
                     }
                 },
                 onDismiss = { showLogoutDialog = false }
             )
         }
+
     }
 }
 

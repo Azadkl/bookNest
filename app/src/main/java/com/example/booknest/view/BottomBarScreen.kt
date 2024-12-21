@@ -154,9 +154,9 @@ fun BottomBarScreen(mainNavController:NavController,modifier: Modifier=Modifier,
                         ,
                     ) {
 
-                        Image(painter = painterResource(id=R.drawable.azad), contentDescription ="User Image" ,
-                            contentScale = ContentScale.Fit,
-                            modifier=Modifier.size(56.dp)
+                        Image(painter = rememberImagePainter(viewModel.profileResponse.value?.avatar), contentDescription ="User Image" ,
+                            contentScale = ContentScale.Crop,
+                            modifier=Modifier.fillMaxSize()
                                 .clip(CircleShape)
                         )
                     }
@@ -463,8 +463,8 @@ fun BottomBarScreen(mainNavController:NavController,modifier: Modifier=Modifier,
                                     Image(
                                         painter = rememberImagePainter(viewModel.profileResponse.value?.avatar),
                                         contentDescription = "User Profile Image",
+                                        contentScale = ContentScale.Crop,
                                         modifier = Modifier
-                                            .offset(y=(3.dp))
                                             .align(Alignment.Center)
                                             .size(80.dp)
                                     )
@@ -536,7 +536,7 @@ fun BottomBarScreen(mainNavController:NavController,modifier: Modifier=Modifier,
                     composable("booksIWantToRead") { ToRead(viewModel = BooksViewModel(),navController=navController) }
                     composable("currentlyReading") { ReadingNow(viewModel = BooksViewModel(),navController=navController) }
                     composable("search_screen") { SearchScreen(navController = navController) }
-                    composable("settings"){ SettingsScreen(mainNavController) }
+                    composable("settings"){ SettingsScreen(mainNavController,viewModel=viewModel) }
                     composable("groups") { GroupsPage(navController) }
                     composable("friends/{currentUser}") { backStackEntry ->
                         val currentUser = backStackEntry.arguments?.getString("currentUser") ?: ""

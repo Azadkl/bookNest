@@ -23,7 +23,7 @@
                                 <PersistentState>
                                   <option name="values">
                                     <map>
-                                      <entry key="url" value="file:/$PROJECT_DIR$/../../../Pc%20Engineer/AppData/Local/Android/Sdk/icons/material/materialiconsoutlined/group/outline_group_24.xml" />
+                                      <entry key="url" value="file:/$PROJECT_DIR$/../../../Pc%20Engineer/AppData/Local/Android/Sdk/icons/material/materialicons/expand_more/baseline_expand_more_24.xml" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -34,7 +34,7 @@
                         <option name="values">
                           <map>
                             <entry key="color" value="877c7c" />
-                            <entry key="outputName" value="outline_group_24" />
+                            <entry key="outputName" value="baseline_expand_more_24" />
                             <entry key="sourceFile" value="C:\Users\Pc Engineer\AndroidStudioProjects\bookNest" />
                           </map>
                         </option>

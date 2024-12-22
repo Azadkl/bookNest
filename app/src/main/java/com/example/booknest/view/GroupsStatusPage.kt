@@ -71,6 +71,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.booknest.Model.DummyData
+import com.example.booknest.Model.DummyDataGroups
 import com.example.booknest.Model.SearchResult
 import com.example.booknest.R
 import com.example.booknest.ui.theme.ButtonColor1
@@ -85,6 +86,8 @@ fun GroupsStatusPage(
     isAdmin: Boolean,
     books: List<SearchResult.Book> // Kitapları alıyoruz
 ) {
+    val dummyData = DummyDataGroups()
+    var allGroups by remember { mutableStateOf(dummyData.dummyGroups) }
     var selectedBook by remember { mutableStateOf<SearchResult.Book?>(null) }
     var searchQuery by remember { mutableStateOf("") }
     var active by remember { mutableStateOf(false) }
@@ -104,7 +107,7 @@ fun GroupsStatusPage(
                     }
                 },
                 actions = {
-                    IconButton(onClick = { /* Handle info icon click */ }) {
+                    IconButton(onClick = { navController.navigate("info/$groupName")}) {
                         Icon(imageVector = Icons.Default.Info, contentDescription = "Info")
                     }
                 },

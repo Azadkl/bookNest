@@ -27,6 +27,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.ui.draw.clip
 import androidx.navigation.NavController
 import com.example.booknest.Model.SearchResult
 import com.example.booknest.R // Ensure this imports your drawable resources
@@ -79,7 +81,8 @@ fun OtherProfilePage(
         // Friendship and Follow Buttons
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.CenterVertically
         ) {
             // Friend Request Button
             Button(
@@ -97,9 +100,58 @@ fun OtherProfilePage(
             }
 
 
+
+
+
+        }
+        Row(modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically) {
+            Column(modifier = Modifier,
+                horizontalAlignment = Alignment.CenterHorizontally) {
+                Box(
+                    modifier = Modifier
+                        .size(74.dp)
+                        .clip(shape = CircleShape)
+                        .clickable { /* Implement challenge logic */ },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.target),
+                        contentDescription = "Challenge Icon",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.size(75.dp)
+                    )
+
+                }
+                Text(text = "Start Challange")
+
+            }
+            Column(modifier = Modifier,
+                horizontalAlignment = Alignment.CenterHorizontally) {
+                Box(
+                    modifier = Modifier
+                        .size(74.dp)
+                        .clip(shape = CircleShape)
+                        .clickable { /* Implement challenge logic */ },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.awards),
+                        contentDescription = "Challenge Icon",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.size(64.dp)
+                    )
+
+                }
+                Text(text = "Awards")
+
+            }
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
+
+
+
 
         // Books Section
         Text(
@@ -117,10 +169,11 @@ fun OtherProfilePage(
             BookSection(title = "Recently Read", isRecentlyRead = true, books = books, navController = navController)
 
         }
-        Spacer(modifier = Modifier.height(24.dp))
+
 
         // Want to Read Section
         BookSection(title = "Want to Read", isRecentlyRead = false, books = books, navController = navController)
+
 
     }
 }

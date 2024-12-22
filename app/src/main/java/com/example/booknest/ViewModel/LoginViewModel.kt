@@ -59,8 +59,7 @@ class LoginViewModel : ViewModel() {
                         val accessToken = response.body()?.body?.accessToken
                         val refreshToken=response.body()?.body?.refreshToken
                         if (accessToken != null && refreshToken != null) {
-                            _accessToken.value = accessToken
-                            _refreshToken.value = refreshToken
+                            setTokens(accessToken,refreshToken)
                             _isLoggedIn.value = true
                             _errorMessage.value = "Sign-out Successful"
                             Log.d("LoginViewModel", "Login Successful - AccessToken: $accessToken")
@@ -100,22 +99,29 @@ class LoginViewModel : ViewModel() {
                             } else {
                                 _errorMessage.value = "Failed to refresh token: No access token received."
                                 onFailure()
+                                logout()
                             }
                         } else {
                             _errorMessage.value = "Refresh token failed: ${response.message()}"
                             onFailure()
+                            logout()
+
                         }
                     }
                 } catch (e: Exception) {
                     withContext(Dispatchers.Main) {
                         _errorMessage.value = "An error occurred during refresh: ${e.message}"
                         onFailure()
+                        logout()
+
                     }
                 }
             }
         } else {
             _errorMessage.value = "No refresh token available. Please login again."
             onFailure()
+            logout()
+
         }
     }
     /**
@@ -175,7 +181,14 @@ class LoginViewModel : ViewModel() {
                             } ?: run {
                                 _errorMessage.value = "Users response body is null."
                             }
-                        }  else {
+                        }
+                        else if (response.code() == 401) {
+                            // Token süresi dolmuşsa yenileme yap
+                            refreshToken(
+                                onSuccess = { fetchUsers() },
+                                onFailure = { logout() }
+                            )
+                        } else {
                             _errorMessage.value = "Failed to fetch users: ${response.message()}"
                         }
                     }
@@ -208,7 +221,13 @@ class LoginViewModel : ViewModel() {
                             _refreshToken.value = null
                             _isLoggedIn.value = false
                             Log.d("LoginViewModel", "Logout successful")
-                        } else {
+                        } else if (response.code() == 401) {
+                            // Token süresi dolmuşsa yenileme yap
+                            refreshToken(
+                                onSuccess = { logout() },
+                                onFailure = { logout() }
+                            )
+                        }  else {
                             _errorMessage.value = "Logout failed: ${response.message()}"
                             Log.e("LoginViewModel", "Logout failed: ${response.message()}")
                         }
@@ -257,7 +276,8 @@ class LoginViewModel : ViewModel() {
                                 _accessToken.value = null
                                 _refreshToken.value = null
                                 _isLoggedIn.value = false
-                            } else {
+                            }
+                            else {
                                 _deleteAccountResponse.value = "Failed to delete account: ${deleteResponse.message()}"
                                 onFailure("Failed to delete account: ${deleteResponse.message()}")
                             }

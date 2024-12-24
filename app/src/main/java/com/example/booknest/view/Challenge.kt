@@ -1,6 +1,10 @@
 package com.example.booknest.view
 
+import android.app.DatePickerDialog
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -21,15 +25,48 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.booknest.R
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.window.Dialog
+import com.example.booknest.Model.SearchResult
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 
 
+// Helper function to convert milliseconds to a readable date
+fun convertMillisToDate(millis: Long): String {
+    val formatter = DateTimeFormatter.ofPattern("dd MMM yyyy")
+    return Instant.ofEpochMilli(millis)
+        .atZone(ZoneId.systemDefault())
+        .toLocalDate()
+        .format(formatter)
+}
 @Composable
 fun Challenge(navController: NavController) {
     val challengeTitle = "2024 Reading Challenge"
     val totalGoal = 50
     val booksRead = remember { 20 } // Example of state tracking
     val progress = booksRead / totalGoal.toFloat()
+
+    // State to manage dialog visibility and challenge data
+    val showDialog = remember { mutableStateOf(false) }
+    val selectedChoice = remember { mutableStateOf("") }
+    val numberInput = remember { mutableStateOf("") }
+    val challengeTitleInput = remember { mutableStateOf("") }
+    val addedChallenges = remember { mutableStateOf(
+        listOf<String>()
+    ) }
+    val challengeDates = remember { mutableStateOf(
+        listOf<Pair<String, Pair<Long?, Long?>>>() // List of pairs: (challengeName, dateRange)
+    ) }
 
     LazyColumn(
         modifier = Modifier
@@ -48,59 +85,13 @@ fun Challenge(navController: NavController) {
                 textAlign = TextAlign.Center
             )
 
-
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 16.dp),
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFFF5F5F5))
-            ) {
-                Column(
-                    modifier = Modifier.padding(16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        text = "$booksRead / $totalGoal Books",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = Color(0xFF333333)
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    LinearProgressIndicator(
-                        progress = progress,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(8.dp)
-                            .clip(RoundedCornerShape(4.dp)),
-                        color = Color(0xFF3CB371),
-                        trackColor = Color(0xFFD3D3D3)
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = "${(progress * 100).toInt()}% Completed",
-                        fontSize = 14.sp,
-                        color = Color.Gray
-                    )
-                }
-            }
-
-
-            Text(
-                text = "Participate in to meet amazing books and expand your limits!",
-                fontSize = 14.sp,
-                color = Color.DarkGray,
-                modifier = Modifier.padding(vertical = 16.dp),
-                textAlign = TextAlign.Center
-            )
-
-
+            // Add Challenge Button
             Button(
-                onClick = { navController.navigate("myBooks") },
+                onClick = { showDialog.value = true },
                 modifier = Modifier.fillMaxWidth(0.8f),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3CB371))
             ) {
-                Text("Add Books to Challenge", fontSize = 16.sp)
+                Text("Add Challenge", fontSize = 16.sp)
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -115,7 +106,6 @@ fun Challenge(navController: NavController) {
 
             Spacer(modifier = Modifier.height(24.dp))
 
-
             Text(
                 text = "Featured Challenges",
                 fontSize = 20.sp,
@@ -123,8 +113,12 @@ fun Challenge(navController: NavController) {
                 modifier = Modifier.padding(vertical = 16.dp)
             )
 
+            // Display added challenges with date range
+            addedChallenges.value.forEachIndexed { index, challenge ->
+                val dateRange = challengeDates.value.getOrNull(index)?.second
+                val startDate = dateRange?.first?.let { convertMillisToDate(it) } ?: "N/A"
+                val endDate = dateRange?.second?.let { convertMillisToDate(it) } ?: "N/A"
 
-            listOf("Fantasy Marathon", "Non-fiction November", "Classic Revival").forEach { challenge ->
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -153,7 +147,7 @@ fun Challenge(navController: NavController) {
                                 color = Color.Black
                             )
                             Text(
-                                text = "Explore now!",
+                                text = "Start: $startDate | End: $endDate",
                                 fontSize = 14.sp,
                                 color = Color.Gray
                             )
@@ -162,6 +156,134 @@ fun Challenge(navController: NavController) {
                 }
             }
         }
+    }
 
+    // BottomSheet for challenge creation
+    if (showDialog.value) {
+        ChallengeBottomSheet(
+            onChallengeAdded = { challengeTitle, numberInput, challengeType, dateRange ->
+                val challengeDescription = if (challengeType == "book") {
+                    "Read $numberInput books: $challengeTitle"
+                } else {
+                    "Read $numberInput pages: $challengeTitle"
+                }
+
+                // Add the challenge with title and date range
+                addedChallenges.value = addedChallenges.value + challengeDescription
+                challengeDates.value = challengeDates.value + Pair(challengeDescription, dateRange)
+
+                showDialog.value = false
+            },
+            onDismiss = { showDialog.value = false }
+        )
+    }
+}
+
+// BottomSheet for adding a challenge
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ChallengeBottomSheet(
+    onChallengeAdded: (String, String, String, Pair<Long?, Long?>) -> Unit,
+    onDismiss: () -> Unit
+) {
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    var currentStep by remember { mutableStateOf(1) }
+    val challengeName = remember { mutableStateOf("") }
+    val bookOrPageChoice = remember { mutableStateOf("") }
+    val numberInput = remember { mutableStateOf("") }
+    val dateRangePickerState = rememberDateRangePickerState()
+
+    ModalBottomSheet(
+        sheetState = sheetState,
+        onDismissRequest = onDismiss,
+        modifier = Modifier.fillMaxHeight(0.6f)
+    ) {
+        // Step 1: Challenge title input
+        if (currentStep == 1) {
+            Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
+                TextField(
+                    value = challengeName.value,
+                    onValueChange = { challengeName.value = it },
+                    label = { Text("Challenge Title") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                Button(onClick = { currentStep = 2 }, modifier = Modifier.fillMaxWidth()) {
+                    Text("Next")
+                }
+            }
+        }
+
+        // Step 2: Select type and number input
+        if (currentStep == 2) {
+            Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
+                Text("Select Challenge Type")
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    Button(
+                        onClick = { bookOrPageChoice.value = "book" },
+                        colors = ButtonDefaults.buttonColors(containerColor = if (bookOrPageChoice.value == "book") Color(0xFF3CB371) else Color.Gray)
+                    ) {
+                        Text("Books")
+                    }
+
+                    Button(
+                        onClick = { bookOrPageChoice.value = "page" },
+                        colors = ButtonDefaults.buttonColors(containerColor = if (bookOrPageChoice.value == "page") Color(0xFF3CB371) else Color.Gray)
+                    ) {
+                        Text("Pages")
+                    }
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+                TextField(
+                    value = numberInput.value,
+                    onValueChange = { numberInput.value = it },
+                    label = { Text("Number (of books/pages)") },
+                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                Button(onClick = { currentStep = 3 }, modifier = Modifier.fillMaxWidth()) {
+                    Text("Next")
+                }
+            }
+        }
+
+        // Step 3: Date picker
+        if (currentStep == 3) {
+            Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
+                DatePickerDialog(
+                    onDismissRequest = onDismiss,
+                    confirmButton = {
+                        TextButton(
+                            onClick = {
+                                val dateRange = Pair(
+                                    dateRangePickerState.selectedStartDateMillis,
+                                    dateRangePickerState.selectedEndDateMillis
+                                )
+                                onChallengeAdded(challengeName.value, numberInput.value, bookOrPageChoice.value, dateRange)
+                                onDismiss()
+                            }
+                        ) {
+                            Text("OK")
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = onDismiss) {
+                            Text("Cancel")
+                        }
+                    }
+                ) {
+                    DateRangePicker(
+                        state = dateRangePickerState,
+                        title = { Text("Select date range") },
+                        showModeToggle = false,
+                        modifier = Modifier.fillMaxWidth().height(500.dp)
+                    )
+                }
+            }
+        }
     }
 }

@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -19,8 +20,13 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -31,11 +37,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.booknest.Model.SearchResult
 
 @Composable
-fun ReadingNow(viewModel: BooksViewModel,navController: NavController) {
+fun ReadingNow(viewModel: BooksViewModel, navController: NavController) {
     val books = viewModel.books
-
+    var showBottomSheet by remember { mutableStateOf(false) }
+    var selectedBook by remember { mutableStateOf<SearchResult.Book?>(null) }
+    var readingStatuses by remember { mutableStateOf<List<Pair<SearchResult.Book, Int>>>(emptyList()) }
     Column(
         modifier = Modifier
             .fillMaxHeight()
@@ -43,96 +52,147 @@ fun ReadingNow(viewModel: BooksViewModel,navController: NavController) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top
     ) {
+        Text(
+            text = "Reading Now",
+            style = TextStyle(fontSize = 40.sp),
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
 
-        // Header text
-        Column(modifier = Modifier.fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(
-                text = "Reading Now",
-                style = TextStyle(fontSize = 40.sp),
-                modifier = Modifier.padding(bottom = 16.dp)
-            )
-        }
-
-
-        // LazyColumn to display books
         LazyColumn(
             contentPadding = PaddingValues(bottom = 90.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp) // Space between items
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             items(books) { book ->
-                // Card for each book with title, author, and genre
+                // Başlangıçta sayfa sayısı 0 olarak kabul edelim
+                var pagesRead = 0 // Sayfa okuma bilgisini başta sıfır yapıyoruz
+
+                // Eğer readingStatuses listesinde kitap varsa, okunan sayfa bilgisini alıyoruz
+                val status = readingStatuses.find { it.first.id == book.id }
+                status?.let {
+                    pagesRead = it.second
+                }
+
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(8.dp)
                         .clip(shape = RoundedCornerShape(16.dp))
                         .clickable {
-                            navController.navigate(
-                            "books/${book.id}/${book.title}/${book.author}/${book.imageResId}/${book.rating}/${book.pageNumber}"
-                        ) },
-
-
+                            navController.navigate("books/${book.id}")
+                        },
                     shape = RoundedCornerShape(16.dp),
                     colors = CardDefaults.cardColors(
                         containerColor = Color.White
                     )
-                    // Rounded corners for the Card
-                    // Use dp for CardElevation
                 ) {
-                    Row (modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically){
+                    Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                         Image(
                             painter = painterResource(id = book.imageResId),
                             contentDescription = book.title,
                             modifier = Modifier.size(100.dp)
                         )
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp)  // Inner padding for content
-                        ) {
-                            // Book title, author, and genre
+                        Column(modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)) {
                             Text(
-                                text = book.title,  // Book title
+                                text = book.title,
                                 style = TextStyle(fontSize = 22.sp, fontWeight = FontWeight.Bold)
                             )
 
                             book.author?.let {
                                 Text(
-                                    text = "by $it",  // Author name (if available)
+                                    text = "by $it",
                                     style = TextStyle(fontSize = 18.sp, color = Color.Gray)
                                 )
                             }
+
                             Row(modifier = Modifier.fillMaxWidth()) {
                                 RatingStars(rating = book.rating.toFloatOrNull() ?: 0f)
                                 Spacer(modifier = Modifier.width(8.dp))
                                 book.rating?.let {
                                     Text(
-                                        text = "$it",  // Genre of the book
+                                        text = "$it",
                                         style = TextStyle(fontSize = 16.sp, color = Color.Gray)
                                     )
                                 }
                             }
+                            val percentage = if (book.pageNumber > 0) {
+                                minOf((pagesRead * 100) / book.pageNumber, 100)
+                            } else 0
 
+                            LinearProgressIndicator(
+                                progress = percentage / 100f,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(8.dp)
+                                    .clip(RoundedCornerShape(4.dp)),
+                                color = Color(0xFF3CB371),
+                                trackColor = Color(0xFFD3D3D3)
+                            )
+                            Text(text = "Completion: $percentage%", fontSize = 14.sp)
 
-                            // Remove Button for each book
-                            Button(
-                                onClick = {
-                                    viewModel.removeBook(book)
-                                },
-                                modifier = Modifier.padding(top = 8.dp),
-                                colors = ButtonDefaults.buttonColors(
-                                    Color(0xFF2E8B57)
-                                )
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceEvenly
                             ) {
-                                Text(text = "Remove")
+                                Button(
+                                    onClick = {
+                                        viewModel.removeBook(book)
+                                    },
+                                    modifier = Modifier.padding(top = 8.dp),
+                                    colors = ButtonDefaults.buttonColors(
+                                        Color(0xFF2E8B57)
+                                    )
+                                ) {
+                                    Text(text = "Remove")
+                                }
+
+
+
+                                Button(
+                                    onClick = {
+                                        selectedBook = book
+                                        showBottomSheet = true
+                                    },
+                                    modifier = Modifier.padding(top = 8.dp),
+                                    colors = ButtonDefaults.buttonColors(
+                                        Color(0xFF2E8B57)
+                                    )
+                                ) {
+                                    Text(text = "Update State")
+                                }
                             }
                         }
                     }
-
                 }
-
             }
+        }
+        if (showBottomSheet && selectedBook != null) {
+            BottomSheet_1(
+                selectedBook = selectedBook!!,
+                onDismiss = { showBottomSheet = false },
+                onSave = { pagesRead ->
+                    // Mevcut kitap verisini güncelleme
+                    readingStatuses = readingStatuses.toMutableList().apply {
+                        // Eğer kitap zaten listede varsa, eski sayfa sayısını güncelliyoruz
+                        val index = indexOfFirst { it.first.id == selectedBook?.id }
+                        if (index != -1) {
+                            // Kitap bulunursa, sayfa sayısını güncelliyoruz
+                            this[index] = selectedBook!! to pagesRead
+                        } else {
+                            // Kitap listede yoksa, yeni kitap ekliyoruz
+                            add(selectedBook!! to pagesRead)
+                        }
+                    }
+                    // Eğer %100'e ulaşmışsa, kitabı listeden çıkaralım
+                    if (pagesRead == selectedBook!!.pageNumber) {
+                        viewModel.removeBook(selectedBook!!)
+                    }
+
+                    showBottomSheet = false
+                }
+            )
         }
     }
 }
+

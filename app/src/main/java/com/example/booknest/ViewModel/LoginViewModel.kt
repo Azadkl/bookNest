@@ -224,8 +224,17 @@ class LoginViewModel : ViewModel() {
                         } else if (response.body()?.success == false) {
                             // Token süresi dolmuşsa yenileme yap
                             refreshToken(
-                                onSuccess = { logout() },
-                                onFailure = { logout() }
+                                onSuccess = {
+                                    // Yenilenen access token ile logout yap
+                                    logout()
+                                },
+                                onFailure = {
+                                    // Refresh token da başarısızsa çıkış yap
+                                    _accessToken.value = null
+                                    _refreshToken.value = null
+                                    _isLoggedIn.value = false
+                                    Log.e("LoginViewModel", "Token expired and refresh failed, logged out")
+                                }
                             )
                         }  else {
                             _errorMessage.value = "Logout failed: ${response.message()}"
@@ -247,6 +256,7 @@ class LoginViewModel : ViewModel() {
             Log.d("LoginViewModel", "No access token, logged out locally.")
         }
     }
+
     fun deleteAccount(
         token: String,
         onSuccess: () -> Unit,

@@ -53,7 +53,7 @@ fun NavigationExample(){
     val navController = rememberNavController()
     val viewModel=LoginViewModel()
     NavHost(navController = navController, startDestination = "login") {
-        composable("login"){ LoginScreen(navController) }
+        composable("login"){ LoginScreen(navController,viewModel) }
         composable("SignIn"){ SignInScreen(navController, viewModel = viewModel) }
         composable("SignUp"){ SignUpScreen(navController, viewModel = SignUpViewModel()) }
         composable("home"){ BottomBarScreen(mainNavController=navController, viewModel = viewModel) }

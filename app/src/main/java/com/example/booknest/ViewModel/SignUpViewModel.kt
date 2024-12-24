@@ -42,7 +42,7 @@ class SignUpViewModel : ViewModel() {
                             _errorMessage.value = signUpResponse?.message ?: "Sign up failed"
                         }
                     } else {
-                        _errorMessage.value = "Sign up failed: ${response.message()}"
+                        _errorMessage.value = "Sign up failed: ${response.body()?.success}"
                     }
                 }
             } catch (e: Exception) {

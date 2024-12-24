@@ -6,6 +6,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -185,7 +186,7 @@ fun GeneralOptionsUI(mainNavController: NavController,viewModel: LoginViewModel)
         )
 
         if (deleteAccountDialog) {
-            LogoutDialog(
+            DeletionDialog(
                 onConfirm = {
                     viewModel.deleteAccount(
                         token = viewModel.accessToken.value ?: "",  // Ensure you pass a valid token
@@ -206,7 +207,55 @@ fun GeneralOptionsUI(mainNavController: NavController,viewModel: LoginViewModel)
 
     }
 }
-
+@Composable
+fun DeletionDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        containerColor = Color.White,
+        shape = RoundedCornerShape(16.dp), // Rounded corners for the dialog
+        title = {
+            Text(
+                text = "Delete the Account?",
+                style = MaterialTheme.typography.bodyMedium,
+                color = Color.Black,
+                modifier = Modifier.padding(bottom = 8.dp) // Space below title
+            )
+        },
+        text = {
+            Text(
+                text = "Are you sure you want to delete your account? This action cannot be undone.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = Color.Gray,
+                modifier = Modifier.padding(bottom = 16.dp) // Space below text
+            )
+        },
+        confirmButton = {
+            Button(
+                onClick = onConfirm,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF2E8B57),
+                    contentColor = Color.White
+                ),
+                shape = RoundedCornerShape(8.dp),
+                modifier = Modifier.padding(horizontal = 8.dp)
+            ) {
+                Text("Yes, Delete")
+            }
+        },
+        dismissButton = {
+            OutlinedButton(
+                onClick = onDismiss,
+                colors = ButtonDefaults.outlinedButtonColors(
+                    contentColor = Color(0xFF2E8B57)
+                ),
+                shape = RoundedCornerShape(8.dp),
+                modifier = Modifier.padding(horizontal = 8.dp)
+            ) {
+                Text("Cancel")
+            }
+            }
+        )
+}
 @Composable
 fun LogoutDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
     AlertDialog(

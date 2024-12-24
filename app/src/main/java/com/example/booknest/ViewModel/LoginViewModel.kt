@@ -144,7 +144,7 @@ class LoginViewModel : ViewModel() {
                             } ?: run {
                                 _errorMessage.value = "Profile response body is null."
                             }
-                        } else if (response.code() == 401) {
+                        } else if (response.body()?.success == false) {
                             // Token süresi dolmuşsa yenileme yap
                             refreshToken(
                                 onSuccess = { fetchProfile() },
@@ -182,7 +182,7 @@ class LoginViewModel : ViewModel() {
                                 _errorMessage.value = "Users response body is null."
                             }
                         }
-                        else if (response.code() == 401) {
+                        else if (response.body()?.success == false) {
                             // Token süresi dolmuşsa yenileme yap
                             refreshToken(
                                 onSuccess = { fetchUsers() },
@@ -221,7 +221,7 @@ class LoginViewModel : ViewModel() {
                             _refreshToken.value = null
                             _isLoggedIn.value = false
                             Log.d("LoginViewModel", "Logout successful")
-                        } else if (response.code() == 401) {
+                        } else if (response.body()?.success == false) {
                             // Token süresi dolmuşsa yenileme yap
                             refreshToken(
                                 onSuccess = { logout() },
@@ -273,11 +273,12 @@ class LoginViewModel : ViewModel() {
 
                                 Log.d("LoginViewModel", "Account delete successful")
                                 onSuccess()
+
                                 _accessToken.value = null
                                 _refreshToken.value = null
                                 _isLoggedIn.value = false
-                            }
-                            else {
+                                _errorMessage.value = "deletion successful"
+                            } else {
                                 _deleteAccountResponse.value = "Failed to delete account: ${deleteResponse.message()}"
                                 onFailure("Failed to delete account: ${deleteResponse.message()}")
                             }
@@ -299,7 +300,6 @@ class LoginViewModel : ViewModel() {
             }
         }
     }
-
 
     // Hata mesajını değiştiren bir fonksiyon
     fun setErrorMessage(message: String) {

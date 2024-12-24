@@ -196,7 +196,8 @@ fun ChallengeBottomSheet(
     ModalBottomSheet(
         sheetState = sheetState,
         onDismissRequest = onDismiss,
-        modifier = Modifier.fillMaxHeight(0.6f)
+        modifier = Modifier.fillMaxHeight(0.6f),
+        shape = RoundedCornerShape(0.dp)
     ) {
         // Step 1: Challenge title input
         if (currentStep == 1) {

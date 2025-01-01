@@ -3,6 +3,8 @@ package com.example.booknest.view
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.ImageDecoder
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -37,6 +39,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -53,6 +56,7 @@ import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
@@ -63,6 +67,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.graphicsLayer
@@ -76,13 +81,62 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.palette.graphics.Palette
+import coil.compose.rememberImagePainter
 import com.example.booknest.Model.SearchResult
 import com.example.booknest.R
+import com.example.booknest.ViewModel.LoginViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import java.net.URL
 
 @Composable
-fun BooksScreen(navController: NavController,result: SearchResult.Book) {
-    val bitmap: Bitmap = BitmapFactory.decodeResource(LocalContext.current.resources, result.imageResId)
-    val palette = Palette.from(bitmap).generate()
+fun BooksScreen(navController: NavController,viewModel: LoginViewModel,  isbn: String,
+                title: String,
+                author: String,
+                cover: String,
+                description:String,
+                rating: String,
+                pages: Int,) {
+    var bitmap by remember { mutableStateOf<Bitmap?>(null) }
+    var dominantColor by remember { mutableStateOf(Color.LightGray) }
+    var vibrantColor by remember { mutableStateOf(Color.Gray) }
+
+    // Ağ işlemini arka planda gerçekleştirin
+    LaunchedEffect(cover) {
+        withContext(Dispatchers.IO) {
+            try {
+                val inputStream = URL(cover).openStream()
+                val originalBitmap = BitmapFactory.decodeStream(inputStream)
+                val scaledBitmap = Bitmap.createScaledBitmap(originalBitmap, 100, 100, true)
+
+                // Palette işlemini de arka planda yapıyoruz
+                val palette = Palette.Builder(scaledBitmap)
+                    .maximumColorCount(24)
+                    .generate()
+
+                // UI güncellemelerini ana iş parçacığında yapın
+                withContext(Dispatchers.Main) {
+                    bitmap = scaledBitmap
+                    dominantColor = palette.dominantSwatch?.rgb?.let { Color(it) } ?: Color.LightGray
+                    vibrantColor = palette.vibrantSwatch?.rgb?.let { Color(it) } ?: dominantColor
+                }
+            } catch (e: Exception) {
+                e.printStackTrace() // Hataları yakalayın
+            }
+        }
+    }
+
+    val animatedDominantColor by animateColorAsState(
+        targetValue = dominantColor,
+        animationSpec = tween(durationMillis = 1000)
+    )
+
+    val animatedVibrantColor by animateColorAsState(
+        targetValue = vibrantColor,
+        animationSpec = tween(durationMillis = 1000)
+    )
+
+
     var userRating by remember { mutableFloatStateOf(0f) }
     var selectedStatus by remember { mutableStateOf("Want to Read") }
     var expanded by remember { mutableStateOf(false) }
@@ -119,7 +173,7 @@ fun BooksScreen(navController: NavController,result: SearchResult.Book) {
             )
         )
     )}
-    val dominantColor = palette?.dominantSwatch?.rgb?.let { Color(it) } ?: Color.Yellow
+
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Top,
@@ -131,7 +185,13 @@ fun BooksScreen(navController: NavController,result: SearchResult.Book) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(380.dp)
-                    .background(dominantColor)
+                    .background(
+                        Brush.verticalGradient(
+                            colors = listOf(animatedDominantColor, animatedVibrantColor),
+                            startY = 0f,
+                            endY = Float.POSITIVE_INFINITY
+                        )
+                    )
                     .graphicsLayer {
                         shadowElevation = 150.dp.toPx()
                     }
@@ -148,33 +208,26 @@ fun BooksScreen(navController: NavController,result: SearchResult.Book) {
                     )
                 }
 
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(dominantColor.copy(alpha = 0.3f))
-                        .graphicsLayer {
-                            shadowElevation = 150.dp.toPx()
-                        }
-                ) {
+
                     Image(
-                        painter = painterResource(id = result.imageResId),
+                        painter = rememberImagePainter(cover),
                         contentDescription = "Book Cover",
                         modifier = Modifier
                             .align(Alignment.Center)
                             .size(290.dp)
                     )
-                }
+
             }
         }
         item {
             Spacer(modifier = Modifier.height(15.dp))
             Text(
-                text = result.title,
+                text = title,
                 style = TextStyle(fontSize = 30.sp, fontWeight = FontWeight.W500),
             )
             Spacer(modifier = Modifier.height(15.dp))
             Text(
-                text = "by ${result.author}",
+                text = "by ${author}",
                 style = TextStyle(fontSize = 25.sp, fontWeight = FontWeight.W400),
             )
             Spacer(modifier = Modifier.height(35.dp))
@@ -190,9 +243,9 @@ fun BooksScreen(navController: NavController,result: SearchResult.Book) {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Column(modifier = Modifier.clickable { navController.navigate("comment") }) {
-                    RatingStars(result.rating.toFloatOrNull() ?: 0f)
+                    RatingStars(rating.toFloatOrNull() ?: 0f)
                     Text(
-                        text = result.rating,
+                        text = rating,
                         style = TextStyle(fontSize = 25.sp, fontWeight = FontWeight.Medium),
                     )
                 }
@@ -378,11 +431,11 @@ fun BooksScreen(navController: NavController,result: SearchResult.Book) {
 
 
             when (selectedTabIndex) {
-                0 -> (AboutContent())
-                1 -> (DetailContent(   title = bookDetails.title,
+                0 -> (AboutContent(description))
+                1 -> (DetailContent(   title =title,
                     publishDate = bookDetails.publishDate,
                     publisher = bookDetails.publisher,
-                    isbn = bookDetails.isbn,
+                    isbn,
                     series = bookDetails.series,
                     language = bookDetails.language,
                     characters = bookDetails.characters))
@@ -393,7 +446,7 @@ fun BooksScreen(navController: NavController,result: SearchResult.Book) {
     }
 }
 @Composable
-fun AboutContent() {
+fun AboutContent(description: String) {
     // Card ile düzenlenmiş içerik
     Card(
         modifier = Modifier
@@ -419,7 +472,7 @@ fun AboutContent() {
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "A book description is a brief overview of the plot, main characters, and themes of the story. It's an important tool that helps in book promotion and sales. Many times, book descriptions also include information about the author. This helps to build credibility and establish a connection with the reader.",
+                text = description,
                 style = TextStyle(
                     fontSize = 16.sp,
                     lineHeight = 22.sp

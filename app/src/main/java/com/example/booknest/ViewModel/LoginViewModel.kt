@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.booknest.api.GenelResponse
 import com.example.booknest.api.LoginRequest
+import com.example.booknest.api.Models.Book
 import com.example.booknest.api.ProfileBody
 import com.example.booknest.api.api
 import kotlinx.coroutines.CoroutineScope
@@ -28,6 +29,10 @@ class LoginViewModel : ViewModel() {
 
     private val _profileResponse = mutableStateOf<ProfileBody?>(null)
     val profileResponse: State<ProfileBody?> = _profileResponse
+
+    private val _bookResponse = mutableStateOf<List<Book>?>(null)
+    val bookResponse: State<List<Book>?> = _bookResponse
+
     private val _usersResponse = mutableStateOf<List<ProfileBody>?>(null)
     val usersResponse: State<List<ProfileBody>?> = _usersResponse
 
@@ -314,6 +319,43 @@ class LoginViewModel : ViewModel() {
     // Hata mesajını değiştiren bir fonksiyon
     fun setErrorMessage(message: String) {
         _errorMessage.value = message
+    }
+    fun fetchBook() {
+        val token = _accessToken.value
+        if (token != null) {
+            viewModelScope.launch(Dispatchers.IO) {
+                try {
+                    val response = api.getBook("Bearer $token")
+                    withContext(Dispatchers.Main) {
+                        if (response.isSuccessful) {
+                            Log.d("Raw Response", response.raw().toString())
+                            Log.d("Response Body", response.body()?.toString() ?: "Response body is null")
+                            Log.d("LoginViewModel", "Book fetch response: ${response.body()}")
+
+                            response.body()?.body?.let { book ->
+                                _bookResponse.value = book
+                            } ?: run {
+                                _errorMessage.value = "Book response body is null."
+                            }
+                        } else if (response.body()?.success == false) {
+                            // Token süresi dolmuşsa yenileme yap
+                            refreshToken(
+                                onSuccess = { fetchBook() },
+                                onFailure = { logout() }
+                            )
+                        } else {
+                            _errorMessage.value = "Failed to fetch book: ${response.message()}"
+                        }
+                    }
+                } catch (e: Exception) {
+                    withContext(Dispatchers.Main) {
+                        _errorMessage.value = "An error occurred: ${e.message}"
+                    }
+                }
+            }
+        } else {
+            _errorMessage.value = "Access token is null. Please login again."
+        }
     }
 }
 

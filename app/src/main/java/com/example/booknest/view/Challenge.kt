@@ -209,7 +209,8 @@ fun ChallengeBottomSheet(
                     modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(modifier = Modifier.height(16.dp))
-                Button(onClick = { currentStep = 2 }, modifier = Modifier.fillMaxWidth()) {
+                Button(onClick = { currentStep = 2 }, modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3CB371))) {
                     Text("Next")
                 }
             }
@@ -217,11 +218,11 @@ fun ChallengeBottomSheet(
 
         // Step 2: Select type and number input
         if (currentStep == 2) {
-            Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
+            Column(modifier = Modifier.fillMaxWidth().padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                 Text("Select Challenge Type")
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    horizontalArrangement = Arrangement.Center
                 ) {
                     Button(
                         onClick = { bookOrPageChoice.value = "book" },
@@ -229,7 +230,7 @@ fun ChallengeBottomSheet(
                     ) {
                         Text("Books")
                     }
-
+                    Spacer(modifier = Modifier.width(16.dp))
                     Button(
                         onClick = { bookOrPageChoice.value = "page" },
                         colors = ButtonDefaults.buttonColors(containerColor = if (bookOrPageChoice.value == "page") Color(0xFF3CB371) else Color.Gray)
@@ -246,7 +247,8 @@ fun ChallengeBottomSheet(
                     modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(modifier = Modifier.height(16.dp))
-                Button(onClick = { currentStep = 3 }, modifier = Modifier.fillMaxWidth()) {
+                Button(onClick = { currentStep = 3 }, modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3CB371))) {
                     Text("Next")
                 }
             }
@@ -281,7 +283,7 @@ fun ChallengeBottomSheet(
                         state = dateRangePickerState,
                         title = { Text("Select date range") },
                         showModeToggle = false,
-                        modifier = Modifier.fillMaxWidth().height(500.dp)
+                        modifier = Modifier.fillMaxWidth().height(500.dp).padding(15.dp)
                     )
                 }
             }

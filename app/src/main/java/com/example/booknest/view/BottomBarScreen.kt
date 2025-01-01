@@ -233,8 +233,10 @@ fun BottomBarScreen(mainNavController:NavController,modifier: Modifier=Modifier,
                         else{
                             var isLoading by remember { mutableStateOf(true) }
                             val users by viewModel.usersResponse
+                            val books by viewModel.bookResponse
                             LaunchedEffect(Unit) {
                                 viewModel.fetchUsers()  // Bu satır verileri çekmeye başlar
+                                viewModel.fetchBook()
                             }
                             if (users != null) {
                                 isLoading = false
@@ -298,32 +300,31 @@ fun BottomBarScreen(mainNavController:NavController,modifier: Modifier=Modifier,
                                                 }
                                         )
                                     }
-                                    // Book verilerini listele
-                                    val books = DummyData().booksOnly  // Dummy verileri kullan
-                                    // Kitapları filtrele
-                                    val filteredBooks = books.filter { book ->
-                                        book.title.contains(searchQuery, ignoreCase = true) || book.author.contains(searchQuery, ignoreCase = true)
-                                    }
-                                    // Filtrelenmiş kitapları listele
-                                    items(filteredBooks) { result ->
+                                    val filteredBooks = books?.filter { book ->
+                                        book.title.contains(searchQuery, ignoreCase = true)
+                                    } ?: emptyList()
+
+                                    items(filteredBooks) { book ->
                                         ListItem(
                                             headlineContent = {
                                                 Row(
-                                                    modifier = Modifier.fillMaxWidth(),
-                                                    verticalAlignment = Alignment.CenterVertically
+                                                    verticalAlignment = Alignment.CenterVertically,
+                                                    modifier = Modifier
+                                                        .fillMaxWidth()
+                                                        .padding(start = 2.dp)
                                                 ) {
                                                     Image(
-                                                        painter = painterResource(id = result.imageResId),
+                                                        painter = rememberImagePainter(book.cover),
                                                         contentDescription = "Book Cover",
                                                         modifier = Modifier.size(70.dp)
                                                     )
                                                     Spacer(modifier = Modifier.width(8.dp))
                                                     Column(modifier = Modifier.weight(1f)) {
-                                                        Text(result.title)
-                                                        Text(result.author, style = MaterialTheme.typography.bodySmall)
+                                                        Text(book.title)
+                                                        Text("${book.authorId}", style = MaterialTheme.typography.bodySmall)
                                                     }
                                                     Text(
-                                                        result.rating,
+                                                        "4.5",
                                                         style = MaterialTheme.typography.bodySmall,
                                                         color = Color.Red
                                                     )
@@ -331,14 +332,14 @@ fun BottomBarScreen(mainNavController:NavController,modifier: Modifier=Modifier,
                                             },
                                             colors = ListItemDefaults.colors(
                                                 containerColor = PrimaryColor,
-                                                headlineColor = Color.Black
+                                                headlineColor = Color.Black,
                                             ),
                                             modifier = Modifier
                                                 .padding(top = 10.dp, start = 10.dp, end = 10.dp)
                                                 .height(70.dp)
                                                 .clip(shape = RoundedCornerShape(15.dp))
                                                 .clickable {
-                                                    navController.navigate("books/${result.id}/${result.title}/${result.author}/${result.imageResId}/${result.rating}/${result.pageNumber}")
+                                                    navController.navigate("books/${Uri.encode(book.isbn)}/${Uri.encode(book.title)}/${Uri.encode(book.authorId.toString())}/${Uri.encode(book.cover)}/${Uri.encode(book.description)}/4.5/${book.pages}")
                                                 }
                                         )
                                     }
@@ -480,7 +481,7 @@ fun BottomBarScreen(mainNavController:NavController,modifier: Modifier=Modifier,
                             }
 
 
-                            CustomBox(modifier, "Challenge", imageResId = R.drawable.outline_person_24,navController = navController,"challenge",onNavigate = { route ->
+                            CustomBox(modifier, "Challenge", imageResId = R.drawable.target,navController = navController,"challenge",onNavigate = { route ->
                                 showBottomSheet = false
                                 navController.navigate(route)
                             })
@@ -546,22 +547,35 @@ fun BottomBarScreen(mainNavController:NavController,modifier: Modifier=Modifier,
                     composable("medals") { MedalsPage(navController) }
                     composable("notifications"){ NotificationsScreen(navController) }
                     composable(
-                        route = "books/{id}/{title}/{author}/{imageResId}/{rating}/{pageNumber}",
+                        route = "books/{isbn}/{title}/{author}/{cover}/{description}/{rating}/{pages}",
                         arguments = listOf(
-                            navArgument("id") { type = NavType.StringType },
+                            navArgument("isbn") { type = NavType.StringType },
                             navArgument("title") { type = NavType.StringType },
                             navArgument("author") { type = NavType.StringType },
-                            navArgument("imageResId") { type = NavType.IntType },
-                            navArgument("rating") { type = NavType.StringType }
+                            navArgument("cover") { type = NavType.StringType },
+                            navArgument("rating") { type = NavType.StringType },
+                            navArgument("pages") { type = NavType.IntType }
                         )
                     ) { backStackEntry ->
-                        val id = backStackEntry.arguments?.getString("id") ?: "-1"
+                        val isbn = backStackEntry.arguments?.getString("isbn") ?: ""
                         val title = backStackEntry.arguments?.getString("title") ?: "Unknown Title"
                         val author = backStackEntry.arguments?.getString("author") ?: "Unknown Author"
-                        val imageResId = backStackEntry.arguments?.getInt("imageResId") ?: R.drawable.farelerveinsanlar
-                        val rating = backStackEntry.arguments?.getString("rating") ?: "no rating"
-                        val pageNumber = backStackEntry.arguments?.getString("pageNumber")?.toIntOrNull() ?: -1
-                        BooksScreen(navController, result = SearchResult.Book(id = id, title = title, author = author, imageResId = imageResId, rating = rating, pageNumber = pageNumber))
+                        val cover = backStackEntry.arguments?.getString("cover") ?: ""
+                        val description = backStackEntry.arguments?.getString("description") ?: ""
+                        val rating = backStackEntry.arguments?.getString("rating") ?: "0.0"
+                        val pages = backStackEntry.arguments?.getInt("pages") ?: -1
+
+                        BooksScreen(
+                            navController = navController,
+                            isbn = isbn,
+                            title = title,
+                            author = author,
+                            cover = cover,
+                            description=description,
+                            rating = rating,
+                            pages = pages,
+                            viewModel = viewModel
+                        )
                     }
                     composable("book_list_screen/{title}") { backStackEntry ->
                         val title = backStackEntry.arguments?.getString("title") ?: "Books"

@@ -54,6 +54,7 @@ dependencies {
     implementation ("io.coil-kt:coil-compose:2.4.0")
     implementation("com.squareup.retrofit2:retrofit:${retrofitVersion}")
     implementation("com.squareup.retrofit2:converter-gson:${retrofitVersion}")
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)

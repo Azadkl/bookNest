@@ -1,5 +1,6 @@
 package com.example.booknest.api
 
+import com.example.booknest.api.Models.Book
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -18,11 +19,22 @@ interface BookNestApi {
 
     @GET("api/Users/profile/")
     suspend fun profile(@Header("Authorization") accessToken: String): Response<GenelResponse<ProfileBody>>
+
     @GET("api/Users/")
     suspend fun users(@Header("Authorization") accessToken: String): Response<GenelResponse<List<ProfileBody>>>
 
     @POST("api/Auth/refreshtoken/")
     suspend fun refreshToken(@Header("Authorization") refreshToken: String): Response<GenelResponse<LoginBody>>
+
+    @GET("api/books/")
+    suspend fun getBook(@Header("Authorization") accessToken: String): Response<GenelResponse<List<Book>>>
+
+
+    @POST("api/books/")
+    suspend fun postBook(@Body book: Book): Response<GenelResponse<Book>>
+
+    @POST("api/books/author/")
+    suspend fun author(@Header("Authorization") refreshToken: String): Response<GenelResponse<Any>>
 
     @DELETE("api/Users/{id}")
     suspend fun deleteAccount(

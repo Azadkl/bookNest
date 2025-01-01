@@ -18,6 +18,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForwardIos
 import androidx.compose.material.icons.filled.Contacts
 import androidx.compose.material.icons.filled.DarkMode
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.Feedback
 import androidx.compose.material.icons.filled.LightMode
@@ -157,7 +158,6 @@ fun GeneralOptionsUI(mainNavController: NavController,viewModel: LoginViewModel)
             subText = "Customize notifications",
             onClick = {} // Boş tıklama işlevi
         )
-        DarkModeSettingItem()
         GeneralSettingItem(
             imageVector = Icons.Default.ExitToApp,
             mainText = "Sign out",
@@ -179,7 +179,7 @@ fun GeneralOptionsUI(mainNavController: NavController,viewModel: LoginViewModel)
             )
         }
         GeneralSettingItem(
-            imageVector = Icons.Default.ExitToApp,
+            imageVector = Icons.Default.Delete,
             mainText = "Delete Account",
             subText = "Permanently delete your account",
             onClick = { deleteAccountDialog = true }
@@ -212,32 +212,25 @@ fun DeletionDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
     AlertDialog(
         onDismissRequest = onDismiss,
         containerColor = Color.White,
-        shape = RoundedCornerShape(16.dp), // Rounded corners for the dialog
         title = {
             Text(
                 text = "Delete the Account?",
-                style = MaterialTheme.typography.bodyMedium,
-                color = Color.Black,
-                modifier = Modifier.padding(bottom = 8.dp) // Space below title
+
             )
         },
         text = {
             Text(
                 text = "Are you sure you want to delete your account? This action cannot be undone.",
-                style = MaterialTheme.typography.bodyMedium,
-                color = Color.Gray,
-                modifier = Modifier.padding(bottom = 16.dp) // Space below text
+
             )
         },
         confirmButton = {
             Button(
                 onClick = onConfirm,
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF2E8B57),
-                    contentColor = Color.White
+                    containerColor = Color(0xFF2E8B57)
                 ),
-                shape = RoundedCornerShape(8.dp),
-                modifier = Modifier.padding(horizontal = 8.dp)
+
             ) {
                 Text("Yes, Delete")
             }
@@ -248,8 +241,7 @@ fun DeletionDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
                 colors = ButtonDefaults.outlinedButtonColors(
                     contentColor = Color(0xFF2E8B57)
                 ),
-                shape = RoundedCornerShape(8.dp),
-                modifier = Modifier.padding(horizontal = 8.dp)
+
             ) {
                 Text("Cancel")
             }
@@ -274,9 +266,9 @@ fun LogoutDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
             }
         },
         dismissButton = {
-            Button(onClick = onDismiss,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF2E8B57)
+            OutlinedButton(onClick = onDismiss,
+                colors = ButtonDefaults.outlinedButtonColors(
+                    contentColor = Color(0xFF2E8B57)
                 )) {
                 Text("No")
             }

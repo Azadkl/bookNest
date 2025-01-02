@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.booknest.api.GenelResponse
 import com.example.booknest.api.LoginRequest
+import com.example.booknest.api.Models.Achievement
 import com.example.booknest.api.Models.Book
 import com.example.booknest.api.Models.BookProgress
 import com.example.booknest.api.Models.Challenge
@@ -14,6 +15,7 @@ import com.example.booknest.api.Models.FriendRequest
 import com.example.booknest.api.Models.FriendResponse
 import com.example.booknest.api.Models.Notification
 import com.example.booknest.api.Models.Review
+import com.example.booknest.api.Models.Shelf
 import com.example.booknest.api.ProfileBody
 import com.example.booknest.api.api
 import kotlinx.coroutines.CoroutineScope
@@ -73,6 +75,17 @@ class LoginViewModel : ViewModel() {
     private val _notificationsResponse = mutableStateOf<List<Notification>?>(null)
     val notificationsResponse: State<List<Notification>?> = _notificationsResponse
 
+    private val _achievementResponse = mutableStateOf<Achievement?>(null)
+    val achievementResponse: State<Achievement?> = _achievementResponse
+
+    private val _achievementsResponse = mutableStateOf<List<Achievement>?>(null)
+    val achievementsResponse: State<List<Achievement>?> = _achievementsResponse
+
+    private val _shelfResponse = mutableStateOf<Shelf?>(null)
+    val shelfResponse: State<Shelf?> = _shelfResponse
+
+    private val _shelvesResponse = mutableStateOf<List<Shelf>?>(null)
+    val shelvesResponse: State<List<Shelf>?> = _shelvesResponse
 
     fun setTokens(accessToken: String, refreshToken: String?) {
         _accessToken.value = accessToken
@@ -927,7 +940,201 @@ class LoginViewModel : ViewModel() {
         }
     }
 
+    // POST: Yeni başarı oluşturma
+    fun createAchievement(achievement: Achievement) {
+        val token = _accessToken.value
+        if (token != null) {
+            _isLoading.value = true
+            viewModelScope.launch(Dispatchers.IO) {
+                try {
+                    val response = api.createAchievement("Bearer $token", achievement)
+                    withContext(Dispatchers.Main) {
+                        if (response.isSuccessful) {
+                            _achievementResponse.value = response.body()?.body
+                        } else {
+                            _errorMessage.value = "Failed to create achievement: ${response.message()}"
+                        }
+                    }
+                } catch (e: Exception) {
+                    withContext(Dispatchers.Main) {
+                        _errorMessage.value = "An error occurred: ${e.message}"
+                    }
+                } finally {
+                    _isLoading.value = false
+                }
+            }
+        } else {
+            _errorMessage.value = "Access token is null. Please login again."
+        }
+    }
 
+    // GET: Belirli bir başarıyı al
+    fun getAchievement(id: Int) {
+        val token = _accessToken.value
+        if (token != null) {
+            _isLoading.value = true
+            viewModelScope.launch(Dispatchers.IO) {
+                try {
+                    val response = api.getAchievement("Bearer $token", id)
+                    withContext(Dispatchers.Main) {
+                        if (response.isSuccessful) {
+                            _achievementResponse.value = response.body()?.body
+                        } else {
+                            _errorMessage.value = "Failed to fetch achievement: ${response.message()}"
+                        }
+                    }
+                } catch (e: Exception) {
+                    withContext(Dispatchers.Main) {
+                        _errorMessage.value = "An error occurred: ${e.message}"
+                    }
+                } finally {
+                    _isLoading.value = false
+                }
+            }
+        } else {
+            _errorMessage.value = "Access token is null. Please login again."
+        }
+    }
+
+    // GET: Kullanıcının tüm başarılarını al
+    fun getUserAchievements() {
+        val token = _accessToken.value
+        if (token != null) {
+            _isLoading.value = true
+            viewModelScope.launch(Dispatchers.IO) {
+                try {
+                    val response = api.getUserAchievements("Bearer $token")
+                    withContext(Dispatchers.Main) {
+                        if (response.isSuccessful) {
+                            _achievementsResponse.value = response.body()?.body
+                        } else {
+                            _errorMessage.value = "Failed to fetch user achievements: ${response.message()}"
+                        }
+                    }
+                } catch (e: Exception) {
+                    withContext(Dispatchers.Main) {
+                        _errorMessage.value = "An error occurred: ${e.message}"
+                    }
+                } finally {
+                    _isLoading.value = false
+                }
+            }
+        } else {
+            _errorMessage.value = "Access token is null. Please login again."
+        }
+    }
+
+    // GET: Tüm başarıları al
+    fun getAllAchievements() {
+        val token = _accessToken.value
+        if (token != null) {
+            _isLoading.value = true
+            viewModelScope.launch(Dispatchers.IO) {
+                try {
+                    val response = api.getAllAchievements("Bearer $token")
+                    withContext(Dispatchers.Main) {
+                        if (response.isSuccessful) {
+                            _achievementsResponse.value = response.body()?.body
+                        } else {
+                            _errorMessage.value = "Failed to fetch all achievements: ${response.message()}"
+                        }
+                    }
+                } catch (e: Exception) {
+                    withContext(Dispatchers.Main) {
+                        _errorMessage.value = "An error occurred: ${e.message}"
+                    }
+                } finally {
+                    _isLoading.value = false
+                }
+            }
+        } else {
+            _errorMessage.value = "Access token is null. Please login again."
+        }
+    }
+
+    // POST: Yeni kitaplık oluşturma
+    fun createShelf(shelf: Shelf) {
+        val token = _accessToken.value
+        if (token != null) {
+            _isLoading.value = true
+            viewModelScope.launch(Dispatchers.IO) {
+                try {
+                    val response = api.createShelf("Bearer $token", shelf)
+                    withContext(Dispatchers.Main) {
+                        if (response.isSuccessful) {
+                            _shelfResponse.value = response.body()?.body
+                        } else {
+                            _errorMessage.value = "Failed to create shelf: ${response.message()}"
+                        }
+                    }
+                } catch (e: Exception) {
+                    withContext(Dispatchers.Main) {
+                        _errorMessage.value = "An error occurred: ${e.message}"
+                    }
+                } finally {
+                    _isLoading.value = false
+                }
+            }
+        } else {
+            _errorMessage.value = "Access token is null. Please login again."
+        }
+    }
+
+    // GET: Tüm kitaplıkları al
+    fun getShelves() {
+        val token = _accessToken.value
+        if (token != null) {
+            _isLoading.value = true
+            viewModelScope.launch(Dispatchers.IO) {
+                try {
+                    val response = api.getShelves("Bearer $token")
+                    withContext(Dispatchers.Main) {
+                        if (response.isSuccessful) {
+                            _shelvesResponse.value = response.body()?.body
+                        } else {
+                            _errorMessage.value = "Failed to fetch shelves: ${response.message()}"
+                        }
+                    }
+                } catch (e: Exception) {
+                    withContext(Dispatchers.Main) {
+                        _errorMessage.value = "An error occurred: ${e.message}"
+                    }
+                } finally {
+                    _isLoading.value = false
+                }
+            }
+        } else {
+            _errorMessage.value = "Access token is null. Please login again."
+        }
+    }
+
+    // GET: Belirli bir kitaplığı al
+    fun getShelf(id: Int) {
+        val token = _accessToken.value
+        if (token != null) {
+            _isLoading.value = true
+            viewModelScope.launch(Dispatchers.IO) {
+                try {
+                    val response = api.getShelf("Bearer $token", id)
+                    withContext(Dispatchers.Main) {
+                        if (response.isSuccessful) {
+                            _shelfResponse.value = response.body()?.body
+                        } else {
+                            _errorMessage.value = "Failed to fetch shelf: ${response.message()}"
+                        }
+                    }
+                } catch (e: Exception) {
+                    withContext(Dispatchers.Main) {
+                        _errorMessage.value = "An error occurred: ${e.message}"
+                    }
+                } finally {
+                    _isLoading.value = false
+                }
+            }
+        } else {
+            _errorMessage.value = "Access token is null. Please login again."
+        }
+    }
 
 }
 

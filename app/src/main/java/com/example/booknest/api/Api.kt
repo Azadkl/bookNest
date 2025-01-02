@@ -1,5 +1,6 @@
 package com.example.booknest.api
 
+import com.example.booknest.api.Models.Achievement
 import com.example.booknest.api.Models.Book
 import com.example.booknest.api.Models.BookProgress
 import com.example.booknest.api.Models.Challenge
@@ -8,6 +9,7 @@ import com.example.booknest.api.Models.FriendRequest
 import com.example.booknest.api.Models.FriendResponse
 import com.example.booknest.api.Models.Notification
 import com.example.booknest.api.Models.Review
+import com.example.booknest.api.Models.Shelf
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -160,6 +162,45 @@ interface BookNestApi {
         @Header("Authorization") accessToken: String,
         @Path("id") id: Int
     ): Response<GenelResponse<Any>>
+
+    @POST("api/achievements")
+    suspend fun createAchievement(
+        @Header("Authorization") accessToken: String,
+        @Body achievement: Achievement
+    ): Response<GenelResponse<Achievement>>
+
+    @GET("api/achievements/{id}")
+    suspend fun getAchievement(
+        @Header("Authorization") accessToken: String,
+        @Path("id") id: Int
+    ): Response<GenelResponse<Achievement>>
+
+    @GET("api/achievements/user")
+    suspend fun getUserAchievements(
+        @Header("Authorization") accessToken: String
+    ): Response<GenelResponse<List<Achievement>>>
+
+    @GET("api/achievements")
+    suspend fun getAllAchievements(
+        @Header("Authorization") accessToken: String
+    ): Response<GenelResponse<List<Achievement>>>
+
+    @POST("api/Shelf")
+    suspend fun createShelf(
+        @Header("Authorization") accessToken: String,
+        @Body shelf: Shelf
+    ): Response<GenelResponse<Shelf>>
+
+    @GET("api/Shelf")
+    suspend fun getShelves(
+        @Header("Authorization") accessToken: String
+    ): Response<GenelResponse<List<Shelf>>>
+
+    @GET("api/Shelf/{id}")
+    suspend fun getShelf(
+        @Header("Authorization") accessToken: String,
+        @Path("id") id: Int
+    ): Response<GenelResponse<Shelf>>
 
 }
 

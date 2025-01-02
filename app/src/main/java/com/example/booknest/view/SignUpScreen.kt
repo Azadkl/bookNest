@@ -189,7 +189,7 @@ fun SignUpScreen(navController: NavController,viewModel: SignUpViewModel) {
                     )
                 )
                 OutlinedTextField(
-                    value = age.toString(),  // Convert integer to string for display
+                    value = if (age == 0) "" else age.toString(),  // Convert integer to string for display
                     placeholder = { Text("Your age") },
                     onValueChange = {
                         // Ensure the input is numeric and update the state

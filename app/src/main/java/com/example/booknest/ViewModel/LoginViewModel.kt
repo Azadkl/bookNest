@@ -7,6 +7,13 @@ import androidx.lifecycle.viewModelScope
 import com.example.booknest.api.GenelResponse
 import com.example.booknest.api.LoginRequest
 import com.example.booknest.api.Models.Book
+import com.example.booknest.api.Models.BookProgress
+import com.example.booknest.api.Models.Challenge
+import com.example.booknest.api.Models.Friend
+import com.example.booknest.api.Models.FriendRequest
+import com.example.booknest.api.Models.FriendResponse
+import com.example.booknest.api.Models.Notification
+import com.example.booknest.api.Models.Review
 import com.example.booknest.api.ProfileBody
 import com.example.booknest.api.api
 import kotlinx.coroutines.CoroutineScope
@@ -38,6 +45,33 @@ class LoginViewModel : ViewModel() {
 
     private val _deleteAccountResponse = mutableStateOf<String?>(null)
     val deleteAccountResponse: State<String?> = _deleteAccountResponse
+
+    private val _challenges = mutableStateOf<List<Challenge>>(emptyList())
+    val challenges: State<List<Challenge>> = _challenges
+
+    private val _reviews = mutableStateOf<List<Review>>(emptyList())
+    val reviews: State<List<Review>> = _reviews
+
+    private val _friendRequestsSent = mutableStateOf<List<FriendRequest>>(emptyList())
+    val friendRequestsSent: State<List<FriendRequest>> = _friendRequestsSent
+
+    private val _friendRequestsReceived = mutableStateOf<List<FriendRequest>>(emptyList())
+    val friendRequestsReceived: State<List<FriendRequest>> = _friendRequestsReceived
+
+    private val _friends = mutableStateOf<List<Friend>>(emptyList())
+    val friends: State<List<Friend>> = _friends
+
+    private val _bookProgress = mutableStateOf<BookProgress?>(null)
+    val bookProgress: State<BookProgress?> = _bookProgress
+
+    private val _maxProgress = mutableStateOf<Int?>(null)
+    val maxProgress: State<Int?> = _maxProgress
+
+    private val _notificationResponse = mutableStateOf<Notification?>(null)
+    val notificationResponse: State<Notification?> = _notificationResponse
+
+    private val _notificationsResponse = mutableStateOf<List<Notification>?>(null)
+    val notificationsResponse: State<List<Notification>?> = _notificationsResponse
 
 
     fun setTokens(accessToken: String, refreshToken: String?) {
@@ -357,5 +391,543 @@ class LoginViewModel : ViewModel() {
             _errorMessage.value = "Access token is null. Please login again."
         }
     }
+    // Get Challenges
+    fun getChallenges() {
+        val token = _accessToken.value
+        if (token != null) {
+            _isLoading.value = true
+            viewModelScope.launch(Dispatchers.IO) {
+                try {
+                    val response = api.getChallenges("Bearer $token")
+                    withContext(Dispatchers.Main) {
+                        if (response.isSuccessful) {
+                            _challenges.value = response.body()?.body ?: emptyList()
+                        } else {
+                            _errorMessage.value = "Failed to fetch challenges: ${response.message()}"
+                        }
+                    }
+                } catch (e: Exception) {
+                    withContext(Dispatchers.Main) {
+                        _errorMessage.value = "An error occurred: ${e.message}"
+                    }
+                } finally {
+                    _isLoading.value = false
+                }
+            }
+        } else {
+            _errorMessage.value = "Access token is null. Please login again."
+        }
+    }
+
+    // Post Challenge
+    fun postChallenge(challenge: Challenge) {
+        val token = _accessToken.value
+        if (token != null) {
+            _isLoading.value = true
+            viewModelScope.launch(Dispatchers.IO) {
+                try {
+                    val response = api.postChallenge("Bearer $token", challenge)
+                    withContext(Dispatchers.Main) {
+                        if (response.isSuccessful) {
+                            _challenges.value = _challenges.value + (response.body()?.body ?: challenge)
+                        } else {
+                            _errorMessage.value = "Failed to post challenge: ${response.message()}"
+                        }
+                    }
+                } catch (e: Exception) {
+                    withContext(Dispatchers.Main) {
+                        _errorMessage.value = "An error occurred: ${e.message}"
+                    }
+                } finally {
+                    _isLoading.value = false
+                }
+            }
+        } else {
+            _errorMessage.value = "Access token is null. Please login again."
+        }
+    }
+
+    // Update Challenge
+    fun updateChallenge(challengeId: Int, challenge: Challenge) {
+        val token = _accessToken.value
+        if (token != null) {
+            _isLoading.value = true
+            viewModelScope.launch(Dispatchers.IO) {
+                try {
+                    val response = api.updateChallenge("Bearer $token", challengeId, challenge)
+                    withContext(Dispatchers.Main) {
+                        if (response.isSuccessful) {
+                            _challenges.value = _challenges.value.map {
+                                if (it == challenge) response.body()?.body ?: it else it
+                            }
+                        } else {
+                            _errorMessage.value = "Failed to update challenge: ${response.message()}"
+                        }
+                    }
+                } catch (e: Exception) {
+                    withContext(Dispatchers.Main) {
+                        _errorMessage.value = "An error occurred: ${e.message}"
+                    }
+                } finally {
+                    _isLoading.value = false
+                }
+            }
+        } else {
+            _errorMessage.value = "Access token is null. Please login again."
+        }
+    }
+
+    // Create Review
+    fun createReview(review: Review) {
+        val token = _accessToken.value
+        if (token != null) {
+            _isLoading.value = true
+            viewModelScope.launch(Dispatchers.IO) {
+                try {
+                    val response = api.createReview("Bearer $token", review)
+                    withContext(Dispatchers.Main) {
+                        if (response.isSuccessful) {
+                            _reviews.value = _reviews.value + (response.body()?.body ?: review)
+                        } else {
+                            _errorMessage.value = "Failed to create review: ${response.message()}"
+                        }
+                    }
+                } catch (e: Exception) {
+                    withContext(Dispatchers.Main) {
+                        _errorMessage.value = "An error occurred: ${e.message}"
+                    }
+                } finally {
+                    _isLoading.value = false
+                }
+            }
+        } else {
+            _errorMessage.value = "Access token is null. Please login again."
+        }
+    }
+
+    // Get Reviews by User
+    fun getReviewsByUser() {
+        val token = _accessToken.value
+        if (token != null) {
+            _isLoading.value = true
+            viewModelScope.launch(Dispatchers.IO) {
+                try {
+                    val response = api.getReviewsByUser("Bearer $token")
+                    withContext(Dispatchers.Main) {
+                        if (response.isSuccessful) {
+                            _reviews.value = response.body()?.body ?: emptyList()
+                        } else {
+                            _errorMessage.value = "Failed to fetch user reviews: ${response.message()}"
+                        }
+                    }
+                } catch (e: Exception) {
+                    withContext(Dispatchers.Main) {
+                        _errorMessage.value = "An error occurred: ${e.message}"
+                    }
+                } finally {
+                    _isLoading.value = false
+                }
+            }
+        } else {
+            _errorMessage.value = "Access token is null. Please login again."
+        }
+    }
+
+    // Get Reviews by Book
+    fun getReviewsByBook(bookId: String) {
+        val token = _accessToken.value
+        if (token != null) {
+            _isLoading.value = true
+            viewModelScope.launch(Dispatchers.IO) {
+                try {
+                    val response = api.getReviewsByBook("Bearer $token", bookId)
+                    withContext(Dispatchers.Main) {
+                        if (response.isSuccessful) {
+                            _reviews.value = response.body()?.body ?: emptyList()
+                        } else {
+                            _errorMessage.value = "Failed to fetch reviews for book: ${response.message()}"
+                        }
+                    }
+                } catch (e: Exception) {
+                    withContext(Dispatchers.Main) {
+                        _errorMessage.value = "An error occurred: ${e.message}"
+                    }
+                } finally {
+                    _isLoading.value = false
+                }
+            }
+        } else {
+            _errorMessage.value = "Access token is null. Please login again."
+        }
+    }
+
+    // Get Review by ID
+    fun getReviewById(reviewId: Int) {
+        val token = _accessToken.value
+        if (token != null) {
+            _isLoading.value = true
+            viewModelScope.launch(Dispatchers.IO) {
+                try {
+                    val response = api.getReviewById("Bearer $token", reviewId)
+                    withContext(Dispatchers.Main) {
+                        if (response.isSuccessful) {
+                            _reviews.value = listOf(response.body()?.body ?: return@withContext)
+                        } else {
+                            _errorMessage.value = "Failed to fetch review: ${response.message()}"
+                        }
+                    }
+                } catch (e: Exception) {
+                    withContext(Dispatchers.Main) {
+                        _errorMessage.value = "An error occurred: ${e.message}"
+                    }
+                } finally {
+                    _isLoading.value = false
+                }
+            }
+        } else {
+            _errorMessage.value = "Access token is null. Please login again."
+        }
+    }
+
+    // Send Friend Request
+    fun sendFriendRequest(friendId: Int) {
+        val token = _accessToken.value
+        if (token != null) {
+            _isLoading.value = true
+            viewModelScope.launch(Dispatchers.IO) {
+                try {
+                    val response = api.sendFriendRequest("Bearer $token", FriendRequest(friendId))
+                    withContext(Dispatchers.Main) {
+                        if (response.isSuccessful) {
+                            _friendRequestsSent.value = _friendRequestsSent.value + (response.body()?.body ?: return@withContext)
+                        } else {
+                            _errorMessage.value = "Failed to send friend request: ${response.message()}"
+                        }
+                    }
+                } catch (e: Exception) {
+                    withContext(Dispatchers.Main) {
+                        _errorMessage.value = "An error occurred: ${e.message}"
+                    }
+                } finally {
+                    _isLoading.value = false
+                }
+            }
+        } else {
+            _errorMessage.value = "Access token is null. Please login again."
+        }
+    }
+
+    // Respond to Friend Request
+    fun respondToFriendRequest(senderId: Int, response: Boolean) {
+        val token = _accessToken.value
+        if (token != null) {
+            _isLoading.value = true
+            viewModelScope.launch(Dispatchers.IO) {
+                try {
+                    val responseBody = FriendResponse(senderId, response)
+                    val apiResponse = api.respondToFriendRequest("Bearer $token", responseBody)
+                    withContext(Dispatchers.Main) {
+                        if (apiResponse.isSuccessful) {
+                            _friends.value = _friends.value + (apiResponse.body()?.body ?: return@withContext)
+                        } else {
+                            _errorMessage.value = "Failed to respond to friend request: ${apiResponse.message()}"
+                        }
+                    }
+                } catch (e: Exception) {
+                    withContext(Dispatchers.Main) {
+                        _errorMessage.value = "An error occurred: ${e.message}"
+                    }
+                } finally {
+                    _isLoading.value = false
+                }
+            }
+        } else {
+            _errorMessage.value = "Access token is null. Please login again."
+        }
+    }
+
+    // Get Sent Friend Requests
+    fun getSentFriendRequests() {
+        val token = _accessToken.value
+        if (token != null) {
+            _isLoading.value = true
+            viewModelScope.launch(Dispatchers.IO) {
+                try {
+                    val response = api.getSentFriendRequests("Bearer $token")
+                    withContext(Dispatchers.Main) {
+                        if (response.isSuccessful) {
+                            _friendRequestsSent.value = response.body()?.body ?: emptyList()
+                        } else {
+                            _errorMessage.value = "Failed to fetch sent requests: ${response.message()}"
+                        }
+                    }
+                } catch (e: Exception) {
+                    withContext(Dispatchers.Main) {
+                        _errorMessage.value = "An error occurred: ${e.message}"
+                    }
+                } finally {
+                    _isLoading.value = false
+                }
+            }
+        } else {
+            _errorMessage.value = "Access token is null. Please login again."
+        }
+    }
+
+    // Get Received Friend Requests
+    fun getReceivedFriendRequests() {
+        val token = _accessToken.value
+        if (token != null) {
+            _isLoading.value = true
+            viewModelScope.launch(Dispatchers.IO) {
+                try {
+                    val response = api.getReceivedFriendRequests("Bearer $token")
+                    withContext(Dispatchers.Main) {
+                        if (response.isSuccessful) {
+                            _friendRequestsReceived.value = response.body()?.body ?: emptyList()
+                        } else {
+                            _errorMessage.value = "Failed to fetch received requests: ${response.message()}"
+                        }
+                    }
+                } catch (e: Exception) {
+                    withContext(Dispatchers.Main) {
+                        _errorMessage.value = "An error occurred: ${e.message}"
+                    }
+                } finally {
+                    _isLoading.value = false
+                }
+            }
+        } else {
+            _errorMessage.value = "Access token is null. Please login again."
+        }
+    }
+
+    // Cancel Friend Request
+    fun cancelFriendRequest(friendId: Int) {
+        val token = _accessToken.value
+        if (token != null) {
+            _isLoading.value = true
+            viewModelScope.launch(Dispatchers.IO) {
+                try {
+                    val response = api.cancelFriendRequest("Bearer $token", friendId)
+                    withContext(Dispatchers.Main) {
+                        if (response.isSuccessful) {
+                            _friendRequestsSent.value = _friendRequestsSent.value.filter { it.friendId != friendId }
+                        } else {
+                            _errorMessage.value = "Failed to cancel request: ${response.message()}"
+                        }
+                    }
+                } catch (e: Exception) {
+                    withContext(Dispatchers.Main) {
+                        _errorMessage.value = "An error occurred: ${e.message}"
+                    }
+                } finally {
+                    _isLoading.value = false
+                }
+            }
+        } else {
+            _errorMessage.value = "Access token is null. Please login again."
+        }
+    }
+
+    // Remove Friend
+    fun removeFriend(friendId: Int) {
+        val token = _accessToken.value
+        if (token != null) {
+            _isLoading.value = true
+            viewModelScope.launch(Dispatchers.IO) {
+                try {
+                    val response = api.removeFriend("Bearer $token", friendId)
+                    withContext(Dispatchers.Main) {
+                        if (response.isSuccessful) {
+                            _friends.value = _friends.value.filter { it.friendId != friendId }
+                        } else {
+                            _errorMessage.value = "Failed to remove friend: ${response.message()}"
+                        }
+                    }
+                } catch (e: Exception) {
+                    withContext(Dispatchers.Main) {
+                        _errorMessage.value = "An error occurred: ${e.message}"
+                    }
+                } finally {
+                    _isLoading.value = false
+                }
+            }
+        } else {
+            _errorMessage.value = "Access token is null. Please login again."
+        }
+    }
+
+    // BookProgress verilerini almak için fonksiyon
+    fun getBookProgress() {
+        val token = _accessToken.value
+        if (token != null) {
+            _isLoading.value = true
+            viewModelScope.launch(Dispatchers.IO) {
+                try {
+                    val response = api.getBookProgress("Bearer $token")
+                    withContext(Dispatchers.Main) {
+                        if (response.isSuccessful) {
+                            _bookProgress.value = response.body()?.body
+                        } else {
+                            _errorMessage.value = "Failed to get book progress: ${response.message()}"
+                        }
+                    }
+                } catch (e: Exception) {
+                    withContext(Dispatchers.Main) {
+                        _errorMessage.value = "An error occurred: ${e.message}"
+                    }
+                } finally {
+                    _isLoading.value = false
+                }
+            }
+        } else {
+            _errorMessage.value = "Access token is null. Please login again."
+        }
+    }
+
+    // BookProgress verisini backend'e göndermek için fonksiyon
+    fun postBookProgress(bookId: String, status: String, progress: Int) {
+        val token = _accessToken.value
+        if (token != null) {
+            _isLoading.value = true
+            val bookProgress = BookProgress(bookId, status, progress)
+            viewModelScope.launch(Dispatchers.IO) {
+                try {
+                    val response = api.postBookProgress("Bearer $token", bookProgress)
+                    withContext(Dispatchers.Main) {
+                        if (response.isSuccessful) {
+                            _bookProgress.value = response.body()?.body
+                        } else {
+                            _errorMessage.value = "Failed to post book progress: ${response.message()}"
+                        }
+                    }
+                } catch (e: Exception) {
+                    withContext(Dispatchers.Main) {
+                        _errorMessage.value = "An error occurred: ${e.message}"
+                    }
+                } finally {
+                    _isLoading.value = false
+                }
+            }
+        } else {
+            _errorMessage.value = "Access token is null. Please login again."
+        }
+    }
+
+    // Maksimum ilerleme verisini almak için fonksiyon
+    fun getMaxProgress() {
+        val token = _accessToken.value
+        if (token != null) {
+            _isLoading.value = true
+            viewModelScope.launch(Dispatchers.IO) {
+                try {
+                    val response = api.getMaxProgress("Bearer $token")
+                    withContext(Dispatchers.Main) {
+                        if (response.isSuccessful) {
+                            _maxProgress.value = response.body()?.body
+                        } else {
+                            _errorMessage.value = "Failed to get max progress: ${response.message()}"
+                        }
+                    }
+                } catch (e: Exception) {
+                    withContext(Dispatchers.Main) {
+                        _errorMessage.value = "An error occurred: ${e.message}"
+                    }
+                } finally {
+                    _isLoading.value = false
+                }
+            }
+        } else {
+            _errorMessage.value = "Access token is null. Please login again."
+        }
+    }
+
+    // POST: Yeni bildirim oluşturma
+    fun createNotification(notification: Notification) {
+        val token = _accessToken.value
+        if (token != null) {
+            _isLoading.value = true
+            viewModelScope.launch(Dispatchers.IO) {
+                try {
+                    val response = api.createNotification("Bearer $token", notification)
+                    withContext(Dispatchers.Main) {
+                        if (response.isSuccessful) {
+                            _notificationResponse.value = response.body()?.body
+                        } else {
+                            _errorMessage.value = "Failed to create notification: ${response.message()}"
+                        }
+                    }
+                } catch (e: Exception) {
+                    withContext(Dispatchers.Main) {
+                        _errorMessage.value = "An error occurred: ${e.message}"
+                    }
+                } finally {
+                    _isLoading.value = false
+                }
+            }
+        } else {
+            _errorMessage.value = "Access token is null. Please login again."
+        }
+    }
+
+    // GET: Belirli bir bildirim al
+    fun getNotification(id: Int) {
+        val token = _accessToken.value
+        if (token != null) {
+            _isLoading.value = true
+            viewModelScope.launch(Dispatchers.IO) {
+                try {
+                    val response = api.getNotification("Bearer $token", id)
+                    withContext(Dispatchers.Main) {
+                        if (response.isSuccessful) {
+                            _notificationResponse.value = response.body()?.body
+                        } else {
+                            _errorMessage.value = "Failed to fetch notification: ${response.message()}"
+                        }
+                    }
+                } catch (e: Exception) {
+                    withContext(Dispatchers.Main) {
+                        _errorMessage.value = "An error occurred: ${e.message}"
+                    }
+                } finally {
+                    _isLoading.value = false
+                }
+            }
+        } else {
+            _errorMessage.value = "Access token is null. Please login again."
+        }
+    }
+
+    // DELETE: Belirli bir bildirimi sil
+    fun deleteNotification(id: Int) {
+        val token = _accessToken.value
+        if (token != null) {
+            _isLoading.value = true
+            viewModelScope.launch(Dispatchers.IO) {
+                try {
+                    val response = api.deleteNotification("Bearer $token", id)
+                    withContext(Dispatchers.Main) {
+                        if (response.isSuccessful) {
+                            _errorMessage.value = "Notification deleted successfully."
+                        } else {
+                            _errorMessage.value = "Failed to delete notification: ${response.message()}"
+                        }
+                    }
+                } catch (e: Exception) {
+                    withContext(Dispatchers.Main) {
+                        _errorMessage.value = "An error occurred: ${e.message}"
+                    }
+                } finally {
+                    _isLoading.value = false
+                }
+            }
+        } else {
+            _errorMessage.value = "Access token is null. Please login again."
+        }
+    }
+
+
+
 }
 

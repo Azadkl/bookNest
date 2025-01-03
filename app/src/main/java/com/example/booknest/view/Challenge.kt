@@ -101,7 +101,7 @@ fun Challenge(navController: NavController) {
                 modifier = Modifier.fillMaxWidth(0.8f),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3CB371))
             ) {
-                Text("Goruntule Books You've Read", fontSize = 16.sp)
+                Text("Books You've Read", fontSize = 16.sp)
             }
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -192,7 +192,9 @@ fun ChallengeBottomSheet(
     val bookOrPageChoice = remember { mutableStateOf("") }
     val numberInput = remember { mutableStateOf("") }
     val dateRangePickerState = rememberDateRangePickerState()
-
+    var enable1=false
+    var enable2=false
+    val enable3=false
     ModalBottomSheet(
         sheetState = sheetState,
         onDismissRequest = onDismiss,
@@ -209,8 +211,10 @@ fun ChallengeBottomSheet(
                     modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(modifier = Modifier.height(16.dp))
-                Button(onClick = { currentStep = 2 }, modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3CB371))) {
+                if(challengeName.value !=""){enable1 = true}
+                Button(enabled = enable1, onClick = { currentStep = 2 }, modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF877f6f
+                    ))) {
                     Text("Next")
                 }
             }
@@ -226,14 +230,15 @@ fun ChallengeBottomSheet(
                 ) {
                     Button(
                         onClick = { bookOrPageChoice.value = "book" },
-                        colors = ButtonDefaults.buttonColors(containerColor = if (bookOrPageChoice.value == "book") Color(0xFF3CB371) else Color.Gray)
+                        colors = ButtonDefaults.buttonColors(containerColor = if (bookOrPageChoice.value == "book") Color(0xFF5f4d3f) else Color.Gray)
                     ) {
                         Text("Books")
                     }
                     Spacer(modifier = Modifier.width(16.dp))
+
                     Button(
                         onClick = { bookOrPageChoice.value = "page" },
-                        colors = ButtonDefaults.buttonColors(containerColor = if (bookOrPageChoice.value == "page") Color(0xFF3CB371) else Color.Gray)
+                        colors = ButtonDefaults.buttonColors(containerColor = if (bookOrPageChoice.value == "page") Color(0xFF5f4d3f) else Color.Gray)
                     ) {
                         Text("Pages")
                     }
@@ -247,8 +252,10 @@ fun ChallengeBottomSheet(
                     modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(modifier = Modifier.height(16.dp))
-                Button(onClick = { currentStep = 3 }, modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3CB371))) {
+                if((bookOrPageChoice.value=="book" || bookOrPageChoice.value=="page") && numberInput.value!=""){enable2 = true}
+                Button(onClick = { currentStep = 3 }, modifier = Modifier.fillMaxWidth(), enabled = enable2,
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF877f6f
+                    ))) {
                     Text("Next")
                 }
             }

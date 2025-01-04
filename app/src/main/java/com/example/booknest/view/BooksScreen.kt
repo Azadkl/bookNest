@@ -581,7 +581,11 @@ fun ReviewCard(review: com.example.booknest.api.Models.Review) {
         ) {
             // Kullanıcı Resmi (Sol Tarafta)
             Image(
-                painter = rememberImagePainter(review.cover),
+                painter = if (!review.cover.isNullOrEmpty()) {
+                    rememberImagePainter(data = review.cover)
+                } else {
+                    painterResource(id = R.drawable.outline_person_24) // Varsayılan görsel
+                },
                 contentDescription = "User Image",
                 modifier = Modifier
                     .size(40.dp)

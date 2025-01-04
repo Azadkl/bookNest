@@ -194,7 +194,16 @@ fun BottomBarScreen(mainNavController:NavController,modifier: Modifier=Modifier,
                         })
 
                     {      // Eğer sonuçlar boşsa, kullanıcıya mesaj göster ve buton ekle
-                        if (filteredResult.isEmpty()) {
+                        val users by viewModel.usersResponse
+                        val books by viewModel.bookResponse
+                        val filteredBooks = books?.filter { book ->
+                            book.title.contains(searchQuery, ignoreCase = true)
+                        } ?: emptyList()
+                        // Arama metnine göre kullanıcıları filtrele
+                        val filteredUsers = users?.filter { user ->
+                            user.username.contains(searchQuery, ignoreCase = true)
+                        } ?: emptyList()
+                        if ((filteredUsers.isEmpty() && filteredBooks.isEmpty()) || searchQuery == "" ) {
                             Column(
                                 modifier = Modifier
                                     .fillMaxSize()
@@ -232,8 +241,7 @@ fun BottomBarScreen(mainNavController:NavController,modifier: Modifier=Modifier,
                         }
                         else{
                             var isLoading by remember { mutableStateOf(true) }
-                            val users by viewModel.usersResponse
-                            val books by viewModel.bookResponse
+
                             LaunchedEffect(Unit) {
                                 viewModel.fetchUsers()  // Bu satır verileri çekmeye başlar
                                 viewModel.fetchBook()
@@ -258,10 +266,7 @@ fun BottomBarScreen(mainNavController:NavController,modifier: Modifier=Modifier,
                                         .padding(top = 10.dp),
                                     contentPadding = PaddingValues(bottom = 100.dp),
                                 ) {
-                                    // Arama metnine göre kullanıcıları filtrele
-                                    val filteredUsers = users?.filter { user ->
-                                        user.username.contains(searchQuery, ignoreCase = true)
-                                    } ?: emptyList()
+
 
                                     // Filtrelenmiş kullanıcıları listele
                                     items(filteredUsers) { user ->
@@ -300,9 +305,7 @@ fun BottomBarScreen(mainNavController:NavController,modifier: Modifier=Modifier,
                                                 }
                                         )
                                     }
-                                    val filteredBooks = books?.filter { book ->
-                                        book.title.contains(searchQuery, ignoreCase = true)
-                                    } ?: emptyList()
+
 
                                     items(filteredBooks) { book ->
                                         ListItem(

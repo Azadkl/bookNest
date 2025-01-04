@@ -3,6 +3,7 @@ package com.example.booknest.view
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.ImageDecoder
+import android.util.Log
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
@@ -90,7 +91,8 @@ import kotlinx.coroutines.withContext
 import java.net.URL
 
 @Composable
-fun BooksScreen(navController: NavController,viewModel: LoginViewModel,  isbn: String,
+fun BooksScreen(navController: NavController,viewModel: LoginViewModel,
+                isbn: String,
                 title: String,
                 author: String,
                 cover: String,
@@ -100,6 +102,10 @@ fun BooksScreen(navController: NavController,viewModel: LoginViewModel,  isbn: S
     var bitmap by remember { mutableStateOf<Bitmap?>(null) }
     var dominantColor by remember { mutableStateOf(Color.LightGray) }
     var vibrantColor by remember { mutableStateOf(Color.Gray) }
+    val review by viewModel.reviews
+    LaunchedEffect(Unit) {
+        viewModel.getReviewsByBook(bookId = isbn)
+    }
 
     // Ağ işlemini arka planda gerçekleştirin
     LaunchedEffect(cover) {
@@ -382,29 +388,35 @@ fun BooksScreen(navController: NavController,viewModel: LoginViewModel,  isbn: S
                 ),
                 maxLines = 3,
             )
-            // Gönder butonu
-            Button(onClick = {
-                // Yorum gönderildiğinde, yeni yorum verisini ekleme
-                val newReview = Review(
-                    userName = "Azad Köl",  // Buraya mevcut kullanıcı adı eklenebilir
-                    userImageResId = R.drawable.azad,  // Kullanıcı resmi
-                    rating = userRating,
-                    comment = userComment,
-                    time = System.currentTimeMillis()
-                )
 
-                // Yeni yorumu listeye ekle
-                reviews = reviews + newReview
+                    Button(onClick = {
+                        // Yorum gönderildiğinde, yeni yorum verisini ekleme
+                        val newReview = com.example.booknest.api.Models.Review(
+                            bookId = isbn,  // Buraya mevcut kullanıcı adı eklenebilir
+                            rating = userRating,
+                            text = userComment,
+                            date = System.currentTimeMillis()
+                        )
 
-                // Yorumlar alanını temizle
-                userRating = 0f
-                userComment = ""
-            },
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2E8B57)),
-                shape = RoundedCornerShape(5.dp)
-            ) {
-                Text("Submit Review")
-            }
+                        // Log: Yorum gönderme işlemini başlat
+                        Log.d("ReviewSubmission", "Attempting to submit review for book ID: $isbn")
+
+                        // Yeni yorumu listeye ekle
+                        viewModel.createReview(newReview)
+
+                        // Log: Yorum gönderildikten sonra
+                        Log.d("ReviewSubmission", "Review submitted successfully: $newReview")
+
+                        // Yorumlar alanını temizle
+                        userRating = 0f
+                        userComment = ""
+                    },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2E8B57)),
+                        shape = RoundedCornerShape(5.dp)
+                    ) {
+                        Text("Submit Review")
+                    }
+
         }
 
         item {
@@ -439,7 +451,7 @@ fun BooksScreen(navController: NavController,viewModel: LoginViewModel,  isbn: S
                     series = bookDetails.series,
                     language = bookDetails.language,
                     characters = bookDetails.characters))
-                2 -> (ReviewContent(reviews))
+                2 -> (ReviewContent(review))
             }
 
         }
@@ -534,7 +546,7 @@ fun DetailRow(label: String, value: String) {
     }
 }
 @Composable
-fun ReviewContent(reviews:List<Review>) {
+fun ReviewContent(reviews:List<com.example.booknest.api.Models.Review>) {
 
 
     // LazyColumn'u doğrudan Tab içinde kullan
@@ -548,7 +560,7 @@ fun ReviewContent(reviews:List<Review>) {
 
 
 @Composable
-fun ReviewCard(review: Review) {
+fun ReviewCard(review: com.example.booknest.api.Models.Review) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -566,19 +578,19 @@ fun ReviewCard(review: Review) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             // Kullanıcı Resmi (Sol Tarafta)
-            Image(
-                painter = painterResource(id = review.userImageResId),
-                contentDescription = "User Image",
-                modifier = Modifier
-                    .size(40.dp)
-                    .clip(CircleShape)
-            )
+//            Image(
+//                painter = painterResource(id = review.),
+//                contentDescription = "User Image",
+//                modifier = Modifier
+//                    .size(40.dp)
+//                    .clip(CircleShape)
+//            )
 
             // Yorum İçeriği
             Column(modifier = Modifier.weight(1f)) {
                 // Kullanıcı adı
                 Text(
-                    text = review.userName,
+                    text = review.bookId,
                     style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 16.sp)
                 )
 
@@ -586,7 +598,7 @@ fun ReviewCard(review: Review) {
 
                 // Yorum metni
                 Text(
-                    text = review.comment,
+                    text = review.text,
                     style = TextStyle(fontSize = 14.sp),
                 )
 
@@ -594,7 +606,7 @@ fun ReviewCard(review: Review) {
 
                 // Yorumun tarihi
                 Text(
-                    text = "${getTimeAgo(review.time)}",
+                    text = "${getTimeAgo(review.date)}",
                     style = TextStyle(fontSize = 12.sp, color = Color.Gray)
                 )
             }

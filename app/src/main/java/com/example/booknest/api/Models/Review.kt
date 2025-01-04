@@ -2,6 +2,7 @@ package com.example.booknest.api.Models
 
 data class Review(
     val bookId: String,
-    val rating: Int,
-    val text: String
+    val rating: Float,
+    val text: String,
+    val date:Long
 )

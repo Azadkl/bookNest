@@ -498,9 +498,15 @@ class LoginViewModel : ViewModel() {
             viewModelScope.launch(Dispatchers.IO) {
                 try {
                     val response = api.createReview("Bearer $token", review)
+                    Log.d("APIResponse", "Response body: ${response.body()}")
+                    val responseBody = response.body()?.body ?: review
+                    Log.d("APIResponse", "Response body: $responseBody")
+                    Log.d("APIResponse", "Raw response: ${response.raw()}")
+
+
                     withContext(Dispatchers.Main) {
                         if (response.isSuccessful) {
-                            _reviews.value = _reviews.value + (response.body()?.body ?: review)
+                            _reviews.value += (response.body()?.body ?: review)
                         } else {
                             _errorMessage.value = "Failed to create review: ${response.message()}"
                         }

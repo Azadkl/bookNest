@@ -1,10 +1,10 @@
 package com.example.booknest.api.Models
 
 data class BookProgress(
-    val BookId: String,
-    val Status: String,
-    val Progress: Int,
-    val Cover : String,
+    val bookId: String,
+    val status: String,
+    val progress: Int,
+    val cover : String,
     val title: String
 )
 data class MybooksList(

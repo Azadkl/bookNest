@@ -86,10 +86,11 @@ import com.example.booknest.ui.theme.PrimaryColor
 fun MyBooksPage(navController: NavController, modifier: Modifier = Modifier,viewModel: LoginViewModel) {
 
     val myBooks = viewModel.myBooks
-//    LaunchedEffect(myBooks) {
-//        viewModel.getBookProgress()
-//        println("Fetched books: ${viewModel.myBooks.value}")
-//    }
+    Log.d("mybooks icerigi","$myBooks")
+    LaunchedEffect(Unit) {
+        viewModel.getBookProgress()
+        println("Fetched books: ${viewModel.myBooks.value}")
+    }
     Column(
         modifier = Modifier
             .fillMaxHeight()
@@ -200,7 +201,7 @@ Row (modifier = Modifier.fillMaxWidth()){
                         modifier = Modifier
                             .size(120.dp, 180.dp) // Sabit genişlik ve yükseklik
                             .clickable { navController.navigate(route) },
-                        painter = rememberImagePainter(book.Cover),
+                        painter = rememberImagePainter(book.cover),
                         contentDescription = "Book Cover Image",
                         contentScale = ContentScale.Crop
                     )

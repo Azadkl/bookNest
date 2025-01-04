@@ -13,6 +13,7 @@ import com.example.booknest.api.Models.Challenge
 import com.example.booknest.api.Models.Friend
 import com.example.booknest.api.Models.FriendRequest
 import com.example.booknest.api.Models.FriendResponse
+import com.example.booknest.api.Models.MybooksList
 import com.example.booknest.api.Models.Notification
 import com.example.booknest.api.Models.Review
 import com.example.booknest.api.Models.Shelf
@@ -62,6 +63,9 @@ class LoginViewModel : ViewModel() {
 
     private val _friends = mutableStateOf<List<Friend>>(emptyList())
     val friends: State<List<Friend>> = _friends
+
+    private val _myBooks = mutableStateOf<MybooksList?>(null)
+    val myBooks: State<MybooksList?> = _myBooks
 
     private val _bookProgress = mutableStateOf<BookProgress?>(null)
     val bookProgress: State<BookProgress?> = _bookProgress
@@ -267,7 +271,7 @@ class LoginViewModel : ViewModel() {
                     val response = api.logout("Bearer $currentAccessToken")
 
                     withContext(Dispatchers.Main) {
-                        if (response.isSuccessful) {
+                        if (response.body()?.success ?: false) {
                             // Logout başarılı, local tokenları temizle
                             _accessToken.value = null
                             _refreshToken.value = null
@@ -780,14 +784,26 @@ class LoginViewModel : ViewModel() {
     // BookProgress verilerini almak için fonksiyon
     fun getBookProgress() {
         val token = _accessToken.value
+        Log.d("if ten onceki token", "$token")
         if (token != null) {
             _isLoading.value = true
             viewModelScope.launch(Dispatchers.IO) {
                 try {
                     val response = api.getBookProgress("Bearer $token")
+                    Log.d("APIResponse", "Response body: ${response.body()}")
                     withContext(Dispatchers.Main) {
                         if (response.isSuccessful) {
-                            _bookProgress.value = response.body()?.body
+                            response.body()?.body?.let { body ->
+                                _myBooks.value = _myBooks.value?.copy(
+                                    read = body.read ?: emptyList(),
+                                    reading = body.reading ?: emptyList(),
+                                    wantToRead = body.wantToRead ?: emptyList()
+                                ) ?: MybooksList(
+                                    read = body.read ?: emptyList(),
+                                    reading = body.reading ?: emptyList(),
+                                    wantToRead = body.wantToRead ?: emptyList()
+                                )
+                            }
                         } else {
                             _errorMessage.value = "Failed to get book progress: ${response.message()}"
                         }
@@ -802,15 +818,16 @@ class LoginViewModel : ViewModel() {
             }
         } else {
             _errorMessage.value = "Access token is null. Please login again."
+            Log.d("if ten sonraki meası", "$_errorMessage")
         }
     }
 
     // BookProgress verisini backend'e göndermek için fonksiyon
-    fun postBookProgress(bookId: String, status: String, progress: Int) {
+    fun postBookProgress(bookId: String, status: String, progress: Int,cover: String,title:String) {
         val token = _accessToken.value
         if (token != null) {
             _isLoading.value = true
-            val bookProgress = BookProgress(bookId, status, progress)
+            val bookProgress = BookProgress(bookId, status, progress,cover,title)
             viewModelScope.launch(Dispatchers.IO) {
                 try {
                     val response = api.postBookProgress("Bearer $token", bookProgress)

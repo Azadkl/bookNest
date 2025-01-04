@@ -1,5 +1,6 @@
 package com.example.booknest.view
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -47,6 +48,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -71,15 +73,23 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import coil.compose.rememberImagePainter
 import com.example.booknest.Book
 import com.example.booknest.Model.SearchResult
 import com.example.booknest.R
+import com.example.booknest.ViewModel.LoginViewModel
+import com.example.booknest.api.Models.BookProgress
 import com.example.booknest.ui.theme.ButtonColor1
 import com.example.booknest.ui.theme.PrimaryColor
 
 @Composable
-fun MyBooksPage(navController: NavController, modifier: Modifier = Modifier,viewModel: BooksViewModel) {
-    val books = viewModel.books.take(6) // Get the first 3 books from the list
+fun MyBooksPage(navController: NavController, modifier: Modifier = Modifier,viewModel: LoginViewModel) {
+
+    val myBooks = viewModel.myBooks
+//    LaunchedEffect(myBooks) {
+//        viewModel.getBookProgress()
+//        println("Fetched books: ${viewModel.myBooks.value}")
+//    }
     Column(
         modifier = Modifier
             .fillMaxHeight()
@@ -111,7 +121,10 @@ fun MyBooksPage(navController: NavController, modifier: Modifier = Modifier,view
 
                     )
                     Divider(color = Color.Black, thickness = 1.dp, modifier = Modifier.fillMaxWidth(0.8f))
-                    BookCard( navController=navController,"booksIveRead",books)
+                    myBooks.value?.let {
+                        BookCard( navController=navController,"booksIveRead",
+                            it.read)
+                    }
 
                 }
                 Spacer(modifier = Modifier.padding(8.dp))
@@ -131,7 +144,10 @@ fun MyBooksPage(navController: NavController, modifier: Modifier = Modifier,view
                         style = TextStyle(fontSize = 25.sp)
                     )
                     Divider(color = Color.Black, thickness = 1.dp, modifier = Modifier.fillMaxWidth(0.8f))
-                    BookCard( navController=navController,"booksIWantToRead",books)
+                    myBooks.value?.let {
+                        BookCard( navController=navController,"booksIWantToRead",
+                            it.wantToRead)
+                    }
 
                 }
                 Spacer(modifier = Modifier.padding(8.dp))
@@ -151,7 +167,10 @@ fun MyBooksPage(navController: NavController, modifier: Modifier = Modifier,view
                         style = TextStyle(fontSize = 25.sp)
                     )
                     Divider(color = Color.Black, thickness = 1.dp, modifier = Modifier.fillMaxWidth(0.8f))
-                    BookCard( navController=navController,"currentlyReading",books)
+                    myBooks.value?.let {
+                        BookCard( navController=navController,"currentlyReading",
+                            it.reading)
+                    }
 
                 }
                 Spacer(modifier = Modifier.padding(8.dp))
@@ -161,7 +180,7 @@ fun MyBooksPage(navController: NavController, modifier: Modifier = Modifier,view
     }
 }
 @Composable
-fun BookCard(navController: NavController, route: String, books: List<SearchResult.Book>) {
+fun BookCard(navController: NavController, route: String, books: List<BookProgress>) {
     Spacer(modifier = Modifier.padding(3.dp))
 Row (modifier = Modifier.fillMaxWidth()){
 
@@ -181,7 +200,7 @@ Row (modifier = Modifier.fillMaxWidth()){
                         modifier = Modifier
                             .size(120.dp, 180.dp) // Sabit genişlik ve yükseklik
                             .clickable { navController.navigate(route) },
-                        painter = painterResource(id = book.imageResId),
+                        painter = rememberImagePainter(book.Cover),
                         contentDescription = "Book Cover Image",
                         contentScale = ContentScale.Crop
                     )

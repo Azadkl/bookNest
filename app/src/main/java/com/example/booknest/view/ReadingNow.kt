@@ -1,5 +1,6 @@
 package com.example.booknest.view
 
+import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -23,6 +24,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -37,14 +39,21 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import coil.compose.rememberAsyncImagePainter
 import com.example.booknest.Model.SearchResult
+import com.example.booknest.ViewModel.LoginViewModel
+import com.example.booknest.api.Models.Book
+import com.example.booknest.api.Models.BookProgress
 
 @Composable
-fun ReadingNow(viewModel: BooksViewModel, navController: NavController) {
-    val books = viewModel.books
+fun ReadingNow(viewModel: LoginViewModel, navController: NavController) {
+    val books = viewModel.bookResponse
+    LaunchedEffect(Unit) {
+        viewModel.getBookProgress()
+    }
     var showBottomSheet by remember { mutableStateOf(false) }
-    var selectedBook by remember { mutableStateOf<SearchResult.Book?>(null) }
-    var readingStatuses by remember { mutableStateOf<List<Pair<SearchResult.Book, Int>>>(emptyList()) }
+    var selectedBook by remember { mutableStateOf<Book?>(null) }
+    var readingStatuses by remember { mutableStateOf<List<Pair<BookProgress, Int>>>(emptyList()) }
     Column(
         modifier = Modifier
             .fillMaxHeight()
@@ -62,12 +71,13 @@ fun ReadingNow(viewModel: BooksViewModel, navController: NavController) {
             contentPadding = PaddingValues(bottom = 90.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            items(books) { book ->
+            val bookList = books.value ?: emptyList()
+            items(bookList) { book ->
                 // Başlangıçta sayfa sayısı 0 olarak kabul edelim
                 var pagesRead = 0 // Sayfa okuma bilgisini başta sıfır yapıyoruz
 
                 // Eğer readingStatuses listesinde kitap varsa, okunan sayfa bilgisini alıyoruz
-                val status = readingStatuses.find { it.first.id == book.id }
+                val status = readingStatuses.find { it.first.BookId == book.isbn }
                 status?.let {
                     pagesRead = it.second
                 }
@@ -78,7 +88,15 @@ fun ReadingNow(viewModel: BooksViewModel, navController: NavController) {
                         .padding(8.dp)
                         .clip(shape = RoundedCornerShape(16.dp))
                         .clickable {
-                            navController.navigate("books/${book.id}")
+                            navController.navigate("\"books/${Uri.encode(book.isbn)}/${
+                                Uri.encode(
+                                    book.title
+                                )
+                            }/${Uri.encode(book.authorId.toString())}/${Uri.encode(book.cover)}/${
+                                Uri.encode(
+                                    book.description
+                                )
+                            }/4.5/${book.pages}")
                         },
                     shape = RoundedCornerShape(16.dp),
                     colors = CardDefaults.cardColors(
@@ -87,7 +105,7 @@ fun ReadingNow(viewModel: BooksViewModel, navController: NavController) {
                 ) {
                     Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                         Image(
-                            painter = painterResource(id = book.imageResId),
+                            painter = rememberAsyncImagePainter(book.cover),
                             contentDescription = book.title,
                             modifier = Modifier.size(100.dp)
                         )
@@ -99,7 +117,7 @@ fun ReadingNow(viewModel: BooksViewModel, navController: NavController) {
                                 style = TextStyle(fontSize = 22.sp, fontWeight = FontWeight.Bold)
                             )
 
-                            book.author?.let {
+                            book.authorId?.let {
                                 Text(
                                     text = "by $it",
                                     style = TextStyle(fontSize = 18.sp, color = Color.Gray)
@@ -107,7 +125,7 @@ fun ReadingNow(viewModel: BooksViewModel, navController: NavController) {
                             }
 
                             Row(modifier = Modifier.fillMaxWidth()) {
-                                RatingStars(rating = book.rating.toFloatOrNull() ?: 0f)
+                                RatingStars(rating = book.rating)
                                 Spacer(modifier = Modifier.width(8.dp))
                                 book.rating?.let {
                                     Text(
@@ -116,8 +134,8 @@ fun ReadingNow(viewModel: BooksViewModel, navController: NavController) {
                                     )
                                 }
                             }
-                            val percentage = if (book.pageNumber > 0) {
-                                minOf((pagesRead * 100) / book.pageNumber, 100)
+                            val percentage = if (book.pages > 0) {
+                                minOf((pagesRead * 100) / book.pages, 100)
                             } else 0
 
                             LinearProgressIndicator(
@@ -137,7 +155,7 @@ fun ReadingNow(viewModel: BooksViewModel, navController: NavController) {
                             ) {
                                 Button(
                                     onClick = {
-                                        viewModel.removeBook(book)
+//                                        viewModel.removeBook(book)
                                     },
                                     modifier = Modifier.padding(top = 8.dp),
                                     colors = ButtonDefaults.buttonColors(
@@ -167,32 +185,32 @@ fun ReadingNow(viewModel: BooksViewModel, navController: NavController) {
                 }
             }
         }
-        if (showBottomSheet && selectedBook != null) {
-            BottomSheet_1(
-                selectedBook = selectedBook!!,
-                onDismiss = { showBottomSheet = false },
-                onSave = { pagesRead ->
-                    // Mevcut kitap verisini güncelleme
-                    readingStatuses = readingStatuses.toMutableList().apply {
-                        // Eğer kitap zaten listede varsa, eski sayfa sayısını güncelliyoruz
-                        val index = indexOfFirst { it.first.id == selectedBook?.id }
-                        if (index != -1) {
-                            // Kitap bulunursa, sayfa sayısını güncelliyoruz
-                            this[index] = selectedBook!! to pagesRead
-                        } else {
-                            // Kitap listede yoksa, yeni kitap ekliyoruz
-                            add(selectedBook!! to pagesRead)
-                        }
-                    }
-                    // Eğer %100'e ulaşmışsa, kitabı listeden çıkaralım
-                    if (pagesRead == selectedBook!!.pageNumber) {
-                        viewModel.removeBook(selectedBook!!)
-                    }
-
-                    showBottomSheet = false
-                }
-            )
-        }
+//        if (showBottomSheet && selectedBook != null) {
+//            BottomSheet_1(
+//                selectedBook = selectedBook!!,
+//                onDismiss = { showBottomSheet = false },
+//                onSave = { pagesRead ->
+//                    // Mevcut kitap verisini güncelleme
+//                    readingStatuses = readingStatuses.toMutableList().apply {
+//                        // Eğer kitap zaten listede varsa, eski sayfa sayısını güncelliyoruz
+//                        val index = indexOfFirst { it.first.id == selectedBook?.id }
+//                        if (index != -1) {
+//                            // Kitap bulunursa, sayfa sayısını güncelliyoruz
+//                            this[index] = selectedBook!! to pagesRead
+//                        } else {
+//                            // Kitap listede yoksa, yeni kitap ekliyoruz
+//                            add(selectedBook!! to pagesRead)
+//                        }
+//                    }
+//                    // Eğer %100'e ulaşmışsa, kitabı listeden çıkaralım
+//                    if (pagesRead == selectedBook!!.pages) {
+////                        viewModel.removeBook(selectedBook!!)
+//                    }
+//
+//                    showBottomSheet = false
+//                }
+//            )
+//        }
     }
 }
 

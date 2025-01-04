@@ -98,7 +98,7 @@ fun BooksScreen(navController: NavController,viewModel: LoginViewModel,
                 cover: String,
                 description:String,
                 rating: String,
-                pages: Int,) {
+                pages: Int) {
     var bitmap by remember { mutableStateOf<Bitmap?>(null) }
     var dominantColor by remember { mutableStateOf(Color.LightGray) }
     var vibrantColor by remember { mutableStateOf(Color.Gray) }
@@ -395,7 +395,9 @@ fun BooksScreen(navController: NavController,viewModel: LoginViewModel,
                             bookId = isbn,  // Buraya mevcut kullanıcı adı eklenebilir
                             rating = userRating,
                             text = userComment,
-                            date = System.currentTimeMillis()
+                            date = System.currentTimeMillis(),
+                            cover=cover,
+                            username = author
                         )
 
                         // Log: Yorum gönderme işlemini başlat

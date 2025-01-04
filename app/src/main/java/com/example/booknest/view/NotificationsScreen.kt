@@ -294,15 +294,20 @@ fun getTimeAgo(time: Long): String {
     val duration = currentTime - time
 
     val seconds = duration / 1000
-    val minutes = duration / (1000 * 60)
-    val hours = duration / (1000 * 60 * 60)
-    val days = duration / (1000 * 60 * 60 * 24)
+    val minutes = duration / 60
+    val hours = minutes / 60
+    val days = hours / 24
+    val weeks = days / 7
+    val months = days / 30
+    val years = days / 365
 
     return when {
         seconds < 60 -> "$seconds s ago"
         minutes < 60 -> "$minutes m ago"
         hours < 24 -> "$hours h ago"
         days < 7 -> "$days d ago"
-        else -> "$days d ago"
+        weeks < 4 -> "$weeks w ago"
+        months < 12 -> "$months mo ago"
+        else -> "$years y ago"
     }
 }

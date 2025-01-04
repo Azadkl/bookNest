@@ -7,6 +7,7 @@ import com.example.booknest.api.Models.Challenge
 import com.example.booknest.api.Models.Friend
 import com.example.booknest.api.Models.FriendRequest
 import com.example.booknest.api.Models.FriendResponse
+import com.example.booknest.api.Models.MybooksList
 import com.example.booknest.api.Models.Notification
 import com.example.booknest.api.Models.Review
 import com.example.booknest.api.Models.Shelf
@@ -138,7 +139,7 @@ interface BookNestApi {
     @GET("api/bookprogress")
     suspend fun getBookProgress(
         @Header("Authorization") accessToken: String
-    ): Response<GenelResponse<BookProgress>>
+    ): Response<GenelResponse<MybooksList>>
 
     // Get Max Progress
     @GET("api/bookprogress/max")

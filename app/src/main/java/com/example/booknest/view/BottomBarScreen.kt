@@ -203,7 +203,12 @@ fun BottomBarScreen(mainNavController:NavController,modifier: Modifier=Modifier,
                         val filteredUsers = users?.filter { user ->
                             user.username.contains(searchQuery, ignoreCase = true)
                         } ?: emptyList()
-                        if ((filteredUsers.isEmpty() && filteredBooks.isEmpty()) || searchQuery == "" ) {
+                        LaunchedEffect(Unit) {
+                            viewModel.fetchUsers()  // Bu satır verileri çekmeye başlar
+                            viewModel.fetchBook()
+                            viewModel.getBookProgress()
+                        }
+                        if ((filteredUsers.isEmpty() && filteredBooks.isEmpty()) || searchQuery=="") {
                             Column(
                                 modifier = Modifier
                                     .fillMaxSize()
@@ -242,10 +247,7 @@ fun BottomBarScreen(mainNavController:NavController,modifier: Modifier=Modifier,
                         else{
                             var isLoading by remember { mutableStateOf(true) }
 
-                            LaunchedEffect(Unit) {
-                                viewModel.fetchUsers()  // Bu satır verileri çekmeye başlar
-                                viewModel.fetchBook()
-                            }
+
                             if (users != null) {
                                 isLoading = false
                             }
@@ -535,10 +537,10 @@ fun BottomBarScreen(mainNavController:NavController,modifier: Modifier=Modifier,
                     composable("Home") { HomePageScreen() }
                     composable("profile") { ProfileScreen(navController,viewModel=viewModel) }
                     composable("search") { SearchScreen(navController) }
-                    composable("myBooks") { MyBooksPage(navController, viewModel = BooksViewModel()) }
+                    composable("myBooks") { MyBooksPage(navController, viewModel = LoginViewModel()) }
                     composable("booksIveRead") { BooksIveRead(viewModel = BooksViewModel(),navController=navController) }
                     composable("booksIWantToRead") { ToRead(viewModel = BooksViewModel(),navController=navController) }
-                    composable("currentlyReading") { ReadingNow(viewModel = BooksViewModel(),navController=navController) }
+                    composable("currentlyReading") { ReadingNow(viewModel = LoginViewModel(),navController=navController) }
                     composable("search_screen") { SearchScreen(navController = navController) }
                     composable("settings"){ SettingsScreen(mainNavController,viewModel=viewModel) }
                     composable("groups") { GroupsPage(navController) }

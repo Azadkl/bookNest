@@ -161,24 +161,24 @@ fun BooksScreen(navController: NavController,viewModel: LoginViewModel,
         language = "English",
         characters = listOf("Jay Gatsby", "Nick Carraway", "Daisy Buchanan")
     )
-    var reviews by remember { mutableStateOf(
-        listOf(
-            Review(
-                userName = "John Doe",
-                userImageResId = R.drawable.azad,
-                rating = 4.5f,
-                comment = "A wonderful book! The story was gripping and the characters were well-developed.",
-                time = System.currentTimeMillis() - (2 * 1000 * 60 * 60 * 24)
-            ),
-            Review(
-                userName = "Jane Smith",
-                userImageResId = R.drawable.azad,
-                rating = 3.0f,
-                comment = "The book was decent, but I felt the pacing was a bit slow.",
-                time = System.currentTimeMillis() - (2 * 1000 * 60 * 60 * 24)
-            )
-        )
-    )}
+//    var reviews by remember { mutableStateOf(
+//        listOf(
+//            Review(
+//                userName = "John Doe",
+//                userImageResId = R.drawable.azad,
+//                rating = 4.5f,
+//                comment = "A wonderful book! The story was gripping and the characters were well-developed.",
+//                time = System.currentTimeMillis() - (2 * 1000 * 60 * 60 * 24)
+//            ),
+//            Review(
+//                userName = "Jane Smith",
+//                userImageResId = R.drawable.azad,
+//                rating = 3.0f,
+//                comment = "The book was decent, but I felt the pacing was a bit slow.",
+//                time = System.currentTimeMillis() - (2 * 1000 * 60 * 60 * 24)
+//            )
+//        )
+//    )}
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -580,19 +580,19 @@ fun ReviewCard(review: com.example.booknest.api.Models.Review) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             // Kullanıcı Resmi (Sol Tarafta)
-//            Image(
-//                painter = painterResource(id = review.),
-//                contentDescription = "User Image",
-//                modifier = Modifier
-//                    .size(40.dp)
-//                    .clip(CircleShape)
-//            )
+            Image(
+                painter = rememberImagePainter(review.cover),
+                contentDescription = "User Image",
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(CircleShape)
+            )
 
             // Yorum İçeriği
             Column(modifier = Modifier.weight(1f)) {
                 // Kullanıcı adı
                 Text(
-                    text = review.bookId,
+                    text = review.username,
                     style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 16.sp)
                 )
 
@@ -630,13 +630,13 @@ fun ReviewCard(review: com.example.booknest.api.Models.Review) {
     }
 }
 
-data class Review(
-    val userName: String,
-    val userImageResId: Int,
-    val rating: Float,
-    val comment: String,
-    val time: Long, // Unix timestamp
-)
+//data class Review(
+//    val userName: String,
+//    val userImageResId: Int,
+//    val rating: Float,
+//    val comment: String,
+//    val time: Long, // Unix timestamp
+//)
 
 
 @Composable

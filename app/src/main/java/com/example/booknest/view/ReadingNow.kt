@@ -3,6 +3,7 @@ package com.example.booknest.view
 import android.net.Uri
 import android.util.Log
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -18,12 +20,17 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -37,6 +44,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -82,7 +90,9 @@ fun ReadingNow(viewModel: LoginViewModel, navController: NavController) {
                 val eleman = viewModel.bookResponse.value?.find { it.isbn == book.bookId }
                 eleman?.let {
                     secilenBook = it
+
                 }
+
 
                 val status = readingStatuses.find { it.first.bookId == book.bookId }
                 status?.let {
@@ -169,37 +179,79 @@ fun ReadingNow(viewModel: LoginViewModel, navController: NavController) {
                     }
                 }
             }
+
+        }
+
+        }
+
+
+
+
+    Log.d("update state","$selectedBook")
+        if (showBottomSheet && selectedBook != null) {
+            BottomSheet_2(
+                selectedBook = selectedBook!!,
+                onDismiss = { showBottomSheet = false },
+                onSave = { pagesRead ->
+
+                    // Eğer %100'e ulaşmışsa, kitabı listeden çıkaralım
+                    if (pagesRead == selectedBook!!.pages) {
+                        viewModel.postBookProgress(selectedBook!!.isbn,"read",100)
+                    }
+                    else{
+                        viewModel.postBookProgress(selectedBook!!.isbn,"reading",(pagesRead/selectedBook!!.pages)*100)
+                    }
+                    showBottomSheet = false
+                }
+            )
         }
     }
 
 
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun BottomSheet_2(
+    selectedBook: Book,
+    onDismiss: () -> Unit,
+    onSave: (Int) -> Unit
+) {
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    var pagesRead by remember { mutableStateOf("") }
 
-//        if (showBottomSheet && selectedBook != null) {
-//            BottomSheet_1(
-//                selectedBook = selectedBook!!,
-//                onDismiss = { showBottomSheet = false },
-//                onSave = { pagesRead ->
-//                    // Mevcut kitap verisini güncelleme
-//                    readingStatuses = readingStatuses.toMutableList().apply {
-//                        // Eğer kitap zaten listede varsa, eski sayfa sayısını güncelliyoruz
-//                        val index = indexOfFirst { it.first.id == selectedBook?.id }
-//                        if (index != -1) {
-//                            // Kitap bulunursa, sayfa sayısını güncelliyoruz
-//                            this[index] = selectedBook!! to pagesRead
-//                        } else {
-//                            // Kitap listede yoksa, yeni kitap ekliyoruz
-//                            add(selectedBook!! to pagesRead)
-//                        }
-//                    }
-//                    // Eğer %100'e ulaşmışsa, kitabı listeden çıkaralım
-//                    if (pagesRead == selectedBook!!.pages) {
-////                        viewModel.removeBook(selectedBook!!)
-//                    }
-//
-//                    showBottomSheet = false
-//                }
-//            )
-//        }
+    ModalBottomSheet(
+        modifier = Modifier.fillMaxHeight(0.5f),
+        sheetState = sheetState,
+        onDismissRequest = { onDismiss() },
+        shape = RoundedCornerShape(0.dp)
+    ) {
+        Column(
+            modifier = Modifier.fillMaxSize().background(Color.Transparent),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                "Update Status for ${selectedBook.title}",
+                style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold),
+                modifier = Modifier.padding(16.dp)
+            )
+            OutlinedTextField(
+                value = pagesRead,
+                onValueChange = { pagesRead = it },
+                label = { Text("Pages Read") },
+                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+                modifier = Modifier.padding(16.dp)
+            )
+            Button(
+                onClick = {
+                    val pages = pagesRead.toIntOrNull() ?: 0 // Geçersiz sayfa girişi olduğunda 0 yap
+                    onSave(pages) // Sayfa okunduğunda status kaydedilir
+                },
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2E8B57)),
+                modifier = Modifier.padding(16.dp)
+            ) {
+                Text("Save")
+            }
+        }
     }
+}
 

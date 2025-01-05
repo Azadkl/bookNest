@@ -12,3 +12,9 @@ data class MybooksList(
     var read: List<BookProgress>,
     val wantToRead :List<BookProgress>
 )
+
+data class PostBookProgress(
+    val BookId: String,
+    val Status: String,
+    val Progress: Int
+)

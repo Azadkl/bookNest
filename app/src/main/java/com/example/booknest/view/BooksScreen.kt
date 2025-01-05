@@ -78,6 +78,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.substring
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -98,7 +99,12 @@ fun BooksScreen(navController: NavController,viewModel: LoginViewModel,
                 cover: String,
                 description:String,
                 rating: String,
-                pages: Int) {
+                pages: Int,
+                publishedDate: String,
+                publisher: String,
+                language: String,
+                category: String
+) {
     var bitmap by remember { mutableStateOf<Bitmap?>(null) }
     var dominantColor by remember { mutableStateOf(Color.LightGray) }
     var vibrantColor by remember { mutableStateOf(Color.Gray) }
@@ -152,33 +158,23 @@ fun BooksScreen(navController: NavController,viewModel: LoginViewModel,
 
     // Durum seçenekleri
     val statusOptions = listOf("Want to Read", "Currently Reading", "I've Read")
-    val bookDetails = BookDetails(
-        title = "The Great Gatsby",
-        publishDate = "April 10, 1925",
-        publisher = "Charles Scribner's Sons",
-        isbn = "9780743273565",
-        series = null,
-        language = "English",
-        characters = listOf("Jay Gatsby", "Nick Carraway", "Daisy Buchanan")
-    )
-//    var reviews by remember { mutableStateOf(
-//        listOf(
-//            Review(
-//                userName = "John Doe",
-//                userImageResId = R.drawable.azad,
-//                rating = 4.5f,
-//                comment = "A wonderful book! The story was gripping and the characters were well-developed.",
-//                time = System.currentTimeMillis() - (2 * 1000 * 60 * 60 * 24)
-//            ),
-//            Review(
-//                userName = "Jane Smith",
-//                userImageResId = R.drawable.azad,
-//                rating = 3.0f,
-//                comment = "The book was decent, but I felt the pacing was a bit slow.",
-//                time = System.currentTimeMillis() - (2 * 1000 * 60 * 60 * 24)
-//            )
-//        )
-//    )}
+
+    // Corresponding status options in the backend
+    val statusOptionsBackEnd = listOf("wanttoread", "Reading", "read")
+
+    // Create a map where the UI option is the key, and the backend option is the value
+    val statusMapping = statusOptions.zip(statusOptionsBackEnd).toMap()
+
+    // Function to get the backend status for a given UI status
+    fun getBackEndStatus(uiStatus: String): String {
+        return statusMapping[uiStatus] ?: "wanttoread"
+    }
+
+
+    // Example usage
+//    val selectedStatus = "Currently Reading"
+//    val backendStatus = getBackEndStatus(selectedStatus)
+
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -204,7 +200,9 @@ fun BooksScreen(navController: NavController,viewModel: LoginViewModel,
             ) {
                 IconButton(
                     onClick = { navController.popBackStack() },
-                    modifier = Modifier.align(Alignment.TopStart).padding(top = 15.dp)
+                    modifier = Modifier
+                        .align(Alignment.TopStart)
+                        .padding(top = 15.dp)
                 ) {
                     Icon(
                         imageVector = Icons.Filled.ArrowBackIosNew,
@@ -251,7 +249,7 @@ fun BooksScreen(navController: NavController,viewModel: LoginViewModel,
                 Column(modifier = Modifier.clickable { navController.navigate("comment") }) {
                     RatingStars(rating.toFloatOrNull() ?: 0f)
                     Text(
-                        text = rating,
+                        text = rating.substring(0,3),
                         style = TextStyle(fontSize = 25.sp, fontWeight = FontWeight.Medium),
                     )
                 }
@@ -316,7 +314,10 @@ fun BooksScreen(navController: NavController,viewModel: LoginViewModel,
                     }
 
                     Button(
-                        onClick = { /* Güncelleme işlemi */ },
+                        onClick = {
+                            Log.d("BookProgress", "bookId: $isbn, status: ${getBackEndStatus(selectedStatus)}, progress: ${if (getBackEndStatus(selectedStatus).compareTo("read") == 0) 100 else 0}")
+                            viewModel.postBookProgress(bookId = isbn, status = getBackEndStatus(selectedStatus), progress = if (getBackEndStatus(selectedStatus).compareTo("read") == 0) 100 else 0)
+                        },
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Color(0xFF2E8B57)
                         ),
@@ -447,12 +448,10 @@ fun BooksScreen(navController: NavController,viewModel: LoginViewModel,
             when (selectedTabIndex) {
                 0 -> (AboutContent(description))
                 1 -> (DetailContent(   title =title,
-                    publishDate = bookDetails.publishDate,
-                    publisher = bookDetails.publisher,
-                    isbn,
-                    series = bookDetails.series,
-                    language = bookDetails.language,
-                    characters = bookDetails.characters))
+                    publishDate = publishedDate,
+                    publisher = publisher, isbn,
+                    language = language,
+                    category = category))
                 2 -> (ReviewContent(review))
             }
 
@@ -503,9 +502,9 @@ fun DetailContent(
     publishDate: String,
     publisher: String,
     isbn: String,
-    series: String?,
+
     language: String,
-    characters: List<String>
+    category: String
 ) {
     Column(
         modifier = Modifier
@@ -519,9 +518,9 @@ fun DetailContent(
         DetailRow("Publish Date", publishDate)
         DetailRow("Publisher", publisher)
         DetailRow("ISBN", isbn)
-        DetailRow("Series", series ?: "N/A")
+
         DetailRow("Language", language)
-        DetailRow("Characters", if (characters.isNotEmpty()) characters.joinToString(", ") else "N/A")
+        DetailRow("Category", category)
     }
 }
 
@@ -626,7 +625,7 @@ fun ReviewCard(review: com.example.booknest.api.Models.Review) {
 
                 // Yıldız Sayısı
                 Text(
-                    text = "${review.rating}",
+                    text = String.format("%.1f", review.rating),  // Format rating to 1 decimal place
                     style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Bold)
                 )
             }
@@ -634,13 +633,6 @@ fun ReviewCard(review: com.example.booknest.api.Models.Review) {
     }
 }
 
-//data class Review(
-//    val userName: String,
-//    val userImageResId: Int,
-//    val rating: Float,
-//    val comment: String,
-//    val time: Long, // Unix timestamp
-//)
 
 
 @Composable
@@ -680,12 +672,4 @@ fun RatingStars(rating: Float) {
         }
     }
 }
-data class BookDetails(
-    val title: String,
-    val publishDate: String,
-    val publisher: String,
-    val isbn: String,
-    val series: String?,
-    val language: String,
-    val characters: List<String>
-)
+

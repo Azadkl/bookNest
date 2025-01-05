@@ -9,6 +9,8 @@ import com.example.booknest.api.Models.FriendRequest
 import com.example.booknest.api.Models.FriendResponse
 import com.example.booknest.api.Models.MybooksList
 import com.example.booknest.api.Models.Notification
+import com.example.booknest.api.Models.PostBook
+import com.example.booknest.api.Models.PostBookProgress
 import com.example.booknest.api.Models.Review
 import com.example.booknest.api.Models.Shelf
 import retrofit2.Response
@@ -41,7 +43,10 @@ interface BookNestApi {
     suspend fun getBook(@Header("Authorization") accessToken: String): Response<GenelResponse<List<Book>>>
 
     @POST("api/books/")
-    suspend fun postBook(@Body book: Book): Response<GenelResponse<Book>>
+    suspend fun postBook(
+        @Header("Authorization") accessToken: String,
+        @Body postBook: PostBook
+    ): Response<GenelResponse<Book>>
 
     @POST("api/books/author/")
     suspend fun author(@Header("Authorization") refreshToken: String): Response<GenelResponse<Any>>
@@ -128,11 +133,10 @@ interface BookNestApi {
         @Path("friendId") friendId: Int
     ): Response<GenelResponse<Any>>
 
-    // Post Book Progress
     @POST("api/bookprogress")
     suspend fun postBookProgress(
         @Header("Authorization") accessToken: String,
-        @Body bookProgress: BookProgress
+        @Body postBookProgress: PostBookProgress
     ): Response<GenelResponse<BookProgress>>
 
     // Get Book Progress

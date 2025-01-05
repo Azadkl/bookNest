@@ -58,6 +58,7 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -82,6 +83,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.substring
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -91,6 +93,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import coil.compose.rememberAsyncImagePainter
 import coil.compose.rememberImagePainter
 import com.example.booknest.Model.DummyData
 import com.example.booknest.Model.SearchResult
@@ -105,7 +108,8 @@ import com.example.booknest.ui.theme.PrimaryColor
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BottomBarScreen(mainNavController:NavController,modifier: Modifier=Modifier,viewModel: LoginViewModel) {
-    var showDialog by remember { mutableStateOf(false) } // Dialog kontrolü için state
+    var showDialog by remember { mutableStateOf(false) }
+    // Dialog kontrolü için state
     val navItemList = listOf(
         NavItem("Home", Icons.Default.Home),
         NavItem("Search", Icons.Default.Search),
@@ -206,7 +210,6 @@ fun BottomBarScreen(mainNavController:NavController,modifier: Modifier=Modifier,
                         LaunchedEffect(Unit) {
                             viewModel.fetchUsers()  // Bu satır verileri çekmeye başlar
                             viewModel.fetchBook()
-                            viewModel.getBookProgress()
                         }
                         if ((filteredUsers.isEmpty() && filteredBooks.isEmpty()) || searchQuery=="") {
                             Column(
@@ -234,12 +237,11 @@ fun BottomBarScreen(mainNavController:NavController,modifier: Modifier=Modifier,
                                 // Dialog gösterme
                                 if (showDialog) {
                                     ContactAdminDialog(
-                                        onConfirm = { bookTitle, authorName, isbn ->
-                                            // Admin ile iletişime geçilecek işlem yapılabilir
-                                            println("Book Title: $bookTitle, Author: $authorName, ISBN: $isbn")
+                                        onConfirm = {isbn ->
                                             showDialog = false // Dialogu kapat
                                         },
-                                        onDismiss = { showDialog = false } // Dialogu kapatma
+                                        onDismiss = { showDialog = false },
+                                        viewModel// Dialogu kapatma
                                     )
                                 }
                             }
@@ -319,17 +321,17 @@ fun BottomBarScreen(mainNavController:NavController,modifier: Modifier=Modifier,
                                                         .padding(start = 2.dp)
                                                 ) {
                                                     Image(
-                                                        painter = rememberImagePainter(book.cover),
+                                                        painter = rememberAsyncImagePainter(book.cover),
                                                         contentDescription = "Book Cover",
                                                         modifier = Modifier.size(70.dp)
                                                     )
                                                     Spacer(modifier = Modifier.width(8.dp))
                                                     Column(modifier = Modifier.weight(1f)) {
                                                         Text(book.title)
-                                                        Text("${book.authorId}", style = MaterialTheme.typography.bodySmall)
+                                                        Text("${book.author}", style = MaterialTheme.typography.bodySmall)
                                                     }
                                                     Text(
-                                                        "4.5",
+                                                        text = book.rating.toString().substring(0,3),
                                                         style = MaterialTheme.typography.bodySmall,
                                                         color = Color.Red
                                                     )
@@ -344,7 +346,7 @@ fun BottomBarScreen(mainNavController:NavController,modifier: Modifier=Modifier,
                                                 .height(70.dp)
                                                 .clip(shape = RoundedCornerShape(15.dp))
                                                 .clickable {
-                                                    navController.navigate("books/${Uri.encode(book.isbn)}/${Uri.encode(book.title)}/${Uri.encode(book.authorId.toString())}/${Uri.encode(book.cover)}/${Uri.encode(book.description)}/4.5/${book.pages}")
+                                                    navController.navigate("books/${Uri.encode(book.isbn)}/${Uri.encode(book.title)}/${Uri.encode(book.author)}/${Uri.encode(book.cover)}/${Uri.encode(book.description)}/${book.rating}/${book.pages}/${Uri.encode(book.category)}/${Uri.encode(book.language)}/${Uri.encode(book.publishedDate)}/${Uri.encode(book.publisher)}")
                                                 }
                                         )
                                     }
@@ -537,10 +539,10 @@ fun BottomBarScreen(mainNavController:NavController,modifier: Modifier=Modifier,
                     composable("Home") { HomePageScreen() }
                     composable("profile") { ProfileScreen(navController,viewModel=viewModel) }
                     composable("search") { SearchScreen(navController) }
-                    composable("myBooks") { MyBooksPage(navController, viewModel = LoginViewModel()) }
-                    composable("booksIveRead") { BooksIveRead(viewModel = BooksViewModel(),navController=navController) }
-                    composable("booksIWantToRead") { ToRead(viewModel = BooksViewModel(),navController=navController) }
-                    composable("currentlyReading") { ReadingNow(viewModel = LoginViewModel(),navController=navController) }
+                    composable("myBooks") { MyBooksPage(navController, viewModel = viewModel) }
+                    composable("booksIveRead") { BooksIveRead(viewModel = viewModel,navController=navController) }
+                    composable("booksIWantToRead") { ToRead(viewModel = viewModel,navController=navController) }
+                    composable("currentlyReading") { ReadingNow(viewModel = viewModel,navController=navController) }
                     composable("search_screen") { SearchScreen(navController = navController) }
                     composable("settings"){ SettingsScreen(mainNavController,viewModel=viewModel) }
                     composable("groups") { GroupsPage(navController) }
@@ -552,14 +554,21 @@ fun BottomBarScreen(mainNavController:NavController,modifier: Modifier=Modifier,
                     composable("medals") { MedalsPage(navController) }
                     composable("notifications"){ NotificationsScreen(navController) }
                     composable(
-                        route = "books/{isbn}/{title}/{author}/{cover}/{description}/{rating}/{pages}",
+                        route = "books/{isbn}/{title}/{author}/{cover}/{description}/" +
+                                "{rating}/{pages}/{category}/{language}/{publishedDate}" +
+                                "/{publisher}",
                         arguments = listOf(
                             navArgument("isbn") { type = NavType.StringType },
                             navArgument("title") { type = NavType.StringType },
                             navArgument("author") { type = NavType.StringType },
                             navArgument("cover") { type = NavType.StringType },
+                            navArgument("description") { type = NavType.StringType },
                             navArgument("rating") { type = NavType.StringType },
-                            navArgument("pages") { type = NavType.IntType }
+                            navArgument("pages") { type = NavType.IntType },
+                            navArgument("category") { type = NavType.StringType },
+                            navArgument("language") { type = NavType.StringType },
+                            navArgument("publishedDate") { type = NavType.StringType },
+                            navArgument("publisher") { type = NavType.StringType }
                         )
                     ) { backStackEntry ->
                         val isbn = backStackEntry.arguments?.getString("isbn") ?: ""
@@ -567,8 +576,13 @@ fun BottomBarScreen(mainNavController:NavController,modifier: Modifier=Modifier,
                         val author = backStackEntry.arguments?.getString("author") ?: "Unknown Author"
                         val cover = backStackEntry.arguments?.getString("cover") ?: ""
                         val description = backStackEntry.arguments?.getString("description") ?: ""
-                        val rating = backStackEntry.arguments?.getString("rating") ?: "0.0"
+                        val rating = backStackEntry.arguments?.getString("rating")?.toDoubleOrNull() ?: 0.0
                         val pages = backStackEntry.arguments?.getInt("pages") ?: -1
+                        val category = backStackEntry.arguments?.getString("category") ?: "Unknown Category"
+                        val language = backStackEntry.arguments?.getString("language") ?: "Unknown Language"
+                        val publishedDate = backStackEntry.arguments?.getString("publishedDate") ?: "Unknown Date"
+                        val publisher = backStackEntry.arguments?.getString("publisher") ?: "Unknown Publisher"
+
 
                         BooksScreen(
                             navController = navController,
@@ -577,8 +591,12 @@ fun BottomBarScreen(mainNavController:NavController,modifier: Modifier=Modifier,
                             author = author,
                             cover = cover,
                             description=description,
-                            rating = rating,
+                            rating = rating.toString(),
                             pages = pages,
+                            category = category,
+                            language = language,
+                            publishedDate = publishedDate,
+                            publisher = publisher,
                             viewModel = viewModel
                         )
                     }
@@ -623,7 +641,7 @@ fun BottomBarScreen(mainNavController:NavController,modifier: Modifier=Modifier,
 
 
 @Composable
-fun ContactAdminDialog(onConfirm: (String, String, String) -> Unit, onDismiss: () -> Unit) {
+fun ContactAdminDialog(onConfirm: (String) -> Unit, onDismiss: () -> Unit,viewModel: LoginViewModel) {
     var bookTitle by remember { mutableStateOf("") }
     var authorName by remember { mutableStateOf("") }
     var isbn by remember { mutableStateOf("") }
@@ -634,21 +652,6 @@ fun ContactAdminDialog(onConfirm: (String, String, String) -> Unit, onDismiss: (
         title = { Text("Contact Admin") },
         text = {
             Column(modifier = Modifier.fillMaxWidth()) {
-                // Kitap adı
-                Text(text = "Book Title:")
-                TextField(
-                    value = bookTitle,
-                    onValueChange = { bookTitle = it },
-                    modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
-                )
-
-                // Yazar adı
-                Text(text = "Author Name:")
-                TextField(
-                    value = authorName,
-                    onValueChange = { authorName = it },
-                    modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
-                )
 
                 // ISBN
                 Text(text = "ISBN:")
@@ -659,9 +662,11 @@ fun ContactAdminDialog(onConfirm: (String, String, String) -> Unit, onDismiss: (
                 )
             }
         },
+
         confirmButton = {
             Button(onClick = {
-                onConfirm(bookTitle, authorName, isbn)
+                viewModel.postBook(isbn)
+                onConfirm(isbn)
             },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(0xFF2E8B57)
@@ -669,6 +674,7 @@ fun ContactAdminDialog(onConfirm: (String, String, String) -> Unit, onDismiss: (
                 Text("Submit")
             }
         },
+
         dismissButton = {
             Button(onClick = onDismiss,
                 colors = ButtonDefaults.buttonColors(

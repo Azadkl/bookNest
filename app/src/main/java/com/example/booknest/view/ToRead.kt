@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -19,8 +20,14 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -31,10 +38,22 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import coil.compose.rememberAsyncImagePainter
+import com.example.booknest.ViewModel.LoginViewModel
+import com.example.booknest.api.Models.Book
+import com.example.booknest.api.Models.BookProgress
 
 @Composable
-fun ToRead(viewModel: BooksViewModel,navController: NavController) {
-    val books = viewModel.books
+fun ToRead(viewModel: LoginViewModel,navController: NavController) {
+    val books = viewModel.myBooks.value?.wantToRead ?: emptyList()
+    val newbook = viewModel.bookResponse
+    LaunchedEffect(Unit) {
+        viewModel.getBookProgress()
+    }
+
+    var showBottomSheet by remember { mutableStateOf(false) }
+    var selectedBook by remember { mutableStateOf<Book?>(null) }
+    var readingStatuses by remember { mutableStateOf<List<Pair<BookProgress, Int>>>(emptyList()) }
 
     Column(
         modifier = Modifier
@@ -43,95 +62,110 @@ fun ToRead(viewModel: BooksViewModel,navController: NavController) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top
     ) {
+        Text(
+            text = "Want to Read",
+            style = TextStyle(fontSize = 40.sp),
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
 
-        // Header text
-        Column(modifier = Modifier.fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(
-                text = "Books I Want To Read",
-                style = TextStyle(fontSize = 30.sp),
-                modifier = Modifier.padding(bottom = 16.dp)
-            )
-        }
-
-
-        // LazyColumn to display books
         LazyColumn(
             contentPadding = PaddingValues(bottom = 90.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp) // Space between items
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             items(books) { book ->
-                // Card for each book with title, author, and genre
+                var pagesRead = 0
+                var secilenBook: Book? = null
+
+                val eleman = viewModel.bookResponse.value?.find { it.isbn == book.bookId }
+                eleman?.let {
+                    secilenBook = it
+                }
+
+                val status = readingStatuses.find { it.first.bookId == book.bookId }
+                status?.let {
+                    pagesRead = it.second
+                }
+
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(8.dp)
-                        .clip(shape = RoundedCornerShape(16.dp))
-                        .clickable {
-                            navController.navigate(
-                                "books/${book.id}/${book.title}/${book.author}/${book.imageResId}/${book.rating}/${book.pageNumber}"
-                            ) },
-                    shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = Color.White
-                    )
-                    // Rounded corners for the Card
-                    // Use dp for CardElevation
+                        .clip(RoundedCornerShape(16.dp)),
+
+                    colors = CardDefaults.cardColors(containerColor = Color.White)
                 ) {
-                    Row (modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically){
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
                         Image(
-                            painter = painterResource(id = book.imageResId),
+                            painter = rememberAsyncImagePainter(book.cover ?: ""),
                             contentDescription = book.title,
                             modifier = Modifier.size(100.dp)
                         )
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(16.dp)  // Inner padding for content
+                                .padding(16.dp)
                         ) {
-                            // Book title, author, and genre
                             Text(
-                                text = book.title,  // Book title
+                                text = book.title,
                                 style = TextStyle(fontSize = 22.sp, fontWeight = FontWeight.Bold)
                             )
-
-                            book.author?.let {
+                            eleman?.author?.let {
                                 Text(
-                                    text = "by $it",  // Author name (if available)
+                                    text = "by $it",
                                     style = TextStyle(fontSize = 18.sp, color = Color.Gray)
                                 )
                             }
-                            Row(modifier = Modifier.fillMaxWidth()) {
-                                RatingStars(rating = book.rating.toFloatOrNull() ?: 0f)
+                            eleman?.rating?.let {
+                                RatingStars(rating = it)
                                 Spacer(modifier = Modifier.width(8.dp))
-                                book.rating?.let {
-                                    Text(
-                                        text = "$it",  // Genre of the book
-                                        style = TextStyle(fontSize = 16.sp, color = Color.Gray)
-                                    )
-                                }
-                            }
-
-
-                            // Remove Button for each book
-                            Button(
-                                onClick = {
-                                    viewModel.removeBook(book)
-                                },
-                                modifier = Modifier.padding(top = 8.dp),
-                                colors = ButtonDefaults.buttonColors(
-                                    Color(0xFF2E8B57)
+                                Text(
+                                    text = "$it",
+                                    style = TextStyle(fontSize = 16.sp, color = Color.Gray)
                                 )
+                            }
+                            LinearProgressIndicator(
+                                progress = book.progress / 100f,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(8.dp)
+                                    .clip(RoundedCornerShape(4.dp)),
+                                color = Color(0xFF3CB371),
+                                trackColor = Color(0xFFD3D3D3)
+                            )
+                            Text(text = "Completion: ${book.progress}%", fontSize = 14.sp)
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceEvenly
                             ) {
-                                Text(text = "Remove")
+                                Button(
+                                    onClick = {
+                                        // viewModel.removeBook(book)
+                                    },
+                                    modifier = Modifier.padding(top = 8.dp),
+                                    colors = ButtonDefaults.buttonColors(Color(0xFF2E8B57))
+                                ) {
+                                    Text(text = "Remove")
+                                }
+
+                                Button(
+                                    onClick = {
+                                        selectedBook = secilenBook
+                                        showBottomSheet = true
+                                    },
+                                    modifier = Modifier.padding(top = 8.dp),
+                                    colors = ButtonDefaults.buttonColors(Color(0xFF2E8B57))
+                                ) {
+                                    Text(text = "Start",)
+                                }
                             }
                         }
                     }
-
                 }
-
             }
         }
-    }
-}
+    }}
+

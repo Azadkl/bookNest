@@ -3,6 +3,7 @@ import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.State
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import com.example.booknest.api.GenelResponse
 import com.example.booknest.api.LoginRequest
@@ -15,6 +16,8 @@ import com.example.booknest.api.Models.FriendRequest
 import com.example.booknest.api.Models.FriendResponse
 import com.example.booknest.api.Models.MybooksList
 import com.example.booknest.api.Models.Notification
+import com.example.booknest.api.Models.PostBook
+import com.example.booknest.api.Models.PostBookProgress
 import com.example.booknest.api.Models.Review
 import com.example.booknest.api.Models.Shelf
 import com.example.booknest.api.ProfileBody
@@ -408,6 +411,40 @@ class LoginViewModel : ViewModel() {
             _errorMessage.value = "Access token is null. Please login again."
         }
     }
+    // BookProgress verisini backend'e göndermek için fonksiyon
+    fun postBook( isbn: String)  {
+        val token = _accessToken.value
+        if (token != null) {
+            _isLoading.value = true
+            viewModelScope.launch(Dispatchers.IO) {
+                try {
+                    // Creating the request body with parameters
+                    val postBook = PostBook(isbn)
+                    Log.d("postBookProgress","$postBook")
+                    // Making the API call
+                    val response = api.postBook("Bearer $token", postBook)
+                    Log.d("giris fonksiyon postbook","$response")
+                    withContext(Dispatchers.Main) {
+                        if (response.isSuccessful) {
+                            var status = response.body()?.status
+                            Log.d("basarili response successful","$response")
+                        } else {
+                            Log.d("donen response body'si", "${response.body()}")
+                            _errorMessage.value = "Failed to create review: ${response.message()}"
+                        }
+                    }
+                } catch (e: Exception) {
+                    withContext(Dispatchers.Main) {
+                        _errorMessage.value = "An error occurred: ${e.message}"
+                    }
+                } finally {
+                    _isLoading.value = false
+                }
+            }
+        } else {
+            _errorMessage.value = "Access token is null. Please login again."
+        }
+    }
     // Get Challenges
     fun getChallenges() {
         val token = _accessToken.value
@@ -784,6 +821,7 @@ class LoginViewModel : ViewModel() {
     // BookProgress verilerini almak için fonksiyon
     fun getBookProgress() {
         val token = _accessToken.value
+        Log.d("isloggedin:","$_isLoggedIn")
         Log.d("if ten onceki token", "$token")
         if (token != null) {
             _isLoading.value = true
@@ -823,19 +861,25 @@ class LoginViewModel : ViewModel() {
     }
 
     // BookProgress verisini backend'e göndermek için fonksiyon
-    fun postBookProgress(bookId: String, status: String, progress: Int,cover: String,title:String) {
+    fun postBookProgress( bookId: String, status: String, progress: Int)  {
         val token = _accessToken.value
         if (token != null) {
             _isLoading.value = true
-            val bookProgress = BookProgress(bookId, status, progress,cover,title)
             viewModelScope.launch(Dispatchers.IO) {
                 try {
-                    val response = api.postBookProgress("Bearer $token", bookProgress)
+            // Creating the request body with parameters
+                    val postBookProgress = PostBookProgress(bookId, status, progress)
+                    Log.d("postBookProgress","$postBookProgress")
+            // Making the API call
+            val response = api.postBookProgress("Bearer $token", postBookProgress)
+            Log.d("giris fonksiyon postbook","$response")
                     withContext(Dispatchers.Main) {
                         if (response.isSuccessful) {
-                            _bookProgress.value = response.body()?.body
+                            var status = response.body()?.status
+                            Log.d("basarili response successful","$response")
                         } else {
-                            _errorMessage.value = "Failed to post book progress: ${response.message()}"
+                            Log.d("donen response body'si", "${response.body()}")
+                            _errorMessage.value = "Failed to create review: ${response.message()}"
                         }
                     }
                 } catch (e: Exception) {

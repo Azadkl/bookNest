@@ -224,7 +224,9 @@ fun BottomBarScreen(mainNavController:NavController,modifier: Modifier=Modifier,
                                     color = Color.Gray,
                                     modifier = Modifier.padding(bottom = 20.dp)
                                 )
+
                                 Button(
+
                                     onClick = {
                                        showDialog=true
                                     },
@@ -645,7 +647,7 @@ fun ContactAdminDialog(onConfirm: (String) -> Unit, onDismiss: () -> Unit,viewMo
     var bookTitle by remember { mutableStateOf("") }
     var authorName by remember { mutableStateOf("") }
     var isbn by remember { mutableStateOf("") }
-
+    var enable1 = false
     AlertDialog(
         onDismissRequest = onDismiss,
         containerColor = Color.White,
@@ -664,7 +666,11 @@ fun ContactAdminDialog(onConfirm: (String) -> Unit, onDismiss: () -> Unit,viewMo
         },
 
         confirmButton = {
-            Button(onClick = {
+            if (isbn != ""){enable1 =true}
+            Button(
+                enabled = enable1,
+                onClick = {
+
                 viewModel.postBook(isbn)
                 onConfirm(isbn)
             },

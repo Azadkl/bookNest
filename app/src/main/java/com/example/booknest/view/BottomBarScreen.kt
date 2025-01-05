@@ -58,7 +58,6 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -108,8 +107,7 @@ import com.example.booknest.ui.theme.PrimaryColor
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BottomBarScreen(mainNavController:NavController,modifier: Modifier=Modifier,viewModel: LoginViewModel) {
-    var showDialog by remember { mutableStateOf(false) }
-    // Dialog kontrolü için state
+    var showDialog by remember { mutableStateOf(false) } // Dialog kontrolü için state
     val navItemList = listOf(
         NavItem("Home", Icons.Default.Home),
         NavItem("Search", Icons.Default.Search),
@@ -224,11 +222,9 @@ fun BottomBarScreen(mainNavController:NavController,modifier: Modifier=Modifier,
                                     color = Color.Gray,
                                     modifier = Modifier.padding(bottom = 20.dp)
                                 )
-
                                 Button(
-
                                     onClick = {
-                                       showDialog=true
+                                        showDialog=true
                                     },
                                     colors = ButtonDefaults.buttonColors(
                                         containerColor = Color(0xFF2E8B57)
@@ -456,7 +452,7 @@ fun BottomBarScreen(mainNavController:NavController,modifier: Modifier=Modifier,
                                         .size(80.dp)
                                         .clickable {
 
-                                                viewModel.fetchProfile()
+                                            viewModel.fetchProfile()
                                             val user = viewModel.profileResponse.value
                                             Log.d("LoginViewModel", "Fetched Profile Data: $user")
 
@@ -647,7 +643,7 @@ fun ContactAdminDialog(onConfirm: (String) -> Unit, onDismiss: () -> Unit,viewMo
     var bookTitle by remember { mutableStateOf("") }
     var authorName by remember { mutableStateOf("") }
     var isbn by remember { mutableStateOf("") }
-    var enable1 = false
+
     AlertDialog(
         onDismissRequest = onDismiss,
         containerColor = Color.White,
@@ -664,13 +660,8 @@ fun ContactAdminDialog(onConfirm: (String) -> Unit, onDismiss: () -> Unit,viewMo
                 )
             }
         },
-
         confirmButton = {
-            if (isbn != ""){enable1 =true}
-            Button(
-                enabled = enable1,
-                onClick = {
-
+            Button(onClick = {
                 viewModel.postBook(isbn)
                 onConfirm(isbn)
             },

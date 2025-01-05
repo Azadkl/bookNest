@@ -867,12 +867,12 @@ class LoginViewModel : ViewModel() {
             _isLoading.value = true
             viewModelScope.launch(Dispatchers.IO) {
                 try {
-            // Creating the request body with parameters
+                    // Creating the request body with parameters
                     val postBookProgress = PostBookProgress(bookId, status, progress)
                     Log.d("postBookProgress","$postBookProgress")
-            // Making the API call
-            val response = api.postBookProgress("Bearer $token", postBookProgress)
-            Log.d("giris fonksiyon postbook","$response")
+                    // Making the API call
+                    val response = api.postBookProgress("Bearer $token", postBookProgress)
+                    Log.d("giris fonksiyon postbook","$response")
                     withContext(Dispatchers.Main) {
                         if (response.isSuccessful) {
                             var status = response.body()?.status

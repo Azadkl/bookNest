@@ -113,6 +113,7 @@ fun ReadingNow(viewModel: LoginViewModel, navController: NavController) {
                     ) {
                         Image(
                             painter = rememberAsyncImagePainter(book.cover ?: ""),
+
                             contentDescription = book.title,
                             modifier = Modifier.size(100.dp)
                         )
@@ -199,7 +200,8 @@ fun ReadingNow(viewModel: LoginViewModel, navController: NavController) {
                         viewModel.postBookProgress(selectedBook!!.isbn,"read",100)
                     }
                     else{
-                        viewModel.postBookProgress(selectedBook!!.isbn,"reading",(pagesRead/selectedBook!!.pages)*100)
+                        viewModel.postBookProgress(selectedBook!!.isbn,"reading",(pagesRead*100/selectedBook!!.pages))
+
                     }
                     showBottomSheet = false
                 }
@@ -226,7 +228,9 @@ fun BottomSheet_2(
         shape = RoundedCornerShape(0.dp)
     ) {
         Column(
-            modifier = Modifier.fillMaxSize().background(Color.Transparent),
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Transparent),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(

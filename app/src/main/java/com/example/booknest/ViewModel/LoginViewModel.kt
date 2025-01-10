@@ -483,8 +483,10 @@ class LoginViewModel : ViewModel() {
             viewModelScope.launch(Dispatchers.IO) {
                 try {
                     val response = api.getChallenges("Bearer $token")
+                    Log.d("get response","$response")
                     withContext(Dispatchers.Main) {
                         if (response.isSuccessful) {
+                            Log.d("basarili get","$response")
                             _challenges.value = response.body()?.body ?: emptyList()
                         } else {
                             _errorMessage.value = "Failed to fetch challenges: ${response.message()}"

@@ -28,6 +28,7 @@ import com.example.booknest.R
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -56,6 +57,7 @@ fun convertMillisToDate(millis: Long): String {
 }
 @Composable
 fun Challenge(navController: NavController, viewModel: LoginViewModel) {
+    val challenge = viewModel.challenges
     val challengeTitle = "2024 Reading Challenge"
     val totalGoal = 50
     val booksRead = remember { 20 } // Example of state tracking
@@ -72,7 +74,9 @@ fun Challenge(navController: NavController, viewModel: LoginViewModel) {
     val challengeDates = remember { mutableStateOf(
         listOf<Pair<String, Pair<Long?, Long?>>>() // List of pairs: (challengeName, dateRange)
     ) }
-
+    LaunchedEffect (Unit){
+        viewModel.getChallenges()
+    }
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -117,9 +121,8 @@ fun Challenge(navController: NavController, viewModel: LoginViewModel) {
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(vertical = 16.dp)
             )
-
             // Display added challenges with date range
-            addedChallenges.value.forEachIndexed { index, challenge ->
+            challenge.value.forEachIndexed { index, challenge ->
                 val dateRange = challengeDates.value.getOrNull(index)?.second
                 val startDate = dateRange?.first?.let { convertMillisToDate(it) } ?: "N/A"
                 val endDate = dateRange?.second?.let { convertMillisToDate(it) } ?: "N/A"
@@ -145,14 +148,15 @@ fun Challenge(navController: NavController, viewModel: LoginViewModel) {
                         )
                         Spacer(modifier = Modifier.width(16.dp))
                         Column {
+                                Text(
+                                    text = challenge.text,
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = Color.Black
+                                )
+
                             Text(
-                                text = challenge,
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.SemiBold,
-                                color = Color.Black
-                            )
-                            Text(
-                                text = "Start: $startDate | End: $endDate",
+                                text = "Start: ${challenge.startedAt} | End: ${challenge.endsAt}",
                                 fontSize = 14.sp,
                                 color = Color.Gray
                             )
@@ -165,10 +169,11 @@ fun Challenge(navController: NavController, viewModel: LoginViewModel) {
 
     // BottomSheet for challenge creation
     if (showDialog.value) {
+        val challenge = viewModel.challenges
         ChallengeBottomSheet(
             onChallengeAdded = { challengeTitle, numberInput, challengeType, dateRange ->
                 val challengeDescription = if (challengeType == "book") {
-                    "Read $numberInput books: $challengeTitle"
+                    "Read $challenge books: $challengeTitle"
                 } else {
                     "Read $numberInput pages: $challengeTitle"
                 }
@@ -190,6 +195,7 @@ fun Challenge(navController: NavController, viewModel: LoginViewModel) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChallengeBottomSheet(
+
     onChallengeAdded: (String, String, String, Pair<Long?, Long?>) -> Unit,
     onDismiss: () -> Unit,
     viewModel: LoginViewModel

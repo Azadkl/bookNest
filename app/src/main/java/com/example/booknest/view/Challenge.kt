@@ -44,6 +44,7 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 
+import java.util.*
 
 // Helper function to convert milliseconds to a readable date
 fun convertMillisToDate(millis: Long): String {
@@ -184,6 +185,8 @@ fun Challenge(navController: NavController, viewModel: LoginViewModel) {
 }
 
 // BottomSheet for adding a challenge
+
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChallengeBottomSheet(
@@ -197,9 +200,13 @@ fun ChallengeBottomSheet(
     val bookOrPageChoice = remember { mutableStateOf("") }
     val numberInput = remember { mutableStateOf("") }
     val dateRangePickerState = rememberDateRangePickerState()
-    var enable1=false
-    var enable2=false
-    val enable3=false
+    var enable1 by remember { mutableStateOf(false) }
+    var enable2 by remember { mutableStateOf(false) }
+    val enable3 = false
+
+    // DateTimeFormatter for the required format 'yyyy-MM-dd'T'HH:mm:ss'
+    val dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")
+
     ModalBottomSheet(
         sheetState = sheetState,
         onDismissRequest = onDismiss,
@@ -216,10 +223,13 @@ fun ChallengeBottomSheet(
                     modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(modifier = Modifier.height(16.dp))
-                if(challengeName.value !=""){enable1 = true}
-                Button(enabled = enable1, onClick = { currentStep = 2 }, modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF877f6f
-                    ))) {
+                enable1 = challengeName.value.isNotEmpty()
+                Button(
+                    enabled = enable1,
+                    onClick = { currentStep = 2 },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF877f6f))
+                ) {
                     Text("Next")
                 }
             }
@@ -257,10 +267,13 @@ fun ChallengeBottomSheet(
                     modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(modifier = Modifier.height(16.dp))
-                if((bookOrPageChoice.value=="book" || bookOrPageChoice.value=="page") && numberInput.value!=""){enable2 = true}
-                Button(onClick = { currentStep = 3 }, modifier = Modifier.fillMaxWidth(), enabled = enable2,
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF877f6f
-                    ))) {
+                enable2 = (bookOrPageChoice.value.isNotEmpty() && numberInput.value.isNotEmpty())
+                Button(
+                    onClick = { currentStep = 3 },
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = enable2,
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF877f6f))
+                ) {
                     Text("Next")
                 }
             }
@@ -278,19 +291,32 @@ fun ChallengeBottomSheet(
                                     dateRangePickerState.selectedStartDateMillis,
                                     dateRangePickerState.selectedEndDateMillis
                                 )
+                                // Ensure to pass null values if not selected
                                 onChallengeAdded(challengeName.value, numberInput.value, bookOrPageChoice.value, dateRange)
-                                val newChallenge= Challenge(
-                                     isCompleted = false,
-                                objective = numberInput.value.toInt(),
-                                 startedAt = dateRange.first.toString(),
-                                 text = challengeName.value,
-                                 type = bookOrPageChoice.value,
-                                endsAt = dateRange.second.toString()
-                                        )
-                                Log.d("dates","$newChallenge")
+
+                                // Convert dates to the required format
+                                val startMillis = dateRange.first ?: 0L
+                                val endMillis = dateRange.second ?: 0L
+
+                                // Convert startMillis and endMillis to the required date format
+                                val startDate = Instant.ofEpochMilli(startMillis)
+                                    .atZone(ZoneId.systemDefault())
+                                    .format(dateTimeFormatter)
+                                val endDate = Instant.ofEpochMilli(endMillis)
+                                    .atZone(ZoneId.systemDefault())
+                                    .format(dateTimeFormatter)
+
+                                val newChallenge = Challenge(
+                                    isCompleted = false,
+                                    objective = numberInput.value.toInt(),
+                                    startedAt = startDate,  // sending formatted string
+                                    text = challengeName.value,
+                                    type = bookOrPageChoice.value,
+                                    endsAt = endDate  // sending formatted string
+                                )
+                                Log.d("dates", "$newChallenge")
                                 viewModel.postChallenge(newChallenge)
                                 onDismiss()
-
                             }
                         ) {
                             Text("OK")

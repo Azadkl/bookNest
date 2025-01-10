@@ -11,7 +11,7 @@ val client = OkHttpClient.Builder()
     .writeTimeout(30, TimeUnit.SECONDS)    // Yazma zaman aşımı
     .build()
 val retrofit = Retrofit.Builder()
-    .baseUrl("http://10.0.2.2:8080/")  // HTTPS yerine HTTP kullanmak
+    .baseUrl("https://booknest-7-an7g.onrender.com")  // HTTPS yerine HTTP kullanmak
     .client(client)
     .addConverterFactory(GsonConverterFactory.create())
     .build()

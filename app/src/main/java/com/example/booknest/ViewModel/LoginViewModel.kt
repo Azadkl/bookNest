@@ -31,8 +31,8 @@ import kotlinx.coroutines.withContext
 import retrofit2.Response
 
 class LoginViewModel : ViewModel() {
-    private val _errorMessage = mutableStateOf("")
-    val errorMessage: State<String> = _errorMessage
+    private val _errorMessage = MutableStateFlow("")
+    val errorMessage: StateFlow<String> = _errorMessage
 
     private val _accessToken = mutableStateOf<String?>(null)
     val accessToken: State<String?> = _accessToken
@@ -103,8 +103,8 @@ class LoginViewModel : ViewModel() {
     private val _isLoggedIn = mutableStateOf(false)
     val isLoggedIn: State<Boolean> = _isLoggedIn
     // Loading durumu
-    private val _isLoading = mutableStateOf(false)
-    val isLoading: State<Boolean> = _isLoading
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading
     // Login işlemi gerçekleştiren fonksiyon
     fun login(username: String, password: String) {
         _isLoading.value = true  // Login işlemi başlatıldı
@@ -120,7 +120,6 @@ class LoginViewModel : ViewModel() {
                         if (accessToken != null && refreshToken != null) {
                             setTokens(accessToken,refreshToken)
                             _isLoggedIn.value = true
-                            _errorMessage.value = "Sign-out Successful"
                             Log.d("LoginViewModel", "Login Successful - AccessToken: $accessToken")
                         } else {
                             _isLoggedIn.value = false // Başarısız giriş
@@ -374,48 +373,49 @@ class LoginViewModel : ViewModel() {
     fun setErrorMessage(message: String) {
         _errorMessage.value = message
     }
-    fun fetchBook() {
-        val token = _accessToken.value
-        if (token != null) {
-            viewModelScope.launch(Dispatchers.IO) {
-                try {
-                    val response = api.getBook("Bearer $token")
-                    withContext(Dispatchers.Main) {
-                        if (response.isSuccessful) {
-                            Log.d("Raw Response", response.raw().toString())
-                            Log.d("Response Body", response.body()?.toString() ?: "Response body is null")
-                            Log.d("LoginViewModel", "Book fetch response: ${response.body()}")
+        fun fetchBook() {
+            val token = _accessToken.value
+            if (token != null) {
+                viewModelScope.launch(Dispatchers.IO) {
+                    try {
+                        val response = api.getBook("Bearer $token")
+                        withContext(Dispatchers.Main) {
+                            if (response.isSuccessful) {
+                                Log.d("Raw Response", response.raw().toString())
+                                Log.d("Response Body", response.body()?.toString() ?: "Response body is null")
+                                Log.d("LoginViewModel", "Book fetch response: ${response.body()}")
 
-                            response.body()?.body?.let { book ->
-                                _bookResponse.value = book
-                            } ?: run {
-                                _errorMessage.value = "Book response body is null."
+                                response.body()?.body?.let { book ->
+                                    _bookResponse.value = book
+                                } ?: run {
+                                    _errorMessage.value = "Book response body is null."
+                                }
+                            } else if (response.body()?.success == false) {
+                                // Token süresi dolmuşsa yenileme yap
+                                refreshToken(
+                                    onSuccess = { fetchBook() },
+                                    onFailure = { logout() }
+                                )
+                            } else {
+                                _errorMessage.value = "Failed to fetch book: ${response.message()}"
                             }
-                        } else if (response.body()?.success == false) {
-                            // Token süresi dolmuşsa yenileme yap
-                            refreshToken(
-                                onSuccess = { fetchBook() },
-                                onFailure = { logout() }
-                            )
-                        } else {
-                            _errorMessage.value = "Failed to fetch book: ${response.message()}"
+                        }
+                    } catch (e: Exception) {
+                        withContext(Dispatchers.Main) {
+                            _errorMessage.value = "An error occurred: ${e.message}"
                         }
                     }
-                } catch (e: Exception) {
-                    withContext(Dispatchers.Main) {
-                        _errorMessage.value = "An error occurred: ${e.message}"
-                    }
                 }
+            } else {
+                _errorMessage.value = "Access token is null. Please login again."
             }
-        } else {
-            _errorMessage.value = "Access token is null. Please login again."
         }
-    }
     // BookProgress verisini backend'e göndermek için fonksiyon
     fun postBook( isbn: String)  {
         val token = _accessToken.value
         if (token != null) {
             _isLoading.value = true
+            _errorMessage.value = "" // Hata mesajını sıfırla
             viewModelScope.launch(Dispatchers.IO) {
                 try {
                     // Creating the request body with parameters
@@ -428,9 +428,10 @@ class LoginViewModel : ViewModel() {
                         if (response.isSuccessful) {
                             var status = response.body()?.status
                             Log.d("basarili response successful","$response")
+                            _errorMessage.value = "Book successfully added!"
                         } else {
                             Log.d("donen response body'si", "${response.body()}")
-                            _errorMessage.value = "Failed to create review: ${response.message()}"
+                            _errorMessage.value =  "Failed to add book: ${response.message()}"
                         }
                     }
                 } catch (e: Exception) {

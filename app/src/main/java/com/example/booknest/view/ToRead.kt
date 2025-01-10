@@ -35,6 +35,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.substring
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -119,12 +120,15 @@ fun ToRead(viewModel: LoginViewModel,navController: NavController) {
                                 )
                             }
                             eleman?.rating?.let {
-                                RatingStars(rating = it)
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text(
-                                    text = "$it",
-                                    style = TextStyle(fontSize = 16.sp, color = Color.Gray)
-                                )
+                                Row(modifier = Modifier.fillMaxWidth()) {
+                                    RatingStars(rating = it)
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text(
+                                        text = "$it".substring(0,3),
+                                        style = TextStyle(fontSize = 16.sp, color = Color.Gray)
+                                    )
+                                }
+
                             }
                             LinearProgressIndicator(
                                 progress = book.progress / 100f,

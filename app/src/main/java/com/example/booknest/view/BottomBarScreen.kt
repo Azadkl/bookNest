@@ -639,44 +639,76 @@ fun BottomBarScreen(mainNavController:NavController,modifier: Modifier=Modifier,
 
 
 @Composable
-fun ContactAdminDialog(onConfirm: (String) -> Unit, onDismiss: () -> Unit,viewModel: LoginViewModel) {
+fun ContactAdminDialog(
+    onConfirm: (String) -> Unit,
+    onDismiss: () -> Unit,
+    viewModel: LoginViewModel
+) {
     var bookTitle by remember { mutableStateOf("") }
     var authorName by remember { mutableStateOf("") }
     var isbn by remember { mutableStateOf("") }
+    val isLoading by viewModel.isLoading.collectAsState()
+    val errorMessage by viewModel.errorMessage.collectAsState()
+    LaunchedEffect(Unit) {
+        viewModel.setErrorMessage("")
+    }
 
     AlertDialog(
-        onDismissRequest = onDismiss,
+        onDismissRequest = {}, // Kullanıcı sadece Cancel butonuyla dialog'u kapatsın
         containerColor = Color.White,
         title = { Text("Contact Admin") },
         text = {
             Column(modifier = Modifier.fillMaxWidth()) {
-
                 // ISBN
                 Text(text = "ISBN:")
                 TextField(
                     value = isbn,
                     onValueChange = { isbn = it },
-                    modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 8.dp)
                 )
+                // Hata veya başarı mesajı
+                if (errorMessage.isNotEmpty()) {
+                    Text(
+                        text = errorMessage,
+                        color = if (errorMessage.contains("success", ignoreCase = true)) Color.Green else Color.Red,
+                        modifier = Modifier.padding(top = 8.dp)
+                    )
+                }
             }
         },
         confirmButton = {
-            Button(onClick = {
-                viewModel.postBook(isbn)
-                onConfirm(isbn)
-            },
+            Button(
+                onClick = {
+                    if (isbn.isNotBlank()) {
+                        viewModel.postBook(isbn) // Backend çağrısı yapılıyor
+                        // Dialog'u açık tutmak için hiçbir şey yapılmıyor
+                    }
+                },
+                enabled = isbn.isNotBlank() && !isLoading,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(0xFF2E8B57)
-                )) {
-                Text("Submit")
+                )
+            ) {
+                if (isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(16.dp),
+                        color = Color.White,
+                        strokeWidth = 2.dp
+                    )
+                } else {
+                    Text("Submit")
+                }
             }
         },
-
         dismissButton = {
-            Button(onClick = onDismiss,
+            Button(
+                onClick = onDismiss, // Kullanıcı Cancel ile dialog'u kapatabilir
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(0xFF2E8B57)
-                )) {
+                )
+            ) {
                 Text("Cancel")
             }
         }

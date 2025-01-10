@@ -225,6 +225,7 @@ fun SignInScreen(navController: NavController,viewModel: LoginViewModel) {
                     if (viewModel.isLoggedIn.value) {
                         navController.navigate("home")
                         viewModel.fetchProfile()
+                        viewModel.fetchBook()
                         viewModel.getBookProgress()
                     }
                 }

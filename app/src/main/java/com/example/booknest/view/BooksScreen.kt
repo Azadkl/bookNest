@@ -171,9 +171,6 @@ fun BooksScreen(navController: NavController,viewModel: LoginViewModel,
     }
 
 
-    // Example usage
-//    val selectedStatus = "Currently Reading"
-//    val backendStatus = getBackEndStatus(selectedStatus)
 
 
     LazyColumn(
@@ -253,14 +250,14 @@ fun BooksScreen(navController: NavController,viewModel: LoginViewModel,
                         style = TextStyle(fontSize = 25.sp, fontWeight = FontWeight.Medium),
                     )
                 }
-
+                val totalRatings = review.fold(0) { total, review -> total + (review.rating?.toInt() ?: 0) }
                 Column {
                     Text(
-                        text = "168,500 ratings",
+                        text = "$totalRatings ratings",
                         style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Medium),
                     )
                     Text(
-                        text = "10,123 reviews",
+                        text = "${review.size} reviews", // Yorum sayısını dinamik olarak alıp gösterir
                         style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Medium),
                     )
                 }
@@ -451,6 +448,7 @@ fun BooksScreen(navController: NavController,viewModel: LoginViewModel,
                     publishDate = publishedDate,
                     publisher = publisher, isbn,
                     language = language,
+                    pages = pages,
                     category = category))
                 2 -> (ReviewContent(review))
             }
@@ -502,7 +500,7 @@ fun DetailContent(
     publishDate: String,
     publisher: String,
     isbn: String,
-
+    pages: Int,
     language: String,
     category: String
 ) {
@@ -518,7 +516,7 @@ fun DetailContent(
         DetailRow("Publish Date", publishDate)
         DetailRow("Publisher", publisher)
         DetailRow("ISBN", isbn)
-
+        DetailRow("Pages", pages.toString())
         DetailRow("Language", language)
         DetailRow("Category", category)
     }

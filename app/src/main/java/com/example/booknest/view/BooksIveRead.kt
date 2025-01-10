@@ -111,12 +111,15 @@ fun BooksIveRead(viewModel: LoginViewModel, navController: NavController) {
                                 )
                             }
                             eleman?.rating?.let {
-                                RatingStars(rating = it)
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text(
-                                    text = "$it",
-                                    style = TextStyle(fontSize = 16.sp, color = Color.Gray)
-                                )
+                                Row(modifier = Modifier.fillMaxWidth()) {
+                                    RatingStars(rating = it)
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text(
+                                        text = "$it".substring(0,3),
+                                        style = TextStyle(fontSize = 16.sp, color = Color.Gray)
+                                    )
+                                }
+
                             }
                             LinearProgressIndicator(
                                 progress = book.progress / 100f,

@@ -246,12 +246,18 @@ fun BooksScreen(navController: NavController,viewModel: LoginViewModel,
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                val totalRatings = review.fold(0) { total, review -> total + (review.rating?.toInt() ?: 0) }
+                val totalRatings = review.fold(0f) { total, review -> total + (review.rating) }
                 Column(modifier = Modifier) {
+                    val averageRating = if (review.isNotEmpty()) {
+                        String.format("%.1f", totalRatings / review.size)
+                    } else {
+                        null
+                    }
 
-                    RatingStars((totalRatings.toFloat() / review.size) ?: 0f)
+                    RatingStars((totalRatings / review.size))
+
                     Text(
-                        text = String.format("%.1f", totalRatings.toFloat() / review.size),
+                        text = averageRating ?: "No ratings yet",
                         style = TextStyle(fontSize = 25.sp, fontWeight = FontWeight.Medium),
                     )
                 }

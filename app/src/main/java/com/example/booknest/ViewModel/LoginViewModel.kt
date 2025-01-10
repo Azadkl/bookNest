@@ -510,9 +510,12 @@ class LoginViewModel : ViewModel() {
             _isLoading.value = true
             viewModelScope.launch(Dispatchers.IO) {
                 try {
+                    Log.d("fonksiyon test","ok")
                     val response = api.postChallenge("Bearer $token", challenge)
+                    Log.d("response","${response}")
                     withContext(Dispatchers.Main) {
                         if (response.isSuccessful) {
+                            Log.d("challenge test","${response}")
                             _challenges.value = _challenges.value + (response.body()?.body ?: challenge)
                         } else {
                             _errorMessage.value = "Failed to post challenge: ${response.message()}"

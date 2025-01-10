@@ -2,6 +2,7 @@ package com.example.booknest.view
 
 import android.app.DatePickerDialog
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -33,7 +34,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.window.Dialog
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.booknest.Model.SearchResult
+import com.example.booknest.ViewModel.LoginViewModel
+import com.example.booknest.api.Models.Challenge
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -50,7 +54,7 @@ fun convertMillisToDate(millis: Long): String {
         .format(formatter)
 }
 @Composable
-fun Challenge(navController: NavController) {
+fun Challenge(navController: NavController, viewModel: LoginViewModel) {
     val challengeTitle = "2024 Reading Challenge"
     val totalGoal = 50
     val booksRead = remember { 20 } // Example of state tracking
@@ -174,7 +178,7 @@ fun Challenge(navController: NavController) {
 
                 showDialog.value = false
             },
-            onDismiss = { showDialog.value = false }
+            onDismiss = { showDialog.value = false },viewModel
         )
     }
 }
@@ -184,7 +188,8 @@ fun Challenge(navController: NavController) {
 @Composable
 fun ChallengeBottomSheet(
     onChallengeAdded: (String, String, String, Pair<Long?, Long?>) -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    viewModel: LoginViewModel
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var currentStep by remember { mutableStateOf(1) }
@@ -274,7 +279,18 @@ fun ChallengeBottomSheet(
                                     dateRangePickerState.selectedEndDateMillis
                                 )
                                 onChallengeAdded(challengeName.value, numberInput.value, bookOrPageChoice.value, dateRange)
+                                val newChallenge= Challenge(
+                                     isCompleted = false,
+                                objective = numberInput.value.toInt(),
+                                 startedAt = dateRange.first.toString(),
+                                 text = challengeName.value,
+                                 type = bookOrPageChoice.value,
+                                endsAt = dateRange.second.toString()
+                                        )
+                                Log.d("dates","$newChallenge")
+                                viewModel.postChallenge(newChallenge)
                                 onDismiss()
+
                             }
                         ) {
                             Text("OK")

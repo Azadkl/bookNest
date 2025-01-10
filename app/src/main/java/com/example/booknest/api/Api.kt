@@ -61,8 +61,11 @@ interface BookNestApi {
     @GET("api/challenges")
     suspend fun getChallenges(@Header("Authorization") accessToken: String): Response<GenelResponse<List<Challenge>>>
 
-    @POST("api/challenges")
-    suspend fun postChallenge(@Header("Authorization") accessToken: String, @Body challenge: Challenge): Response<GenelResponse<Challenge>>
+    @POST("api/challenges/")
+    suspend fun postChallenge(
+        @Header("Authorization") accessToken: String,
+        @Body challenge: Challenge
+    ):Response<GenelResponse<Challenge>>
 
     @PUT("api/challenges/{id}")
     suspend fun updateChallenge(
@@ -107,6 +110,7 @@ interface BookNestApi {
         @Header("Authorization") accessToken: String,
         @Body friendResponse: FriendResponse
     ): Response<GenelResponse<Friend>>
+
 
     // Get Sent Friend Requests
     @GET("api/friends/requests/sent")

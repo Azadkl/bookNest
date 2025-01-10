@@ -548,7 +548,7 @@ fun BottomBarScreen(mainNavController:NavController,modifier: Modifier=Modifier,
                         val currentUser = backStackEntry.arguments?.getString("currentUser") ?: ""
                         FriendsPage(navController = navController, currentUser = currentUser)
                     }
-                    composable("challenge") { Challenge(navController) }
+                    composable("challenge") { Challenge(navController,viewModel=viewModel) }
                     composable("medals") { MedalsPage(navController) }
                     composable("notifications"){ NotificationsScreen(navController) }
                     composable(

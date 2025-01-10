@@ -64,8 +64,8 @@ fun ReadingNow(viewModel: LoginViewModel, navController: NavController) {
     var showBottomSheet by remember { mutableStateOf(false) }
     var selectedBook by remember { mutableStateOf<Book?>(null) }
     var readingStatuses by remember { mutableStateOf<List<Pair<BookProgress, Int>>>(emptyList()) }
-    LaunchedEffect(Unit) {
-        viewModel.fetchBook()
+    var refreshBooks by remember { mutableStateOf(false) }
+    LaunchedEffect(refreshBooks) {
         viewModel.getBookProgress()
     }
         Column(
@@ -173,7 +173,9 @@ fun ReadingNow(viewModel: LoginViewModel, navController: NavController) {
                                 ) {
                                     Button(
                                         onClick = {
-                                           viewModel.deleteBookProgress(postBook = PostBook(isbn = secilenBook!!.isbn))
+                                            viewModel.deleteBookProgress(isbn = secilenBook!!.isbn)
+                                            // Silme işleminden sonra state'i güncelleyerek yeniden veri çekme tetikliyoruz
+                                            refreshBooks = !refreshBooks
                                         },
                                         modifier = Modifier.padding(top = 8.dp),
                                         colors = ButtonDefaults.buttonColors(Color(0xFF2E8B57))
@@ -223,6 +225,7 @@ fun ReadingNow(viewModel: LoginViewModel, navController: NavController) {
                     }
 
 
+                    refreshBooks = !refreshBooks
                     showBottomSheet = false
                 }
             )

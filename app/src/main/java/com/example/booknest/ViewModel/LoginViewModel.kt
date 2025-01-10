@@ -316,45 +316,31 @@ class LoginViewModel : ViewModel() {
         }
     }
 
-    fun deleteBookProgress(
-        postBook: PostBook
-    ) {
+    fun deleteBookProgress(isbn: String) {
         val token = _accessToken.value
         if (token != null) {
-
-
             viewModelScope.launch(Dispatchers.IO) {
                 _errorMessage.value = ""
                 try {
-                    val deleteResponse =
-                        api.deleteBookProgress("Bearer $token", postBook)
-                    withContext(Dispatchers.Main) {  // Ensure UI updates happen on the main thread
-
-
+                    val deleteResponse = api.deleteBookProgress("Bearer $token", isbn)
+                    Log.d("Selected book", "$deleteResponse")
+                    withContext(Dispatchers.Main) {
                         if (deleteResponse.isSuccessful) {
                             _deleteAccountResponse.value = "Book deleted successfully"
-
-
-                            _errorMessage.value = "book deletion successful"
+                            _errorMessage.value = "Book deletion successful"
                         } else {
                             _deleteAccountResponse.value =
                                 "Failed to delete account: ${deleteResponse.message()}"
-
                         }
-
-
                     }
                 } catch (e: Exception) {
-                    withContext(Dispatchers.Main) {  // Ensure error handling happens on the main thread
+                    withContext(Dispatchers.Main) {
                         _deleteAccountResponse.value = "Error: ${e.message}"
-
                     }
                 }
             }
         }
     }
-
-
 
 
     fun deleteAccount(

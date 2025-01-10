@@ -109,8 +109,11 @@ fun BooksScreen(navController: NavController,viewModel: LoginViewModel,
     var dominantColor by remember { mutableStateOf(Color.LightGray) }
     var vibrantColor by remember { mutableStateOf(Color.Gray) }
     val review by viewModel.reviews
-    LaunchedEffect(Unit) {
+    var refreshBooks by remember { mutableStateOf(false) }
+    LaunchedEffect(refreshBooks) {
+
         viewModel.getReviewsByBook(bookId = isbn)
+        viewModel.fetchBook()
     }
 
     // Ağ işlemini arka planda gerçekleştirin
@@ -243,14 +246,16 @@ fun BooksScreen(navController: NavController,viewModel: LoginViewModel,
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Column(modifier = Modifier.clickable { navController.navigate("comment") }) {
-                    RatingStars(rating.toFloatOrNull() ?: 0f)
+                val totalRatings = review.fold(0) { total, review -> total + (review.rating?.toInt() ?: 0) }
+                Column(modifier = Modifier) {
+
+                    RatingStars((totalRatings.toFloat() / review.size) ?: 0f)
                     Text(
-                        text = rating.substring(0,3),
+                        text = String.format("%.1f", totalRatings.toFloat() / review.size),
                         style = TextStyle(fontSize = 25.sp, fontWeight = FontWeight.Medium),
                     )
                 }
-                val totalRatings = review.fold(0) { total, review -> total + (review.rating?.toInt() ?: 0) }
+
                 Column {
                     Text(
                         text = "$totalRatings ratings",
@@ -398,18 +403,11 @@ fun BooksScreen(navController: NavController,viewModel: LoginViewModel,
                             username = author
                         )
 
-                        // Log: Yorum gönderme işlemini başlat
-                        Log.d("ReviewSubmission", "Attempting to submit review for book ID: $isbn")
 
-                        // Yeni yorumu listeye ekle
-                        viewModel.createReview(newReview)
-
-                        // Log: Yorum gönderildikten sonra
-                        Log.d("ReviewSubmission", "Review submitted successfully: $newReview")
-
-                        // Yorumlar alanını temizle
                         userRating = 0f
                         userComment = ""
+                        viewModel.createReview(newReview)
+                        refreshBooks = !refreshBooks
                     },
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2E8B57)),
                         shape = RoundedCornerShape(5.dp)

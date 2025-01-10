@@ -39,7 +39,9 @@ import com.example.booknest.api.Models.BookProgress
 fun BooksIveRead(viewModel: LoginViewModel, navController: NavController) {
     val books = viewModel.myBooks.value?.read ?: emptyList()
     val newbook = viewModel.bookResponse
-    LaunchedEffect(Unit) {
+    // Yeni state ekledik
+    var refreshBooks by remember { mutableStateOf(false) }
+    LaunchedEffect(refreshBooks) {
         viewModel.getBookProgress()
     }
 
@@ -138,7 +140,9 @@ fun BooksIveRead(viewModel: LoginViewModel, navController: NavController) {
                             ) {
                                 Button(
                                     onClick = {
-                                        // viewModel.removeBook(book)
+                                        viewModel.deleteBookProgress(isbn = secilenBook!!.isbn)
+                                        // Silme işleminden sonra state'i güncelleyerek yeniden veri çekme tetikliyoruz
+                                        refreshBooks = !refreshBooks
                                     },
                                     modifier = Modifier.padding(top = 8.dp),
                                     colors = ButtonDefaults.buttonColors(Color(0xFF2E8B57))

@@ -22,6 +22,7 @@ import retrofit2.http.Headers
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface BookNestApi {
     @POST("api/Auth/login/")
@@ -119,11 +120,12 @@ interface BookNestApi {
         @Header("Authorization") accessToken: String
     ): Response<GenelResponse<List<FriendRequest>>>
 
-    @DELETE("api/bookprogress")
+    @DELETE("api/bookprogress/{isbn}")
     suspend fun deleteBookProgress(
         @Header("Authorization") accessToken: String,
-        @Body postBook: PostBook
+        @Path("isbn") isbn: String
     ): Response<GenelResponse<Any>>
+
 
 
     // Cancel Friend Request

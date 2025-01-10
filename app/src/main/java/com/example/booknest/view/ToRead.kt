@@ -48,7 +48,8 @@ import com.example.booknest.api.Models.BookProgress
 fun ToRead(viewModel: LoginViewModel,navController: NavController) {
     val books = viewModel.myBooks.value?.wantToRead ?: emptyList()
     val newbook = viewModel.bookResponse
-    LaunchedEffect(Unit) {
+    var refreshBooks by remember { mutableStateOf(false) }
+    LaunchedEffect(refreshBooks) {
         viewModel.getBookProgress()
     }
 
@@ -147,7 +148,9 @@ fun ToRead(viewModel: LoginViewModel,navController: NavController) {
                             ) {
                                 Button(
                                     onClick = {
-                                        // viewModel.removeBook(book)
+                                        viewModel.deleteBookProgress(isbn = secilenBook!!.isbn)
+                                        // Silme işleminden sonra state'i güncelleyerek yeniden veri çekme tetikliyoruz
+                                        refreshBooks = !refreshBooks
                                     },
                                     modifier = Modifier.padding(top = 8.dp),
                                     colors = ButtonDefaults.buttonColors(Color(0xFF2E8B57))
@@ -158,6 +161,7 @@ fun ToRead(viewModel: LoginViewModel,navController: NavController) {
                                 Button(
                                     onClick = {
                                         selectedBook = secilenBook
+                                        viewModel.postBookProgress(bookId = selectedBook!!.isbn, status = "Reading", progress =  0)
                                         showBottomSheet = true
                                     },
                                     modifier = Modifier.padding(top = 8.dp),

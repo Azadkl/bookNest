@@ -5,6 +5,6 @@ data class Review(
     val rating: Float,
     val text: String,
     val date:Long,
-    val cover:String,
+    val avatar:String,
     val username: String
 )

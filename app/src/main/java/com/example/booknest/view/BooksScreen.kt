@@ -405,7 +405,7 @@ fun BooksScreen(navController: NavController,viewModel: LoginViewModel,
                             rating = userRating,
                             text = userComment,
                             date = System.currentTimeMillis(),
-                            cover=cover,
+                            avatar = cover,
                             username = author
                         )
 
@@ -582,9 +582,10 @@ fun ReviewCard(review: com.example.booknest.api.Models.Review) {
         ) {
             // Kullanıcı Resmi (Sol Tarafta)
             Image(
-                painter = if (!review.cover.isNullOrEmpty()) {
-                    rememberImagePainter(data = review.cover)
+                painter = if (!review.avatar.isNullOrEmpty()) {
+                    rememberImagePainter(data = review.avatar)
                 } else {
+                    Log.d("profilimiz","${review.avatar}")
                     painterResource(id = R.drawable.outline_person_24) // Varsayılan görsel
                 },
                 contentDescription = "User Image",

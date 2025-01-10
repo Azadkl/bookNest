@@ -267,6 +267,7 @@ class LoginViewModel : ViewModel() {
     fun logout() {
         val currentAccessToken = _accessToken.value
         if (currentAccessToken != null) {
+            _errorMessage.value=""
             viewModelScope.launch(Dispatchers.IO) {
                 try {
                     // Backend'e logout isteği gönder
@@ -425,13 +426,14 @@ class LoginViewModel : ViewModel() {
                     val response = api.postBook("Bearer $token", postBook)
                     Log.d("giris fonksiyon postbook","$response")
                     withContext(Dispatchers.Main) {
-                        if (response.isSuccessful) {
-                            var status = response.body()?.status
-                            Log.d("basarili response successful","$response")
-                            _errorMessage.value = "Book successfully added!"
+                        if (response.body()?.status == 200) {
+                            _errorMessage.value = "Book added successfully!"
                         } else {
-                            Log.d("donen response body'si", "${response.body()}")
-                            _errorMessage.value =  "Failed to add book: ${response.message()}"
+                            if (response.body()?.status == 400) {
+                                _errorMessage.value = "This book already exists."
+                            } else {
+                                _errorMessage.value = "Failed to add book: ${response.message()}"
+                            }
                         }
                     }
                 } catch (e: Exception) {

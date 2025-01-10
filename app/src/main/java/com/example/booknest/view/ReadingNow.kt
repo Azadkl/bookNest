@@ -53,13 +53,13 @@ import com.example.booknest.Model.SearchResult
 import com.example.booknest.ViewModel.LoginViewModel
 import com.example.booknest.api.Models.Book
 import com.example.booknest.api.Models.BookProgress
+import com.example.booknest.api.Models.PostBook
 
 
 @Composable
 fun ReadingNow(viewModel: LoginViewModel, navController: NavController) {
     val books = viewModel.myBooks.value?.reading ?: emptyList()
     val newbook = viewModel.bookResponse
-
 
     var showBottomSheet by remember { mutableStateOf(false) }
     var selectedBook by remember { mutableStateOf<Book?>(null) }
@@ -173,7 +173,7 @@ fun ReadingNow(viewModel: LoginViewModel, navController: NavController) {
                                 ) {
                                     Button(
                                         onClick = {
-                                            // viewModel.removeBook(book)
+                                           viewModel.deleteBookProgress(postBook = PostBook(isbn = secilenBook!!.isbn))
                                         },
                                         modifier = Modifier.padding(top = 8.dp),
                                         colors = ButtonDefaults.buttonColors(Color(0xFF2E8B57))

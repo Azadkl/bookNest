@@ -119,6 +119,13 @@ interface BookNestApi {
         @Header("Authorization") accessToken: String
     ): Response<GenelResponse<List<FriendRequest>>>
 
+    @DELETE("api/bookprogress")
+    suspend fun deleteBookProgress(
+        @Header("Authorization") accessToken: String,
+        @Body postBook: PostBook
+    ): Response<GenelResponse<Any>>
+
+
     // Cancel Friend Request
     @DELETE("api/friends/requests/{friendId}")
     suspend fun cancelFriendRequest(

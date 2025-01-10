@@ -57,6 +57,7 @@ fun convertMillisToDate(millis: Long): String {
 }
 @Composable
 fun Challenge(navController: NavController, viewModel: LoginViewModel) {
+    val bookOrPageChoicee = remember { mutableStateOf("") }
     val challenge = viewModel.challenges
     val challengeTitle = "2024 Reading Challenge"
     val totalGoal = 50
@@ -147,9 +148,17 @@ fun Challenge(navController: NavController, viewModel: LoginViewModel) {
                             contentScale = ContentScale.Crop
                         )
                         Spacer(modifier = Modifier.width(16.dp))
+                        if(challenge.type=="pages") {bookOrPageChoicee.value = "page"} else {bookOrPageChoicee.value = "book"}
+
                         Column {
+                            Text(
+                                text = "${challenge.text}",
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.ExtraBold,
+                                color = Color.Black
+                            )
                                 Text(
-                                    text = challenge.text,
+                                    text = "Read ${challenge.objective} ${bookOrPageChoicee.value}",
                                     fontSize = 16.sp,
                                     fontWeight = FontWeight.SemiBold,
                                     color = Color.Black
@@ -258,8 +267,8 @@ fun ChallengeBottomSheet(
                     Spacer(modifier = Modifier.width(16.dp))
 
                     Button(
-                        onClick = { bookOrPageChoice.value = "page" },
-                        colors = ButtonDefaults.buttonColors(containerColor = if (bookOrPageChoice.value == "page") Color(0xFF5f4d3f) else Color.Gray)
+                        onClick = { bookOrPageChoice.value = "pages" },
+                        colors = ButtonDefaults.buttonColors(containerColor = if (bookOrPageChoice.value == "pages") Color(0xFF5f4d3f) else Color.Gray)
                     ) {
                         Text("Pages")
                     }

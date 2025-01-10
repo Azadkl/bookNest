@@ -514,7 +514,7 @@ class LoginViewModel : ViewModel() {
                 try {
                     Log.d("fonksiyon test","ok")
                     val response = api.postChallenge("Bearer $token", challenge)
-                    Log.d("response","${response}")
+                    Log.d("post test","${response}")
                     withContext(Dispatchers.Main) {
                         if (response.isSuccessful) {
                             Log.d("challenge test","${response}")

@@ -90,6 +90,10 @@ import com.example.booknest.ViewModel.LoginViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.net.URL
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun BooksScreen(navController: NavController,viewModel: LoginViewModel,
@@ -109,8 +113,8 @@ fun BooksScreen(navController: NavController,viewModel: LoginViewModel,
     var dominantColor by remember { mutableStateOf(Color.LightGray) }
     var vibrantColor by remember { mutableStateOf(Color.Gray) }
     val review by viewModel.reviews
-    var refreshBooks by remember { mutableStateOf(false) }
-    LaunchedEffect(refreshBooks) {
+
+    LaunchedEffect(Unit) {
 
         viewModel.getReviewsByBook(bookId = isbn)
         viewModel.fetchBook()
@@ -397,23 +401,27 @@ fun BooksScreen(navController: NavController,viewModel: LoginViewModel,
                 ),
                 maxLines = 3,
             )
-
+            val dateTimeFormatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME
+            val currentTime = System.currentTimeMillis()
+            val formattedDate = Instant.ofEpochMilli(currentTime)
+                .atZone(ZoneId.systemDefault())
+                .format(dateTimeFormatter)
                     Button(onClick = {
                         // Yorum gönderildiğinde, yeni yorum verisini ekleme
                         val newReview = com.example.booknest.api.Models.Review(
                             bookId = isbn,  // Buraya mevcut kullanıcı adı eklenebilir
                             rating = userRating,
                             text = userComment,
-                            date = System.currentTimeMillis(),
+                            date = formattedDate,
                             avatar = cover,
                             username = author
                         )
-
+                        Log.d("newReview","$newReview")
+                        viewModel.createReview(newReview)
 
                         userRating = 0f
                         userComment = ""
-                        viewModel.createReview(newReview)
-                        refreshBooks = !refreshBooks
+
                     },
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2E8B57)),
                         shape = RoundedCornerShape(5.dp)
@@ -564,6 +572,15 @@ fun ReviewContent(reviews:List<com.example.booknest.api.Models.Review>) {
 
 @Composable
 fun ReviewCard(review: com.example.booknest.api.Models.Review) {
+    val dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss") // Tarih formatını uygun şekilde belirleyin
+    val reviewDate = try {
+        // Eğer review.date ISO 8601 formatında bir string ise, bunu bir Instant'a çevirin
+        Instant.parse(review.date).atZone(ZoneId.systemDefault()).format(dateTimeFormatter)
+    } catch (e: Exception) {
+        // Eğer tarih yanlış formatta ise varsayılan bir değer kullanabilirsiniz
+        "Unknown date"
+    }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -612,9 +629,8 @@ fun ReviewCard(review: com.example.booknest.api.Models.Review) {
 
                 Spacer(modifier = Modifier.height(4.dp))
 
-                // Yorumun tarihi
                 Text(
-                    text = "${getTimeAgo(review.date)}",
+                    text = reviewDate,  // Formatted review date
                     style = TextStyle(fontSize = 12.sp, color = Color.Gray)
                 )
             }

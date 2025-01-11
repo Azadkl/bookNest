@@ -103,8 +103,8 @@ class LoginViewModel : ViewModel() {
     private val _isLoggedIn = mutableStateOf(false)
     val isLoggedIn: State<Boolean> = _isLoggedIn
     // Loading durumu
-    private val _isLoading = MutableStateFlow(false)
-    val isLoading: StateFlow<Boolean> = _isLoading
+    private val _isLoading = mutableStateOf(false)
+    val isLoading: State<Boolean> = _isLoading
     // Login işlemi gerçekleştiren fonksiyon
     fun login(username: String, password: String) {
         _isLoading.value = true  // Login işlemi başlatıldı

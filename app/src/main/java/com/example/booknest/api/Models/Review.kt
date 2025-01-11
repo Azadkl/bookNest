@@ -4,7 +4,7 @@ data class Review(
     val bookId: String,
     val rating: Float,
     val text: String,
-    val date:Long,
+    val date:String,
     val avatar:String,
     val username: String
 )

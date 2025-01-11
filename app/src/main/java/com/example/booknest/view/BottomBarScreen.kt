@@ -647,8 +647,8 @@ fun ContactAdminDialog(
     var bookTitle by remember { mutableStateOf("") }
     var authorName by remember { mutableStateOf("") }
     var isbn by remember { mutableStateOf("") }
-    val isLoading by viewModel.isLoading.collectAsState()
     val errorMessage by viewModel.errorMessage.collectAsState()
+    var isLoading by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) {
         viewModel.setErrorMessage("")
     }
@@ -682,9 +682,11 @@ fun ContactAdminDialog(
             Button(
                 onClick = {
                     if (isbn.isNotBlank()) {
+                        isLoading = true // Yükleme başlatıldı
                         viewModel.postBook(isbn) // Backend çağrısı yapılıyor
                         // Dialog'u açık tutmak için hiçbir şey yapılmıyor
                     }
+                    isLoading=false
                 },
                 enabled = isbn.isNotBlank() && !isLoading,
                 colors = ButtonDefaults.buttonColors(

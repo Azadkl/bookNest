@@ -16,6 +16,7 @@ import com.example.booknest.api.Models.FriendRequest
 import com.example.booknest.api.Models.FriendResponse
 import com.example.booknest.api.Models.MybooksList
 import com.example.booknest.api.Models.Notification
+import com.example.booknest.api.Models.OtherProfile
 import com.example.booknest.api.Models.PostBook
 import com.example.booknest.api.Models.PostBookProgress
 import com.example.booknest.api.Models.Review
@@ -43,8 +44,14 @@ class LoginViewModel : ViewModel() {
     private val _profileResponse = mutableStateOf<ProfileBody?>(null)
     val profileResponse: State<ProfileBody?> = _profileResponse
 
+    private val _otherResponse = mutableStateOf<OtherProfile?>(null)
+    val otherResponse: State<OtherProfile?> = _otherResponse
+
     private val _bookResponse = mutableStateOf<List<Book>?>(null)
     val bookResponse: State<List<Book>?> = _bookResponse
+
+    private val _clickedBook = mutableStateOf<Book?>(null)
+    val clickedBook: State<Book?> = _clickedBook
 
     private val _usersResponse = mutableStateOf<List<ProfileBody>?>(null)
     val usersResponse: State<List<ProfileBody>?> = _usersResponse
@@ -401,6 +408,46 @@ class LoginViewModel : ViewModel() {
     fun setErrorMessage(message: String) {
         _errorMessage.value = message
     }
+    fun resetClickedBook() {
+        _clickedBook.value = null
+    }
+
+    fun fetchOneBook(id: String) {
+        val token = _accessToken.value
+        if (token != null) {
+            viewModelScope.launch(Dispatchers.IO) {
+                try {
+                    val response = api.fetchOneBook("Bearer $token",id)
+                    withContext(Dispatchers.Main) {
+                        if (response.isSuccessful) {
+                            Log.d("Raw Response", response.raw().toString())
+                            Log.d("Response Body", response.body()?.toString() ?: "Response body is null")
+                            Log.d("LoginViewModel", "Book fetch response: ${response.body()}")
+
+
+                                _clickedBook.value = response.body()?.body
+                                _errorMessage.value = "Book response body is null."
+
+                        } else if (response.body()?.success == false) {
+                            // Token süresi dolmuşsa yenileme yap
+                            refreshToken(
+                                onSuccess = { fetchBook() },
+                                onFailure = { logout() }
+                            )
+                        } else {
+                            _errorMessage.value = "Failed to fetch book: ${response.message()}"
+                        }
+                    }
+                } catch (e: Exception) {
+                    withContext(Dispatchers.Main) {
+                        _errorMessage.value = "An error occurred: ${e.message}"
+                    }
+                }
+            }
+        } else {
+            _errorMessage.value = "Access token is null. Please login again."
+        }
+    }
         fun fetchBook() {
             val token = _accessToken.value
             if (token != null) {
@@ -475,6 +522,44 @@ class LoginViewModel : ViewModel() {
             _errorMessage.value = "Access token is null. Please login again."
         }
     }
+
+    fun getOtherProfile( id: Int)  {
+        val token = _accessToken.value
+        Log.d("diger kullanici profili","$token")
+        if (token != null) {
+            _isLoading.value = true
+            _errorMessage.value = "" // Hata mesajını sıfırla
+
+
+            viewModelScope.launch(Dispatchers.IO) {
+                try {
+                    val response = api.getUserById("Bearer $token", id)
+
+
+
+                    withContext(Dispatchers.Main) {
+                        if (response.isSuccessful) {
+                            Log.d("response basarili","$response")
+                            _otherResponse.value =  response.body()?.body
+                        } else {
+                           _errorMessage.value=" other kullanici bilgisi cekilme basarisiz."
+                        }
+                    }
+                } catch (e: Exception) {
+                    withContext(Dispatchers.Main) {
+                        _errorMessage.value = "An error occurred: ${e.message}"
+                    }
+                } finally {
+                    _isLoading.value = false
+                }
+            }
+        } else {
+            _errorMessage.value = "Access token is null. Please login again."
+        }
+    }
+
+
+
     // Get Challenges
     fun getChallenges() {
         val token = _accessToken.value
@@ -929,6 +1014,11 @@ class LoginViewModel : ViewModel() {
             _errorMessage.value = "Access token is null. Please login again."
         }
     }
+
+
+
+
+
 
     // Maksimum ilerleme verisini almak için fonksiyon
     fun getMaxProgress() {

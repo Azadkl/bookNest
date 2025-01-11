@@ -1,5 +1,7 @@
 package com.example.booknest.view
 
+import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
@@ -28,33 +30,33 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.draw.clip
 import androidx.navigation.NavController
+import coil.compose.rememberAsyncImagePainter
 import com.example.booknest.Model.SearchResult
 import com.example.booknest.R // Ensure this imports your drawable resources
 import com.example.booknest.ViewModel.LoginViewModel
 
     @Composable
     fun OtherProfilePage(
+        id: Int,
         userName: String,
         userImageResId: String,
         navController: NavController,
         currentUser: String,
         viewModel: LoginViewModel
     ) {
+        Log.d("id other","$id")
         // Arkadaşlık durumu: "None", "Pending", "Friend"
         var friendshipStatus by remember { mutableStateOf("None") }
+        val otherProfileResponse = viewModel.otherResponse
+        var fetchOneResponse = viewModel.clickedBook
+        Log.d("otherRepsone","${otherProfileResponse}")
+        LaunchedEffect (Unit){
+            viewModel.getOtherProfile(id)
+        }
 
-
-        // Dummy list of books
-        val books = listOf(
-            SearchResult.Book("101", "The Great Gatsby", "F. Scott Fitzgerald", R.drawable.farelerveinsanlar, "4.0",pageNumber = 300),
-            SearchResult.Book("102", "1984", "George Orwell", R.drawable.farelerveinsanlar, "4.5",pageNumber = 300),
-            SearchResult.Book("103", "Fareler ve İnsanlar", "John Steinbeck", R.drawable.farelerveinsanlar, "4.6",pageNumber = 300),
-            SearchResult.Book("104", "Shadows of Self", "Brandon Sanderson", R.drawable.images, "3.6",pageNumber = 300),
-            SearchResult.Book("105", "House of Flame and Shadow", "Sarah J. Maas", R.drawable.houseoflame, "5.0",pageNumber = 300),
-            SearchResult.Book("106", "1984", "George Orwell", R.drawable.farelerveinsanlar, "4.5",pageNumber = 300)
-        )
 
         // Main Column for layout
         Column(
@@ -90,10 +92,17 @@ import com.example.booknest.ViewModel.LoginViewModel
                 // Friendship Button
                 Button(
                     onClick = {
-                        when (friendshipStatus) {
-                            "None" -> friendshipStatus = "Pending" // İstek gönderildi
-                            "Pending" -> friendshipStatus = "Friend" // İstek kabul edildi
-                            "Friend" -> friendshipStatus = "None" // Arkadaşlıktan çıkarıldı
+                        if(otherProfileResponse.value?.isFriend == true){
+                            viewModel.removeFriend(otherProfileResponse.value!!.id)
+                        }
+                        else if(otherProfileResponse.value?.pendingSentRequest == true){
+                            viewModel.cancelFriendRequest(otherProfileResponse.value!!.id)
+                        }
+                        else if(otherProfileResponse.value?.pendingReceivedRequest == true){
+                            viewModel.respondToFriendRequest(otherProfileResponse.value!!.id,true)
+                        }
+                        else{
+                            otherProfileResponse.value?.let { viewModel.sendFriendRequest(it.id) }
                         }
                     },
                     colors = ButtonDefaults.buttonColors(
@@ -106,16 +115,39 @@ import com.example.booknest.ViewModel.LoginViewModel
                     ),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(
-                        text = when (friendshipStatus) {
-                            "None" -> "Add Friend"
-                            "Pending" -> "Pending"
-                            "Friend" -> "Your Friend"
-                            else -> "Unknown"
-                        },
-                        color = Color.White,
-                        style = MaterialTheme.typography.bodyMedium
-                    )
+
+                    if(otherProfileResponse.value?.isFriend == true){
+                        Text(
+                            text ="You are friends",
+                            color = Color.White,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                    else if(otherProfileResponse.value?.pendingSentRequest == true){
+                        Text(
+                            text ="Cancel friend request",
+                            color = Color.White,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                    else if(otherProfileResponse.value?.pendingReceivedRequest == true){
+                        Text(
+                            text ="Accept request",
+                            color = Color.White,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                    else{
+                        Text(
+                            text ="Add friend",
+                            color = Color.White,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+
+
+
+
                 }
 
 
@@ -184,14 +216,57 @@ import com.example.booknest.ViewModel.LoginViewModel
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                // Pass the books list to the BookSection composable
-                BookSection(title = "Recently Read", isRecentlyRead = true, books = books, navController = navController)
+                // Access the read books
+                otherProfileResponse.value?.read?.let { readBooks ->
+                Log.d("okunan raf","${otherProfileResponse.value?.read}")
+                    // Display only the book covers
+                    var isLoading by remember { mutableStateOf(false) }
 
+                    LazyRow(
+                        contentPadding = PaddingValues(16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        items(readBooks) { bookProgress ->
+                            Image(
+                                painter = rememberAsyncImagePainter(bookProgress.cover),
+                                contentDescription = "",
+                                modifier = Modifier
+                                    .size(100.dp)
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .clickable {
+                                        isLoading = true
+                                        viewModel.fetchOneBook(bookProgress.bookId) // Fetch the book
+                                    },
+                                contentScale = ContentScale.Crop
+                            )
+
+                            if (isLoading) {
+                                LaunchedEffect(viewModel.clickedBook.value) {
+                                    val book = viewModel.clickedBook.value
+                                    if (book != null) {
+                                        val safeAuthor = book.author ?: "Unknown"
+                                        Log.d("Navigation URI", "books/${Uri.encode(book.isbn)}/${Uri.encode(book.title)}/${Uri.encode(safeAuthor)}")
+                                        navController.navigate(
+                                            "books/${Uri.encode(book.isbn)}/${Uri.encode(book.title)}/${Uri.encode(safeAuthor)}/${Uri.encode(book.cover)}/${Uri.encode(book.description)}/${book.rating}/${book.pages}/${Uri.encode(book.category)}/${Uri.encode(book.language)}/${Uri.encode(book.publishedDate)}/${Uri.encode(book.publisher)}"
+                                        ) {
+                                            popUpTo(navController.currentDestination?.id ?: return@navigate) { saveState = true }
+                                            launchSingleTop = true
+                                            restoreState = true
+                                        }
+                                        viewModel.resetClickedBook()
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                }
             }
 
 
+
             // Want to Read Section
-            BookSection(title = "Want to Read", isRecentlyRead = false, books = books, navController = navController)
+                    //BookSection(title = "Want to Read", isRecentlyRead = false, books = books, navController = navController)
 
 
         }

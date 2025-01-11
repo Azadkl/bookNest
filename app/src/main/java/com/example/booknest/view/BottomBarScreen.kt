@@ -198,12 +198,14 @@ fun BottomBarScreen(mainNavController:NavController,modifier: Modifier=Modifier,
                     {      // Eğer sonuçlar boşsa, kullanıcıya mesaj göster ve buton ekle
                         val users by viewModel.usersResponse
                         val books by viewModel.bookResponse
+                        val myId by viewModel.profileResponse
                         val filteredBooks = books?.filter { book ->
                             book.title.contains(searchQuery, ignoreCase = true)
                         } ?: emptyList()
                         // Arama metnine göre kullanıcıları filtrele
                         val filteredUsers = users?.filter { user ->
                             user.username.contains(searchQuery, ignoreCase = true)
+                                    && user.id!= myId?.id ?: 0
                         } ?: emptyList()
                         LaunchedEffect(Unit) {
                             viewModel.fetchUsers()  // Bu satır verileri çekmeye başlar
@@ -303,7 +305,7 @@ fun BottomBarScreen(mainNavController:NavController,modifier: Modifier=Modifier,
                                                 .clip(shape = RoundedCornerShape(15.dp))
                                                 .clickable {
                                                     isLoading = true
-                                                    navController.navigate("otherProfile/${user.username}/${Uri.encode(user.avatar)}")
+                                                    navController.navigate("otherProfile/${user.username}/${Uri.encode(user.avatar)}/${user.id}")
                                                 }
                                         )
                                     }
@@ -622,13 +624,15 @@ fun BottomBarScreen(mainNavController:NavController,modifier: Modifier=Modifier,
                     }
 
 
-                    composable("otherProfile/{userName}/{userImageResId}", arguments = listOf(
+                    composable("otherProfile/{userName}/{userImageResId}/{id}", arguments = listOf(
                         navArgument("userName") { type = NavType.StringType },
-                        navArgument("userImageResId") { type = NavType.StringType }
+                        navArgument("userImageResId") { type = NavType.StringType },
+                                navArgument("id") { type = NavType.IntType }
                     )) { backStackEntry ->
                         val userName = backStackEntry.arguments?.getString("userName") ?: ""
                         val userImageResId = backStackEntry.arguments?.getString("userImageResId") ?: ""
-                        OtherProfilePage(userName = userName, userImageResId = userImageResId, navController = navController, currentUser = userName,viewModel=viewModel)
+                        val id = backStackEntry.arguments?.getInt("id") ?: 0
+                        OtherProfilePage(userName = userName, userImageResId = userImageResId, navController = navController, currentUser = userName,viewModel=viewModel, id = id)
                     }
 
                 }

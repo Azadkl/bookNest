@@ -192,32 +192,41 @@ Row (modifier = Modifier.fillMaxWidth()){
     ) {
         item {
             books.forEachIndexed { index, book ->
-                Box(
-                    modifier = Modifier
-                        .offset(x = (-30 * (index-2)).dp) // Her kitap arasına 40.dp kadar kaydırma
-                        .zIndex(books.size - index.toFloat()) // Önde görünmesi için zIndex kullanılıyor
-                ) {
-                    Image(
+                if (books.size >= 4) { // Only apply offset and zIndex when there are 4 or more books
+                    Box(
                         modifier = Modifier
-                            .size(120.dp, 180.dp) // Sabit genişlik ve yükseklik
-                            .clickable { navController.navigate(route) },
-                        painter = rememberImagePainter(book.cover),
-                        contentDescription = "Book Cover Image",
-                        contentScale = ContentScale.Crop
-                    )
+                            .offset(x = (-30 * (index - 2)).dp)
+                            .zIndex(books.size - index.toFloat())
+                    ) {
+                        Image(
+                            modifier = Modifier
+                                .size(120.dp, 180.dp)
+                                .clickable { navController.navigate(route) },
+                            painter = rememberImagePainter(book.cover),
+                            contentDescription = "Book Cover Image",
+                            contentScale = ContentScale.Crop
+                        )
+                    }
+                } else {
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(start = 16.dp)
+                    ){
+                        Image(
+                            modifier = Modifier
+                                .size(120.dp, 180.dp)
+                                .clickable { navController.navigate(route) },
+                            painter = rememberImagePainter(book.cover),
+                            contentDescription = "Book Cover Image",
+                            contentScale = ContentScale.Crop
+                        )
+                    }
+
                 }
             }
         }
 
     }
-    Box(modifier = Modifier){
-        Card(modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp)
-                .clip(shape = RoundedCornerShape(16.dp))){
-                    Text("More")
-                }
-    }
+
 
 }
 

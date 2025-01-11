@@ -9,6 +9,7 @@ import com.example.booknest.api.Models.FriendRequest
 import com.example.booknest.api.Models.FriendResponse
 import com.example.booknest.api.Models.MybooksList
 import com.example.booknest.api.Models.Notification
+import com.example.booknest.api.Models.OtherProfile
 import com.example.booknest.api.Models.PostBook
 import com.example.booknest.api.Models.PostBookProgress
 import com.example.booknest.api.Models.Review
@@ -42,6 +43,12 @@ interface BookNestApi {
 
     @GET("api/books/")
     suspend fun getBook(@Header("Authorization") accessToken: String): Response<GenelResponse<List<Book>>>
+
+    @GET("api/books/{id}")
+    suspend fun fetchOneBook(
+        @Header("Authorization") accessToken: String,
+        @Path("id") id: String
+    ): Response<GenelResponse<Book>>
 
     @POST("api/books/")
     suspend fun postBook(
@@ -84,6 +91,13 @@ interface BookNestApi {
     suspend fun getReviewsByUser(
         @Header("Authorization") accessToken: String
     ): Response<GenelResponse<List<Review>>>
+
+    @GET("api/users/id/{id}")
+    suspend fun getUserById(
+        @Header("Authorization") accessToken: String,
+        @Path ("id") id: Int
+    ): Response<GenelResponse<OtherProfile>>
+
 
     @GET("api/reviews/book/{bookId}")
     suspend fun getReviewsByBook(

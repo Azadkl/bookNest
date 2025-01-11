@@ -68,6 +68,7 @@ fun ReadingNow(viewModel: LoginViewModel, navController: NavController) {
     LaunchedEffect(refreshBooks) {
         viewModel.getBookProgress()
     }
+
         Column(
             modifier = Modifier
                 .fillMaxHeight()
@@ -100,12 +101,16 @@ fun ReadingNow(viewModel: LoginViewModel, navController: NavController) {
                     status?.let {
                         pagesRead = it.second
                     }
-
+                    var isLoading by remember { mutableStateOf(false) }
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(8.dp)
-                            .clip(RoundedCornerShape(16.dp)),
+                            .clip(RoundedCornerShape(16.dp))
+                            .clickable {
+                                isLoading = true
+                                viewModel.fetchOneBook(book.bookId) // Fetch the book
+                            },
 
                         colors = CardDefaults.cardColors(containerColor = Color.White)
                     ) {
@@ -173,9 +178,10 @@ fun ReadingNow(viewModel: LoginViewModel, navController: NavController) {
                                 ) {
                                     Button(
                                         onClick = {
+                                            refreshBooks = !refreshBooks
                                             viewModel.deleteBookProgress(isbn = secilenBook!!.isbn)
                                             // Silme işleminden sonra state'i güncelleyerek yeniden veri çekme tetikliyoruz
-                                            refreshBooks = !refreshBooks
+
                                         },
                                         modifier = Modifier.padding(top = 8.dp),
                                         colors = ButtonDefaults.buttonColors(Color(0xFF2E8B57))
@@ -194,6 +200,23 @@ fun ReadingNow(viewModel: LoginViewModel, navController: NavController) {
                                         Text(text = "Update")
                                     }
                                 }
+                            }
+                        }
+                    }
+                    if (isLoading) {
+                        LaunchedEffect(viewModel.clickedBook.value) {
+                            val book = viewModel.clickedBook.value
+                            if (book != null) {
+                                val safeAuthor = book.author ?: "Unknown"
+                                Log.d("Navigation URI", "books/${Uri.encode(book.isbn)}/${Uri.encode(book.title)}/${Uri.encode(safeAuthor)}")
+                                navController.navigate(
+                                    "books/${Uri.encode(book.isbn)}/${Uri.encode(book.title)}/${Uri.encode(safeAuthor)}/${Uri.encode(book.cover)}/${Uri.encode(book.description)}/${book.rating}/${book.pages}/${Uri.encode(book.category)}/${Uri.encode(book.language)}/${Uri.encode(book.publishedDate)}/${Uri.encode(book.publisher)}"
+                                ) {
+                                    popUpTo(navController.currentDestination?.id ?: return@navigate) { saveState = true }
+                                    launchSingleTop = true
+                                    restoreState = true
+                                }
+                                viewModel.resetClickedBook()
                             }
                         }
                     }
@@ -224,11 +247,11 @@ fun ReadingNow(viewModel: LoginViewModel, navController: NavController) {
 
                     }
 
-
-                    refreshBooks = !refreshBooks
                     showBottomSheet = false
+                    refreshBooks = !refreshBooks
                 }
             )
+
         }
     }
 

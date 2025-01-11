@@ -1,5 +1,7 @@
 package com.example.booknest.view
 
+import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -87,12 +89,16 @@ fun ToRead(viewModel: LoginViewModel,navController: NavController) {
                 status?.let {
                     pagesRead = it.second
                 }
-
+                var isLoading by remember { mutableStateOf(false) }
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(8.dp)
-                        .clip(RoundedCornerShape(16.dp)),
+                        .clip(RoundedCornerShape(16.dp))
+                        .clickable {
+                            isLoading = true
+                            viewModel.fetchOneBook(book.bookId) // Fetch the book
+                        },
 
                     colors = CardDefaults.cardColors(containerColor = Color.White)
                 ) {
@@ -170,6 +176,23 @@ fun ToRead(viewModel: LoginViewModel,navController: NavController) {
                                     Text(text = "Start",)
                                 }
                             }
+                        }
+                    }
+                }
+                if (isLoading) {
+                    LaunchedEffect(viewModel.clickedBook.value) {
+                        val book = viewModel.clickedBook.value
+                        if (book != null) {
+                            val safeAuthor = book.author ?: "Unknown"
+                            Log.d("Navigation URI", "books/${Uri.encode(book.isbn)}/${Uri.encode(book.title)}/${Uri.encode(safeAuthor)}")
+                            navController.navigate(
+                                "books/${Uri.encode(book.isbn)}/${Uri.encode(book.title)}/${Uri.encode(safeAuthor)}/${Uri.encode(book.cover)}/${Uri.encode(book.description)}/${book.rating}/${book.pages}/${Uri.encode(book.category)}/${Uri.encode(book.language)}/${Uri.encode(book.publishedDate)}/${Uri.encode(book.publisher)}"
+                            ) {
+                                popUpTo(navController.currentDestination?.id ?: return@navigate) { saveState = true }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
+                            viewModel.resetClickedBook()
                         }
                     }
                 }

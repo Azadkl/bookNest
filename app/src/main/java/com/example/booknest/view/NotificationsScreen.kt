@@ -31,6 +31,7 @@ import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -43,15 +44,20 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
 import com.example.booknest.R
+import com.example.booknest.ViewModel.LoginViewModel
+import com.example.booknest.api.Models.ReceivedRequest
 
 @Composable
-fun NotificationsScreen(navController: NavController) {
+fun NotificationsScreen(navController: NavController,viewModel: LoginViewModel) {
     var selectedTabIndex by remember { mutableIntStateOf(0) }
     val tabTitles = listOf("NOTIFICATIONS", "REQUEST")
     val friendRequests = remember { mutableStateOf(listOf<FriendRequest>()) }
+    //val receivedRequest= viewModel.friendRequestsReceived.value.size
+
     // Friend requests backend'den çekiliyor (simülasyon)
     LaunchedEffect(Unit) {
         friendRequests.value = fetchFriendRequestsFromBackend()
@@ -104,7 +110,7 @@ fun NotificationsScreen(navController: NavController) {
 
         when (selectedTabIndex) {
             0 -> NotificationsContent()
-            1 -> RequestContent(friendRequests = friendRequests.value)
+            1 -> RequestContent(receivedRequests = viewModel.friendRequestsReceived.value,viewModel)
         }
     }
 }
@@ -173,17 +179,17 @@ data class FriendRequest(
 )
 
 @Composable
-fun RequestContent(friendRequests: List<FriendRequest>) {
+fun RequestContent(receivedRequests: List<ReceivedRequest>,viewModel: LoginViewModel) {
     LazyColumn {
-        items(friendRequests) { request ->
-            FriendRequestItem(request)
+        items(receivedRequests) { request ->
+            FriendRequestItem(request, viewModel )
         }
     }
 }
 
 @Composable
-fun FriendRequestItem(request: FriendRequest) {
-    val timeAgo = getTimeAgo(request.requestTime)
+fun FriendRequestItem(request: ReceivedRequest,viewModel: LoginViewModel) {
+    val timeAgo = getTimeAgo_2(request.createdAt)
 
     Row(
         modifier = Modifier
@@ -192,14 +198,14 @@ fun FriendRequestItem(request: FriendRequest) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         // Profil Resmi
-        Image(
-            painter = rememberImagePainter(request.userProfileImageUrl),
-            contentDescription = "Profile Picture",
-            modifier = Modifier
-                .size(50.dp)
-                .clip(CircleShape)
-                .border(1.dp, Color.Gray, CircleShape)
-        )
+//        Image(
+//            painter = rememberImagePainter(request.userProfileImageUrl),
+//            contentDescription = "Profile Picture",
+//            modifier = Modifier
+//                .size(50.dp)
+//                .clip(CircleShape)
+//                .border(1.dp, Color.Gray, CircleShape)
+//        )
 
         Spacer(modifier = Modifier.width(16.dp))
 
@@ -208,7 +214,7 @@ fun FriendRequestItem(request: FriendRequest) {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.Start
         ) {
-            Text(text = request.userName, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+            Text(text = "${request.senderId}", fontWeight = FontWeight.Bold, fontSize = 18.sp)
             Text(text = timeAgo, style = MaterialTheme.typography.bodySmall, fontSize = 15.sp)
         }
 
@@ -216,10 +222,10 @@ fun FriendRequestItem(request: FriendRequest) {
 
         // Onay ve Red Butonları
         Row {
-            IconButton(onClick = { /* Red action */ }) {
+            IconButton(onClick = { viewModel.respondToFriendRequest(request.senderId, false) }) {
                 Icon(imageVector = Icons.Default.Close, contentDescription = "Reject")
             }
-            IconButton(onClick = { /* Accept action */ }) {
+            IconButton(onClick = { viewModel.respondToFriendRequest(request.senderId, true) }) {
                 Icon(imageVector = Icons.Default.Check, contentDescription = "Accept")
             }
         }
@@ -234,7 +240,7 @@ fun FriendRequestsScreen() {
         friendRequests.value = fetchFriendRequestsFromBackend()
     }
 
-    RequestContent(friendRequests = friendRequests.value)
+//    RequestContent(friendRequests = friendRequests.value)
 }
 
 suspend fun fetchFriendRequestsFromBackend(): List<FriendRequest> {

@@ -367,7 +367,11 @@ fun BottomBarScreen(mainNavController:NavController,modifier: Modifier=Modifier,
                         modifier = Modifier
                             .padding(top = 30.dp)
                             .clip(shape = CircleShape)
-                            .clickable { navController.navigate("notifications") }
+                            .clickable {
+                                navController.navigate("notifications")
+                                viewModel.getReceivedFriendRequests()
+
+                            }
                             .size(56.dp)
                             .background(Color.White)
                         ,
@@ -536,7 +540,7 @@ fun BottomBarScreen(mainNavController:NavController,modifier: Modifier=Modifier,
                 color = PrimaryColor
             ) {
                 NavHost(navController = navController, startDestination = "Home") {
-                    composable("Home") { HomePageScreen() }
+                    composable("Home") { HomePageScreen(viewModel = viewModel) }
                     composable("profile") { ProfileScreen(navController,viewModel=viewModel) }
                     composable("search") { SearchScreen(navController) }
                     composable("myBooks") { MyBooksPage(navController, viewModel = viewModel) }
@@ -552,7 +556,7 @@ fun BottomBarScreen(mainNavController:NavController,modifier: Modifier=Modifier,
                     }
                     composable("challenge") { Challenge(navController,viewModel=viewModel) }
                     composable("medals") { MedalsPage(navController) }
-                    composable("notifications"){ NotificationsScreen(navController) }
+                    composable("notifications"){ NotificationsScreen(navController,viewModel=viewModel) }
                     composable(
                         route = "books/{isbn}/{title}/{author}/{cover}/{description}/" +
                                 "{rating}/{pages}/{category}/{language}/{publishedDate}" +

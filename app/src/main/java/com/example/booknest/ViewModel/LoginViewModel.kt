@@ -16,9 +16,11 @@ import com.example.booknest.api.Models.FriendRequest
 import com.example.booknest.api.Models.FriendResponse
 import com.example.booknest.api.Models.MybooksList
 import com.example.booknest.api.Models.Notification
+import com.example.booknest.api.Models.NotificationResponse
 import com.example.booknest.api.Models.OtherProfile
 import com.example.booknest.api.Models.PostBook
 import com.example.booknest.api.Models.PostBookProgress
+import com.example.booknest.api.Models.ReceivedRequest
 import com.example.booknest.api.Models.Review
 import com.example.booknest.api.Models.Shelf
 import com.example.booknest.api.ProfileBody
@@ -56,6 +58,11 @@ class LoginViewModel : ViewModel() {
     private val _usersResponse = mutableStateOf<List<ProfileBody>?>(null)
     val usersResponse: State<List<ProfileBody>?> = _usersResponse
 
+    private val _notifications = mutableStateOf<List<NotificationResponse>?>(null)
+    val notifications: State<List<NotificationResponse>?> = _notifications
+
+
+
     private val _deleteAccountResponse = mutableStateOf<String?>(null)
     val deleteAccountResponse: State<String?> = _deleteAccountResponse
 
@@ -68,8 +75,9 @@ class LoginViewModel : ViewModel() {
     private val _friendRequestsSent = mutableStateOf<List<FriendRequest>>(emptyList())
     val friendRequestsSent: State<List<FriendRequest>> = _friendRequestsSent
 
-    private val _friendRequestsReceived = mutableStateOf<List<FriendRequest>>(emptyList())
-    val friendRequestsReceived: State<List<FriendRequest>> = _friendRequestsReceived
+
+    private val _friendRequestsReceived = mutableStateOf<List<ReceivedRequest>>(emptyList())
+    val friendRequestsReceived: State<List<ReceivedRequest>> = _friendRequestsReceived
 
     private val _friends = mutableStateOf<List<Friend>>(emptyList())
     val friends: State<List<Friend>> = _friends
@@ -783,6 +791,40 @@ class LoginViewModel : ViewModel() {
         }
     }
 
+    fun getNotification() {
+        val token = _accessToken.value
+        if (token != null) {
+            _isLoading.value = true
+            viewModelScope.launch(Dispatchers.IO) {
+                try {
+
+                    val response = api.getNotifications("Bearer $token")
+                    Log.d("response home", "$response")
+                    withContext(Dispatchers.Main) {
+                        if (response.isSuccessful) {
+                            Log.d("basasrili response", "$response")
+                            _notifications.value = response.body()?.body
+                        } else {
+                            _errorMessage.value = "Failed to fetch review: ${response.message()}"
+                        }
+                    }
+                } catch (e: Exception) {
+                    withContext(Dispatchers.Main) {
+                        _errorMessage.value = "An error occurred: ${e.message}"
+                    }
+                } finally {
+                    _isLoading.value = false
+                }
+            }
+        } else {
+            _errorMessage.value = "Access token is null. Please login again."
+        }
+    }
+
+
+
+
+
     // Send Friend Request
     fun sendFriendRequest(friendId: Int) {
         val token = _accessToken.value
@@ -818,10 +860,13 @@ class LoginViewModel : ViewModel() {
             _isLoading.value = true
             viewModelScope.launch(Dispatchers.IO) {
                 try {
+
                     val responseBody = FriendResponse(senderId, response)
                     val apiResponse = api.respondToFriendRequest("Bearer $token", responseBody)
+                    Log.d("fonksiyon iletim basarili","${apiResponse}")
                     withContext(Dispatchers.Main) {
                         if (apiResponse.isSuccessful) {
+                            Log.d("buton basarili","${apiResponse}")
                             _friends.value = _friends.value + (apiResponse.body()?.body ?: return@withContext)
                         } else {
                             _errorMessage.value = "Failed to respond to friend request: ${apiResponse.message()}"
@@ -879,6 +924,7 @@ class LoginViewModel : ViewModel() {
                     withContext(Dispatchers.Main) {
                         if (response.isSuccessful) {
                             _friendRequestsReceived.value = response.body()?.body ?: emptyList()
+                            Log.d("gelen istekler", "${_friendRequestsReceived.value}")
                         } else {
                             _errorMessage.value = "Failed to fetch received requests: ${response.message()}"
                         }
@@ -1104,7 +1150,7 @@ class LoginViewModel : ViewModel() {
     }
 
     // GET: Belirli bir bildirim al
-    fun getNotification(id: Int) {
+    fun getNotificationRequests(id: Int) {
         val token = _accessToken.value
         if (token != null) {
             _isLoading.value = true

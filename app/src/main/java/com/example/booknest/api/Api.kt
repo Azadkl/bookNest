@@ -9,9 +9,11 @@ import com.example.booknest.api.Models.FriendRequest
 import com.example.booknest.api.Models.FriendResponse
 import com.example.booknest.api.Models.MybooksList
 import com.example.booknest.api.Models.Notification
+import com.example.booknest.api.Models.NotificationResponse
 import com.example.booknest.api.Models.OtherProfile
 import com.example.booknest.api.Models.PostBook
 import com.example.booknest.api.Models.PostBookProgress
+import com.example.booknest.api.Models.ReceivedRequest
 import com.example.booknest.api.Models.Review
 import com.example.booknest.api.Models.Shelf
 import retrofit2.Response
@@ -136,7 +138,13 @@ interface BookNestApi {
     @GET("api/friends/requests/received")
     suspend fun getReceivedFriendRequests(
         @Header("Authorization") accessToken: String
-    ): Response<GenelResponse<List<FriendRequest>>>
+    ): Response<GenelResponse<List<ReceivedRequest>>>
+
+    @GET("api/notifications")
+    suspend fun getNotifications(
+        @Header("Authorization") accessToken: String
+    ): Response<GenelResponse<List<NotificationResponse>>>
+
 
     @DELETE("api/bookprogress/{isbn}")
     suspend fun deleteBookProgress(
@@ -188,6 +196,13 @@ interface BookNestApi {
         @Header("Authorization") accessToken: String,
         @Path("id") id: Int
     ): Response<GenelResponse<Notification>>
+
+
+
+
+
+
+
 
     @DELETE("api/notifications/{id}")
     suspend fun deleteNotification(

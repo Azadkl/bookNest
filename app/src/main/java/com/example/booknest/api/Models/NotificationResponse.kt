@@ -10,5 +10,6 @@ data class NotificationResponse(
     val type: String,
     val userAvatar: String,
     val userId: Int,
-    val userName: String
+    val userName: String,
+    val createdAt: String
 )

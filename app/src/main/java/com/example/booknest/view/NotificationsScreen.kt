@@ -49,19 +49,15 @@ import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
 import com.example.booknest.R
 import com.example.booknest.ViewModel.LoginViewModel
+import com.example.booknest.api.Models.NotificationResponse
 import com.example.booknest.api.Models.ReceivedRequest
 
 @Composable
 fun NotificationsScreen(navController: NavController,viewModel: LoginViewModel) {
     var selectedTabIndex by remember { mutableIntStateOf(0) }
     val tabTitles = listOf("NOTIFICATIONS", "REQUEST")
-    val friendRequests = remember { mutableStateOf(listOf<FriendRequest>()) }
-    //val receivedRequest= viewModel.friendRequestsReceived.value.size
 
-    // Friend requests backend'den çekiliyor (simülasyon)
-    LaunchedEffect(Unit) {
-        friendRequests.value = fetchFriendRequestsFromBackend()
-    }
+
     Column (modifier = Modifier.fillMaxSize()){
 
         Box(
@@ -109,74 +105,58 @@ fun NotificationsScreen(navController: NavController,viewModel: LoginViewModel) 
 
 
         when (selectedTabIndex) {
-            0 -> NotificationsContent()
+            0 -> viewModel.notifications.value?.let { NotificationsContent(notificationList = it) }
             1 -> RequestContent(receivedRequests = viewModel.friendRequestsReceived.value,viewModel)
         }
     }
 }
 
 @Composable
-fun NotificationsContent() {
-    // Örnek bildirim verileri
-    val notifications = remember {
-        listOf(
-            Notification("Azad", " is now your friend", System.currentTimeMillis() - 500000, R.drawable.azad),
-            Notification("Azad", " read a new book: 'Kotlin Programming'", System.currentTimeMillis() - 3600000, R.drawable.azad),
-            Notification("John", " is now your friend", System.currentTimeMillis() - 86400000, R.drawable.azad),
-            Notification("Azad", " is now your friend", System.currentTimeMillis() - 86400000, R.drawable.azad),
-            Notification("John", " read a new book: 'Advanced Kotlin'", System.currentTimeMillis() - 259200000, R.drawable.azad)
-        )
-    }
+fun NotificationsContent(notificationList: List<NotificationResponse>) {
+    val filteredNotifications = notificationList?.filter { notification ->
+        notification.type=="friends"
+    } ?: emptyList()
 
-    // Bildirimleri zaman dilimlerine göre grupla
-    val todayNotifications = notifications.filter { it.time > System.currentTimeMillis() - 86400000 }
-    val thisWeekNotifications = notifications.filter { it.time > System.currentTimeMillis() - 604800000 }
-    val thisMonthNotifications = notifications.filter { it.time > System.currentTimeMillis() - 2592000000 }
-
-    // LazyColumn ile tüm bildirimleri tek bir liste içinde grupla
     LazyColumn(modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(bottom = 90.dp)
     ) {
-        // Today Notifications
-        if (todayNotifications.isNotEmpty()) {
-            item {
-                Text(text = "Today", style = MaterialTheme.typography.headlineSmall, modifier = Modifier.padding(16.dp))
-            }
-            items(todayNotifications) { notification ->
-                NotificationItem(notification)
-            }
+items(filteredNotifications) {notification->
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        // Profil Resmi
+        Image(
+            painter = rememberImagePainter(notification.userAvatar),
+            contentDescription = "Profile Picture",
+            modifier = Modifier
+                .size(50.dp)
+                .clip(CircleShape)
+                .border(1.dp, Color.Gray, CircleShape)
+        )
+
+        Spacer(modifier = Modifier.width(16.dp))
+
+        // Kullanıcı Adı ve Zaman Bilgisi
+        Column(
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.Start
+        ) {
+            Text(text = "${notification.userName} is now your friend", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+            Text(text = "${getTimeAgo_2(notification.createdAt)}", style = MaterialTheme.typography.bodySmall, fontSize = 15.sp)
         }
 
-        // This Week Notifications
-        if (thisWeekNotifications.isNotEmpty()) {
-            item {
-                Text(text = "This Week", style = MaterialTheme.typography.headlineSmall, modifier = Modifier.padding(16.dp))
-            }
-            items(thisWeekNotifications) { notification ->
-                NotificationItem(notification)
-            }
-        }
+        Spacer(modifier = Modifier.weight(1f))
 
-        // This Month Notifications
-        if (thisMonthNotifications.isNotEmpty()) {
-            item {
-                Text(text = "This Month", style = MaterialTheme.typography.headlineSmall, modifier = Modifier.padding(16.dp))
-            }
-            items(thisMonthNotifications) { notification ->
-                NotificationItem(notification)
-            }
-        }
     }
 }
+}
 
+}
 
-
-data class FriendRequest(
-    val userId: String,
-    val userName: String,
-    val userProfileImageUrl: Int,
-    val requestTime: Long // Unix timestamp (milisaniye cinsinden)
-)
 
 @Composable
 fun RequestContent(receivedRequests: List<ReceivedRequest>,viewModel: LoginViewModel) {
@@ -197,15 +177,14 @@ fun FriendRequestItem(request: ReceivedRequest,viewModel: LoginViewModel) {
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Profil Resmi
-//        Image(
-//            painter = rememberImagePainter(request.userProfileImageUrl),
-//            contentDescription = "Profile Picture",
-//            modifier = Modifier
-//                .size(50.dp)
-//                .clip(CircleShape)
-//                .border(1.dp, Color.Gray, CircleShape)
-//        )
+        Image(
+            painter = rememberImagePainter(request.avatar),
+            contentDescription = "Profile Picture",
+            modifier = Modifier
+                .size(50.dp)
+                .clip(CircleShape)
+                .border(1.dp, Color.Gray, CircleShape)
+        )
 
         Spacer(modifier = Modifier.width(16.dp))
 
@@ -214,7 +193,7 @@ fun FriendRequestItem(request: ReceivedRequest,viewModel: LoginViewModel) {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.Start
         ) {
-            Text(text = "${request.senderId}", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+            Text(text = request.username, fontWeight = FontWeight.Bold, fontSize = 18.sp)
             Text(text = timeAgo, style = MaterialTheme.typography.bodySmall, fontSize = 15.sp)
         }
 
@@ -231,26 +210,7 @@ fun FriendRequestItem(request: ReceivedRequest,viewModel: LoginViewModel) {
         }
     }
 }
-@Composable
-fun FriendRequestsScreen() {
-    val friendRequests = remember { mutableStateOf(listOf<FriendRequest>()) }
 
-    LaunchedEffect(Unit) {
-        // Burada backend'den veri çekme işlemini yapıyoruz (örneğin Retrofit kullanabilirsiniz)
-        friendRequests.value = fetchFriendRequestsFromBackend()
-    }
-
-//    RequestContent(friendRequests = friendRequests.value)
-}
-
-suspend fun fetchFriendRequestsFromBackend(): List<FriendRequest> {
-    // Backend API çağrısı (Retrofit, Ktor vb.)
-    // Bu sadece bir örnektir, kendi backend implementasyonunuzu kullanın
-    return listOf(
-        FriendRequest("1", "John Doe",  R.drawable.azad,System.currentTimeMillis() - 3600000),
-        FriendRequest("2", "Jane Smith", R.drawable.azad, System.currentTimeMillis() - 7200000)
-    )
-}
 
 
 

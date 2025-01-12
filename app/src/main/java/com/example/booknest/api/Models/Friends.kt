@@ -16,5 +16,7 @@ data class Friend(
 data class ReceivedRequest (
     val senderId: Int,
     val receiverId: Int,
-    val createdAt: String
+    val createdAt: String,
+    val avatar : String,
+    val username: String
 )

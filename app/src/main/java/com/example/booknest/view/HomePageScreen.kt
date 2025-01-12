@@ -118,10 +118,13 @@ fun HomePageScreen(modifier: Modifier = Modifier, viewModel: LoginViewModel) {
 }
 @Composable
 fun NotificationContent(notificationList: List<NotificationResponse>, viewModel: LoginViewModel) {
+    val filteredNotifications = notificationList?.filter { notification ->
+        notification.type=="bookprogress"
+    } ?: emptyList()
     LazyColumn(modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(bottom = 90.dp)
     ) {
-        items(notificationList) { notification ->
+        items(filteredNotifications) { notification ->
             StatusCard( notification,viewModel )
         }
     }

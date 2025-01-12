@@ -147,9 +147,9 @@ fun BooksIveRead(viewModel: LoginViewModel, navController: NavController) {
                             ) {
                                 Button(
                                     onClick = {
-                                        viewModel.deleteBookProgress(isbn = secilenBook!!.isbn)
-                                        // Silme işleminden sonra state'i güncelleyerek yeniden veri çekme tetikliyoruz
-                                        refreshBooks = !refreshBooks
+                                        secilenBook?.isbn?.let { isbn ->
+                                            viewModel.deleteBookProgress(isbn)
+                                        }
                                     },
                                     modifier = Modifier.padding(top = 8.dp),
                                     colors = ButtonDefaults.buttonColors(Color(0xFF2E8B57))

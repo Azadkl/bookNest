@@ -47,10 +47,22 @@ import com.example.booknest.ViewModel.LoginViewModel
         currentUser: String,
         viewModel: LoginViewModel
     ) {
+        val otherProfileResponse = viewModel.otherResponse
         Log.d("id other","$id")
         // Arkadaşlık durumu: "None", "Pending", "Friend"
-        var friendshipStatus by remember { mutableStateOf("None") }
-        val otherProfileResponse = viewModel.otherResponse
+        val otherProfile = otherProfileResponse.value
+        val friendshipStatus by remember(otherProfile) {
+            mutableStateOf(
+                when {
+                    otherProfile?.isFriend == true -> "Friend"
+                    otherProfile?.pendingSentRequest == true -> "Pending"
+                    otherProfile?.pendingReceivedRequest == true -> "PendingReceived"
+                    else -> "None"
+                }
+            )
+        }
+
+
         var fetchOneResponse = viewModel.clickedBook
         Log.d("otherRepsone","${otherProfileResponse}")
         LaunchedEffect (Unit){
@@ -92,62 +104,57 @@ import com.example.booknest.ViewModel.LoginViewModel
                 // Friendship Button
                 Button(
                     onClick = {
-                        if(otherProfileResponse.value?.isFriend == true){
-                            viewModel.removeFriend(otherProfileResponse.value!!.id)
-                        }
-                        else if(otherProfileResponse.value?.pendingSentRequest == true){
-                            viewModel.cancelFriendRequest(otherProfileResponse.value!!.id)
-                        }
-                        else if(otherProfileResponse.value?.pendingReceivedRequest == true){
-                            viewModel.respondToFriendRequest(otherProfileResponse.value!!.id,true)
-                        }
-                        else{
-                            otherProfileResponse.value?.let { viewModel.sendFriendRequest(it.id) }
+                        when (friendshipStatus) {
+                            "Friend" -> {
+                                otherProfile?.let {
+                                    viewModel.removeFriend(it.id)
+                                    // UI'yi hemen güncelle
+                                    viewModel.updateFriendshipStatus(it.copy(isFriend = false))
+                                }
+                            }
+                            "Pending" -> {
+                                otherProfile?.let {
+                                    viewModel.cancelFriendRequest(it.id)
+                                    // UI'yi hemen güncelle
+                                    viewModel.updateFriendshipStatus(it.copy(pendingSentRequest = false))
+                                }
+                            }
+                            "PendingReceived" -> {
+                                otherProfile?.let {
+                                    viewModel.respondToFriendRequest(it.id, true)
+                                    // UI'yi hemen güncelle
+                                    viewModel.updateFriendshipStatus(it.copy(isFriend = true, pendingReceivedRequest = false))
+                                }
+                            }
+                            "None" -> {
+                                otherProfile?.let {
+                                    viewModel.sendFriendRequest(it.id)
+                                    // UI'yi hemen güncelle
+                                    viewModel.updateFriendshipStatus(it.copy(pendingSentRequest = true))
+                                }
+                            }
                         }
                     },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = when (friendshipStatus) {
-                            "None" -> Color.Blue
-                            "Pending" -> Color.Red
                             "Friend" -> Color.Green
+                            "Pending", "PendingReceived" -> Color.Red
+                            "None" -> Color.Blue
                             else -> Color.Gray
                         }
                     ),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-
-                    if(otherProfileResponse.value?.isFriend == true){
-                        Text(
-                            text ="You are friends",
-                            color = Color.White,
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                    }
-                    else if(otherProfileResponse.value?.pendingSentRequest == true){
-                        Text(
-                            text ="Cancel friend request",
-                            color = Color.White,
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                    }
-                    else if(otherProfileResponse.value?.pendingReceivedRequest == true){
-                        Text(
-                            text ="Accept request",
-                            color = Color.White,
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                    }
-                    else{
-                        Text(
-                            text ="Add friend",
-                            color = Color.White,
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                    }
-
-
-
-
+                    Text(
+                        text = when (friendshipStatus) {
+                            "Friend" -> "You are friends"
+                            "Pending" -> "Cancel friend request"
+                            "PendingReceived" -> "Accept request"
+                            "None" -> "Add friend"
+                            else -> "Unknown"
+                        },
+                        color = Color.White
+                    )
                 }
 
 

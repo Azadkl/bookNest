@@ -65,6 +65,8 @@ fun ReadingNow(viewModel: LoginViewModel, navController: NavController) {
     var selectedBook by remember { mutableStateOf<Book?>(null) }
     var readingStatuses by remember { mutableStateOf<List<Pair<BookProgress, Int>>>(emptyList()) }
     var refreshBooks by remember { mutableStateOf(false) }
+    var isLoading by remember { mutableStateOf(false) }
+
     LaunchedEffect(refreshBooks) {
         viewModel.getBookProgress()
     }
@@ -101,7 +103,6 @@ fun ReadingNow(viewModel: LoginViewModel, navController: NavController) {
                     status?.let {
                         pagesRead = it.second
                     }
-                    var isLoading by remember { mutableStateOf(false) }
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -178,10 +179,9 @@ fun ReadingNow(viewModel: LoginViewModel, navController: NavController) {
                                 ) {
                                     Button(
                                         onClick = {
-                                            refreshBooks = !refreshBooks
-                                            viewModel.deleteBookProgress(isbn = secilenBook!!.isbn)
-                                            // Silme işleminden sonra state'i güncelleyerek yeniden veri çekme tetikliyoruz
-
+                                            secilenBook?.isbn?.let { isbn ->
+                                                viewModel.deleteBookProgress(isbn)
+                                            }
                                         },
                                         modifier = Modifier.padding(top = 8.dp),
                                         colors = ButtonDefaults.buttonColors(Color(0xFF2E8B57))
@@ -249,6 +249,7 @@ fun ReadingNow(viewModel: LoginViewModel, navController: NavController) {
 
                     showBottomSheet = false
                     refreshBooks = !refreshBooks
+                    isLoading=false
                 }
             )
 

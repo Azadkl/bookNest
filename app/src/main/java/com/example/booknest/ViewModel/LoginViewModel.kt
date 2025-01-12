@@ -333,6 +333,16 @@ class LoginViewModel : ViewModel() {
                     Log.d("Selected book", "$deleteResponse")
                     withContext(Dispatchers.Main) {
                         if (deleteResponse.isSuccessful) {
+                            // Silinen kitabı `read` ve `wantToRead` listelerinden çıkar
+                            val updatedReadBooks = _myBooks.value?.read?.filterNot { it.bookId == isbn }
+                            val updatedWantToReadBooks = _myBooks.value?.wantToRead?.filterNot { it.bookId == isbn }
+                            val updatedReading=_myBooks.value?.reading?.filterNot { it.bookId==isbn }
+                            _myBooks.value = _myBooks.value?.copy(
+                                read = updatedReadBooks ?: emptyList(),
+                                wantToRead = updatedWantToReadBooks ?: emptyList(),
+                                reading = updatedReading ?: emptyList()
+                            )
+
                             _deleteAccountResponse.value = "Book deleted successfully"
                             _errorMessage.value = "Book deletion successful"
                         } else {
@@ -348,6 +358,7 @@ class LoginViewModel : ViewModel() {
             }
         }
     }
+
 
 
     fun deleteAccount(
@@ -522,7 +533,9 @@ class LoginViewModel : ViewModel() {
             _errorMessage.value = "Access token is null. Please login again."
         }
     }
-
+    fun updateFriendshipStatus(updatedProfile: OtherProfile) {
+        _otherResponse.value = updatedProfile
+    }
     fun getOtherProfile( id: Int)  {
         val token = _accessToken.value
         Log.d("diger kullanici profili","$token")
@@ -995,8 +1008,21 @@ class LoginViewModel : ViewModel() {
                     Log.d("giris fonksiyon postbook","$response")
                     withContext(Dispatchers.Main) {
                         if (response.isSuccessful) {
-                            var status = response.body()?.status
-                            Log.d("basarili response successful","$response")
+                            val updatedStatus = response.body()?.status
+                            Log.d("basarili response successful", "$response")
+
+                            // Güncellenen kitabı listeye ekleyelim
+                            val updatedBooks = _myBooks.value?.reading?.map {
+                                if (it.bookId == bookId) {
+                                    it.copy(progress = progress, status = status) // Kitabın durumunu güncelle
+                                } else {
+                                    it
+                                }
+                            }
+
+                            // Güncellenmiş listeyi viewModel'e aktaralım
+                            _myBooks.value = _myBooks.value?.copy(reading = updatedBooks ?: emptyList())
+
                         } else {
                             Log.d("donen response body'si", "${response.body()}")
                             _errorMessage.value = "Failed to create review: ${response.message()}"

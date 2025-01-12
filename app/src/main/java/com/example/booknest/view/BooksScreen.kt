@@ -90,6 +90,7 @@ import com.example.booknest.ViewModel.LoginViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.net.URL
+import java.text.SimpleDateFormat
 import java.time.Duration
 import java.time.Instant
 import java.time.LocalDateTime
@@ -579,32 +580,6 @@ fun ReviewContent(reviews:List<com.example.booknest.api.Models.Review>) {
 
 @Composable
 fun ReviewCard(review: com.example.booknest.api.Models.Review) {
-    val dateTimeFormatter = DateTimeFormatterBuilder()
-        .appendPattern("yyyy-MM-dd'T'HH:mm:ss")
-        .optionalStart()
-        .appendFraction(ChronoField.NANO_OF_SECOND, 0, 9, true)
-        .optionalEnd()
-        .toFormatter()
-    val createdAtInstant = LocalDateTime.parse(review.createdAt, dateTimeFormatter)
-        .atZone(ZoneId.systemDefault())
-        .toInstant()
-    val nowInstant = Instant.now()
-
-// Calculate the difference
-    val duration = Duration.between(createdAtInstant, nowInstant)
-
-// Option 1: Get the difference in days, hours, minutes
-    val days = duration.toDays()
-    val hours = duration.toHours() % 24
-    val minutes = duration.toMinutes() % 60
-
-// Option 2: Get human-readable output
-    val timeDifferenceText = when {
-        days > 0 -> "$days days ago"
-        hours > 0 -> "$hours hours ago"
-        minutes > 0 -> "$minutes minutes ago"
-        else -> "just now"
-    }
 
    Log.d("review.date","$review")// Tarih formatını uygun şekilde belirleyin
 
@@ -658,7 +633,7 @@ fun ReviewCard(review: com.example.booknest.api.Models.Review) {
                 Spacer(modifier = Modifier.height(4.dp))
 
                 Text(
-                    text = "${timeDifferenceText}",  // Formatted review date
+                    text = "${getTimeAgo_2(review.createdAt)}",  // Formatted review date
                     style = TextStyle(fontSize = 12.sp, color = Color.Gray)
                 )
             }
@@ -719,4 +694,29 @@ fun RatingStars(rating: Float) {
         }
     }
 }
+fun getTimeAgo_2(time: String): String {
+    // Tarihi uygun bir formata dönüştür
+    val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")
+    val reviewDate = dateFormat.parse(time) ?: return "Invalid time"
+    val reviewTime = reviewDate.time  // Milisaniye cinsinden
+    val currentTime = System.currentTimeMillis()
+    val duration = currentTime - reviewTime
 
+    val seconds = duration / 1000
+    val minutes = duration / (60 * 1000)
+    val hours = duration / (60 * 60 * 1000)
+    val days = duration / (24 * 60 * 60 * 1000)
+    val weeks = days / 7
+    val months = days / 30
+    val years = days / 365
+
+    return when {
+        seconds < 60 -> "$seconds s ago"
+        minutes < 60 -> "$minutes m ago"
+        hours < 24 -> "$hours h ago"
+        days < 7 -> "$days d ago"
+        weeks < 4 -> "$weeks w ago"
+        months < 12 -> "$months mo ago"
+        else -> "$years y ago"
+    }
+}

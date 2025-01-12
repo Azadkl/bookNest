@@ -67,203 +67,203 @@ fun SearchScreen (navController: NavController,modifier: Modifier=Modifier){
         .fillMaxSize()
         .padding(top = 120.dp),
         horizontalAlignment = Alignment.Start,){
-       item {
-           Column {
-               Row (modifier=Modifier.fillMaxWidth()
-                   .padding(start = 10.dp, end = 10.dp),
-                   verticalAlignment = Alignment.CenterVertically,
-                   horizontalArrangement = Arrangement.SpaceBetween){
-
-                   Text(text = "MOST READ THIS WEEK", style = TextStyle(
-                       fontSize = 15.sp,
-                       fontWeight = FontWeight.Medium,
-                       color = Color.DarkGray
-                   )
-                   )
-                   Text(modifier = Modifier.clickable {
-                       val books = DummyData().dummyData.filterIsInstance<SearchResult.Book>()
-                       navController.navigate("book_list_screen/Most Read This Week") {
-                       }
-                   },
-                       text = "SEE ALL", style = TextStyle(
-                           fontSize = 15.sp,
-                           fontWeight = FontWeight.Medium,
-                           color = Color.DarkGray
-                       )
-                   )
-               }
-               LazyRow (modifier=Modifier.fillMaxWidth()
-                   .padding(top = 15.dp, bottom = 15.dp)){
-                    item {
-                        Image(
-                            painter = painterResource(id = R.drawable.houseoflame),
-                            contentDescription = "Book Cover",
-                            modifier = Modifier
-                                .size(140.dp)
-                        )
-                    }
-
-                   item {
-                       Image(
-                           painter = painterResource(id = R.drawable.images),
-                           contentDescription = "Book Cover",
-                           modifier = Modifier
-                               .size(140.dp)
-                       )
-                   }
-
-                   item {
-                       Image(
-                           painter = painterResource(id = R.drawable.farelerveinsanlar),
-                           contentDescription = "Book Cover",
-                           modifier = Modifier
-                               .size(140.dp)
-                       )
-                   }
-
-                   item {
-                       Image(
-                           painter = painterResource(id = R.drawable.images),
-                           contentDescription = "Book Cover",
-                           modifier = Modifier
-                               .size(140.dp)
-                       )
-                   }
-               }
-           }
-
-
-       }
-        item {
-            Column {
-                Row (modifier=Modifier.fillMaxWidth()
-                    .padding(start = 10.dp, end = 10.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween){
-
-                    Text(text = "NEW RELEASES THIS MONTH", style = TextStyle(
-                        fontSize = 15.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = Color.DarkGray
-                    )
-                    )
-                    Text(modifier = Modifier.clickable { val books = DummyData().dummyData.filterIsInstance<SearchResult.Book>()
-                            navController.navigate("book_list_screen/New Releases This Month") {
-                            }
-                    },
-                        text = "SEE ALL", style = TextStyle(
-                            fontSize = 15.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = Color.DarkGray
-                        )
-                    )
-                }
-                LazyRow(modifier=Modifier.fillMaxWidth()
-                    .padding(top = 15.dp, bottom = 15.dp)) {
-                    item {
-                        Image(
-                            painter = painterResource(id = R.drawable.images),
-                            contentDescription = "Book Cover",
-                            modifier = Modifier
-                                .size(140.dp)
-                        )
-                    }
-
-                    item {
-                        Image(
-                            painter = painterResource(id = R.drawable.farelerveinsanlar),
-                            contentDescription = "Book Cover",
-                            modifier = Modifier
-                                .size(140.dp)
-                        )
-                    }
-
-                    item {
-                        Image(
-                            painter = painterResource(id = R.drawable.images),
-                            contentDescription = "Book Cover",
-                            modifier = Modifier
-                                .size(140.dp)
-                        )
-                    }
-
-                    item {
-                        Image(
-                            painter = painterResource(id = R.drawable.houseoflame),
-                            contentDescription = "Book Cover",
-                            modifier = Modifier
-                                .size(140.dp)
-                        )
-                    }
-                }
-            }
-
-
-        }
-        item {
-            Column {
-                Row (modifier=Modifier.fillMaxWidth()
-                    .padding(start = 10.dp, end = 10.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween){
-
-                    Text(text = "NEW RELEASES THIS YEAR", style = TextStyle(
-                        fontSize = 15.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = Color.DarkGray
-                    )
-                    )
-                    Text(modifier = Modifier.clickable { val books = DummyData().dummyData.filterIsInstance<SearchResult.Book>()
-                        navController.navigate("book_list_screen/New Releases This Year") {
-                        } },
-                        text = "SEE ALL", style = TextStyle(
-                            fontSize = 15.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = Color.DarkGray
-                        )
-                    )
-                }
-                LazyRow(modifier=Modifier.fillMaxWidth()
-                    .padding(top = 15.dp, bottom = 15.dp)) {
-                    item {
-                        Image(
-                            painter = painterResource(id = R.drawable.farelerveinsanlar),
-                            contentDescription = "Book Cover",
-                            modifier = Modifier
-                                .size(140.dp)
-                        )
-                    }
-
-                    item {
-                        Image(
-                            painter = painterResource(id = R.drawable.houseoflame),
-                            contentDescription = "Book Cover",
-                            modifier = Modifier
-                                .size(140.dp)
-                        )
-                    }
-
-                    item {
-                        Image(
-                            painter = painterResource(id = R.drawable.farelerveinsanlar),
-                            contentDescription = "Book Cover",
-                            modifier = Modifier
-                                .size(140.dp)
-                        )
-                    }
-
-                    item {
-                        Image(
-                            painter = painterResource(id = R.drawable.images),
-                            contentDescription = "Book Cover",
-                            modifier = Modifier
-                                .size(140.dp)
-                        )
-                    }
-                }
-            }
-
-
-        }
+//       item {
+//           Column {
+//               Row (modifier=Modifier.fillMaxWidth()
+//                   .padding(start = 10.dp, end = 10.dp),
+//                   verticalAlignment = Alignment.CenterVertically,
+//                   horizontalArrangement = Arrangement.SpaceBetween){
+//
+//                   Text(text = "MOST READ THIS WEEK", style = TextStyle(
+//                       fontSize = 15.sp,
+//                       fontWeight = FontWeight.Medium,
+//                       color = Color.DarkGray
+//                   )
+//                   )
+//                   Text(modifier = Modifier.clickable {
+//                       val books = DummyData().dummyData.filterIsInstance<SearchResult.Book>()
+//                       navController.navigate("book_list_screen/Most Read This Week") {
+//                       }
+//                   },
+//                       text = "SEE ALL", style = TextStyle(
+//                           fontSize = 15.sp,
+//                           fontWeight = FontWeight.Medium,
+//                           color = Color.DarkGray
+//                       )
+//                   )
+//               }
+//               LazyRow (modifier=Modifier.fillMaxWidth()
+//                   .padding(top = 15.dp, bottom = 15.dp)){
+//                    item {
+//                        Image(
+//                            painter = painterResource(id = R.drawable.houseoflame),
+//                            contentDescription = "Book Cover",
+//                            modifier = Modifier
+//                                .size(140.dp)
+//                        )
+//                    }
+//
+//                   item {
+//                       Image(
+//                           painter = painterResource(id = R.drawable.images),
+//                           contentDescription = "Book Cover",
+//                           modifier = Modifier
+//                               .size(140.dp)
+//                       )
+//                   }
+//
+//                   item {
+//                       Image(
+//                           painter = painterResource(id = R.drawable.farelerveinsanlar),
+//                           contentDescription = "Book Cover",
+//                           modifier = Modifier
+//                               .size(140.dp)
+//                       )
+//                   }
+//
+//                   item {
+//                       Image(
+//                           painter = painterResource(id = R.drawable.images),
+//                           contentDescription = "Book Cover",
+//                           modifier = Modifier
+//                               .size(140.dp)
+//                       )
+//                   }
+//               }
+//           }
+//
+//
+//       }
+//        item {
+//            Column {
+//                Row (modifier=Modifier.fillMaxWidth()
+//                    .padding(start = 10.dp, end = 10.dp),
+//                    verticalAlignment = Alignment.CenterVertically,
+//                    horizontalArrangement = Arrangement.SpaceBetween){
+//
+//                    Text(text = "NEW RELEASES THIS MONTH", style = TextStyle(
+//                        fontSize = 15.sp,
+//                        fontWeight = FontWeight.Medium,
+//                        color = Color.DarkGray
+//                    )
+//                    )
+//                    Text(modifier = Modifier.clickable { val books = DummyData().dummyData.filterIsInstance<SearchResult.Book>()
+//                            navController.navigate("book_list_screen/New Releases This Month") {
+//                            }
+//                    },
+//                        text = "SEE ALL", style = TextStyle(
+//                            fontSize = 15.sp,
+//                            fontWeight = FontWeight.Medium,
+//                            color = Color.DarkGray
+//                        )
+//                    )
+//                }
+//                LazyRow(modifier=Modifier.fillMaxWidth()
+//                    .padding(top = 15.dp, bottom = 15.dp)) {
+//                    item {
+//                        Image(
+//                            painter = painterResource(id = R.drawable.images),
+//                            contentDescription = "Book Cover",
+//                            modifier = Modifier
+//                                .size(140.dp)
+//                        )
+//                    }
+//
+//                    item {
+//                        Image(
+//                            painter = painterResource(id = R.drawable.farelerveinsanlar),
+//                            contentDescription = "Book Cover",
+//                            modifier = Modifier
+//                                .size(140.dp)
+//                        )
+//                    }
+//
+//                    item {
+//                        Image(
+//                            painter = painterResource(id = R.drawable.images),
+//                            contentDescription = "Book Cover",
+//                            modifier = Modifier
+//                                .size(140.dp)
+//                        )
+//                    }
+//
+//                    item {
+//                        Image(
+//                            painter = painterResource(id = R.drawable.houseoflame),
+//                            contentDescription = "Book Cover",
+//                            modifier = Modifier
+//                                .size(140.dp)
+//                        )
+//                    }
+//                }
+//            }
+//
+//
+//        }
+//        item {
+//            Column {
+//                Row (modifier=Modifier.fillMaxWidth()
+//                    .padding(start = 10.dp, end = 10.dp),
+//                    verticalAlignment = Alignment.CenterVertically,
+//                    horizontalArrangement = Arrangement.SpaceBetween){
+//
+//                    Text(text = "NEW RELEASES THIS YEAR", style = TextStyle(
+//                        fontSize = 15.sp,
+//                        fontWeight = FontWeight.Medium,
+//                        color = Color.DarkGray
+//                    )
+//                    )
+//                    Text(modifier = Modifier.clickable { val books = DummyData().dummyData.filterIsInstance<SearchResult.Book>()
+//                        navController.navigate("book_list_screen/New Releases This Year") {
+//                        } },
+//                        text = "SEE ALL", style = TextStyle(
+//                            fontSize = 15.sp,
+//                            fontWeight = FontWeight.Medium,
+//                            color = Color.DarkGray
+//                        )
+//                    )
+//                }
+//                LazyRow(modifier=Modifier.fillMaxWidth()
+//                    .padding(top = 15.dp, bottom = 15.dp)) {
+//                    item {
+//                        Image(
+//                            painter = painterResource(id = R.drawable.farelerveinsanlar),
+//                            contentDescription = "Book Cover",
+//                            modifier = Modifier
+//                                .size(140.dp)
+//                        )
+//                    }
+//
+//                    item {
+//                        Image(
+//                            painter = painterResource(id = R.drawable.houseoflame),
+//                            contentDescription = "Book Cover",
+//                            modifier = Modifier
+//                                .size(140.dp)
+//                        )
+//                    }
+//
+//                    item {
+//                        Image(
+//                            painter = painterResource(id = R.drawable.farelerveinsanlar),
+//                            contentDescription = "Book Cover",
+//                            modifier = Modifier
+//                                .size(140.dp)
+//                        )
+//                    }
+//
+//                    item {
+//                        Image(
+//                            painter = painterResource(id = R.drawable.images),
+//                            contentDescription = "Book Cover",
+//                            modifier = Modifier
+//                                .size(140.dp)
+//                        )
+//                    }
+//                }
+//            }
+//
+//
+//        }
     }
 }

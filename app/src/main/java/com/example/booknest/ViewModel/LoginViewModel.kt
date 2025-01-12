@@ -736,6 +736,7 @@ class LoginViewModel : ViewModel() {
                     val response = api.getReviewsByBook("Bearer $token", bookId)
                     withContext(Dispatchers.Main) {
                         if (response.isSuccessful) {
+                            Log.d("reviet get","${response.body()?.body}")
                             _reviews.value = response.body()?.body ?: emptyList()
                         } else {
                             _errorMessage.value = "Failed to fetch reviews for book: ${response.message()}"

@@ -90,10 +90,13 @@ import com.example.booknest.ViewModel.LoginViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.net.URL
+import java.time.Duration
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeFormatterBuilder
+import java.time.temporal.ChronoField
 
 @Composable
 fun BooksScreen(navController: NavController,viewModel: LoginViewModel,
@@ -117,6 +120,7 @@ fun BooksScreen(navController: NavController,viewModel: LoginViewModel,
     LaunchedEffect(Unit) {
 
         viewModel.getReviewsByBook(bookId = isbn)
+        Log.d("get islemi","${viewModel.reviews}")
         viewModel.fetchBook()
     }
 
@@ -154,6 +158,9 @@ fun BooksScreen(navController: NavController,viewModel: LoginViewModel,
         targetValue = vibrantColor,
         animationSpec = tween(durationMillis = 1000)
     )
+
+
+
 
 
     var userRating by remember { mutableFloatStateOf(0f) }
@@ -401,7 +408,7 @@ fun BooksScreen(navController: NavController,viewModel: LoginViewModel,
                 ),
                 maxLines = 3,
             )
-            val dateTimeFormatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME
+            val dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")
             val currentTime = System.currentTimeMillis()
             val formattedDate = Instant.ofEpochMilli(currentTime)
                 .atZone(ZoneId.systemDefault())
@@ -412,7 +419,7 @@ fun BooksScreen(navController: NavController,viewModel: LoginViewModel,
                             bookId = isbn,  // Buraya mevcut kullanıcı adı eklenebilir
                             rating = userRating,
                             text = userComment,
-                            date = formattedDate,
+                            createdAt = formattedDate,
                             avatar = cover,
                             username = author
                         )
@@ -572,14 +579,35 @@ fun ReviewContent(reviews:List<com.example.booknest.api.Models.Review>) {
 
 @Composable
 fun ReviewCard(review: com.example.booknest.api.Models.Review) {
-    val dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss") // Tarih formatını uygun şekilde belirleyin
-    val reviewDate = try {
-        // Eğer review.date ISO 8601 formatında bir string ise, bunu bir Instant'a çevirin
-        Instant.parse(review.date).atZone(ZoneId.systemDefault()).format(dateTimeFormatter)
-    } catch (e: Exception) {
-        // Eğer tarih yanlış formatta ise varsayılan bir değer kullanabilirsiniz
-        "Unknown date"
+    val dateTimeFormatter = DateTimeFormatterBuilder()
+        .appendPattern("yyyy-MM-dd'T'HH:mm:ss")
+        .optionalStart()
+        .appendFraction(ChronoField.NANO_OF_SECOND, 0, 9, true)
+        .optionalEnd()
+        .toFormatter()
+    val createdAtInstant = LocalDateTime.parse(review.createdAt, dateTimeFormatter)
+        .atZone(ZoneId.systemDefault())
+        .toInstant()
+    val nowInstant = Instant.now()
+
+// Calculate the difference
+    val duration = Duration.between(createdAtInstant, nowInstant)
+
+// Option 1: Get the difference in days, hours, minutes
+    val days = duration.toDays()
+    val hours = duration.toHours() % 24
+    val minutes = duration.toMinutes() % 60
+
+// Option 2: Get human-readable output
+    val timeDifferenceText = when {
+        days > 0 -> "$days days ago"
+        hours > 0 -> "$hours hours ago"
+        minutes > 0 -> "$minutes minutes ago"
+        else -> "just now"
     }
+
+   Log.d("review.date","$review")// Tarih formatını uygun şekilde belirleyin
+
 
     Card(
         modifier = Modifier
@@ -630,7 +658,7 @@ fun ReviewCard(review: com.example.booknest.api.Models.Review) {
                 Spacer(modifier = Modifier.height(4.dp))
 
                 Text(
-                    text = reviewDate,  // Formatted review date
+                    text = "${timeDifferenceText}",  // Formatted review date
                     style = TextStyle(fontSize = 12.sp, color = Color.Gray)
                 )
             }
